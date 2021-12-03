@@ -1,0 +1,21 @@
+export interface Notification {
+  account: string,
+  blockNumber: number,
+  eventIndex: 2,
+  event: string,
+  followingId: null,
+  spaceId: null,
+  postId: number,
+  commentId: number,
+  parentCommentId: null,
+  date: Date,
+  aggregated: boolean,
+  aggCount: number,
+  avatarSrc: string,
+  userName: string,
+  imageUrl: string,
+  isOwnerPost: boolean,
+  isOwnerSpace: boolean,
+  postName: string,
+  spaceName: string
+}

@@ -1,0 +1,39 @@
+body {
+  font-family: Roboto, sans-serif
+}
+
+.theme--light.v-btn:focus::before {
+  opacity: 0 !important;
+}
+
+theme--light.v-btn:hover::before {
+  opacity: 0 !important;
+}
+
+.v-btn:before {
+  display: none !important;
+}
+
+.action-panel-wp {
+  button.v-btn.v-btn--has-bg {
+    background-color: transparent;
+    box-shadow: none;
+
+  }
+}
+
+.v-text-field--outlined fieldset {
+  padding-left: 19px;
+}
+
+.v-text-field--outlined .v-label.v-label--active {
+  top: 15px !important;
+}
+
+.v-select.v-select--chips:not(.v-text-field--single-line).v-text-field--enclosed .v-select__selections {
+  min-height: 55px !important;
+}
+
+.v-select--chips.v-text-field--outlined .v-label.v-label--active {
+  padding-left: 7px;
+}
