@@ -20,8 +20,16 @@ const CLEAR_SELECTED_SPACE_POSTS = 'CLEAR_SELECTED_SPACE_POSTS'
 const SET_ACCOUNT_POSTS_IDS = 'SET_ACCOUNT_POSTS_IDS'
 const SET_POSTS_COMMENT = 'SET_POSTS_COMMENT'
 const NEW_POSTS_ABSENT = 'NEW_POSTS_ABSENT'
+const UPDATE_POST_REACTION_COUNT = 'UPDATE_POST_REACTION_COUNT'
 const postService = new PostService()
 const subsocialApiService = new SubsocialApiService()
+
+export interface UpdateReactionModel {
+  type: string,
+  isActive: boolean,
+  postId: string,
+  isNew: boolean
+}
 
 export interface PostModel {
   list: SharedPostStruct[],
@@ -29,9 +37,9 @@ export interface PostModel {
   isLoadingPosts: boolean,
   isLoadingPostsIds: boolean,
   selectedPost: [],
-  spacePostsIds: [],
+  spacePostsIds: string[],
   postComments: [],
-  accountPostsIds: [],
+  accountPostsIds: string[],
   newPostsAbsent: boolean
 }
 
@@ -48,36 +56,58 @@ export const state = (): PostModel => ({
 })
 
 export const mutations = {
-  [UPDATE_POSTS] (state: any, posts: []) {
-    state.list = [...new Map(state.list.concat(posts).map((item: PostStruct) =>
+  [UPDATE_POSTS] (state: PostModel, posts: []) {
+    state.list = [...new Map(state.list.concat(posts).map((item: SharedPostStruct) =>
       [item.id, item])).values()]
   },
-  [SET_LOADING_POST_IDS] (state: any, loading: boolean) {
+  [SET_LOADING_POST_IDS] (state: PostModel, loading: boolean) {
     state.isLoadingPostsIds = loading
   },
-  [SET_LOADING_POSTS] (state: any, loading: boolean) {
+  [SET_LOADING_POSTS] (state: PostModel, loading: boolean) {
     state.isLoadingPosts = loading
   },
-  [SET_SUGGESTED_POST_IDS] (state: any, ids: string[]) {
+  [SET_SUGGESTED_POST_IDS] (state: PostModel, ids: string[]) {
     state.postsIds = ids
   },
-  [SET_SELECTED_SPACE_POSTS] (state: any, ids: string[]) {
+  [SET_SELECTED_SPACE_POSTS] (state: PostModel, ids: string[]) {
     state.spacePostsIds = ids
   },
-  [SET_SELECTED_POSTS] (state: any, posts: {}) {
+  [SET_SELECTED_POSTS] (state: PostModel, posts: {}) {
     state.selectedPost = { ...state.selectedPost, ...posts }
   },
-  [SET_POSTS_COMMENT] (state: any, posts: []) {
+  [SET_POSTS_COMMENT] (state: PostModel, posts: []) {
     state.postComments = { ...state.postComments, ...posts }
   },
-  [CLEAR_SELECTED_POSTS] (state: any) {
+  [CLEAR_SELECTED_POSTS] (state: PostModel) {
     state.selectedPost = []
   },
-  [SET_ACCOUNT_POSTS_IDS] (state: any, ids: string[]) {
+  [SET_ACCOUNT_POSTS_IDS] (state: PostModel, ids: string[]) {
     state.accountPostsIds = ids
   },
-  [NEW_POSTS_ABSENT] (state: any, payload: boolean) {
+  [NEW_POSTS_ABSENT] (state: PostModel, payload: boolean) {
     state.newPostsAbsent = payload
+  },
+  [UPDATE_POST_REACTION_COUNT] (state: PostModel, payload: UpdateReactionModel) {
+    state.list.map((i) => {
+      if (i.id === payload.postId) {
+        if (payload.isNew) {
+          i.downvotesCount = payload.type === 'downvote' ? ++i.downvotesCount : i.downvotesCount
+          i.upvotesCount = payload.type === 'upvote' ? ++i.upvotesCount : i.upvotesCount
+        } else {
+          i.downvotesCount = payload.type === 'downvote' && payload.isActive
+            ? ++i.downvotesCount
+            : payload.type === 'downvote' && !payload.isActive
+              ? --i.downvotesCount
+              : i.downvotesCount
+          i.upvotesCount = payload.type === 'upvote' && payload.isActive
+            ? ++i.upvotesCount
+            : payload.type === 'upvote' && !payload.isActive
+              ? --i.upvotesCount
+              : i.upvotesCount
+        }
+        return i
+      }
+    })
   }
 }
 
@@ -85,7 +115,6 @@ export const actions = {
   async getSuggestedPostIds ({ dispatch, commit }: {dispatch: Dispatch, commit: Commit}) {
     commit(SET_LOADING_POST_IDS, true)
     await subsocialApiService.initSubsocialApi().then(() => {
-      console.log('api init')
       postService.getSuggestedPostsIds().then((ids: string[]) => {
         commit(SET_SUGGESTED_POST_IDS, ids)
         commit(SET_LOADING_POST_IDS, false)
@@ -95,7 +124,7 @@ export const actions = {
   },
 
   async getPostsByIds ({ commit }: {commit: Commit}, payload: { ids: string[], type: string }) {
-    await new Promise((resolve, reject) => {
+    await new Promise((resolve) => {
       if (payload.type === 'public') {
         resolve(postService.getPosts(payload.ids))
       } else {
@@ -151,6 +180,10 @@ export const actions = {
       dispatch('getPostsByIds', { ids: ids.slice(0, 20), type: 'public' })
       commit(SET_LOADING_POST_IDS, false)
     })
+  },
+
+  updatePostReaction ({ commit }: {commit: Commit}, payload: {type: string, isActive: boolean, postId: string, isNew: boolean}) {
+    commit(UPDATE_POST_REACTION_COUNT, payload)
   }
 }
 
@@ -210,7 +243,7 @@ export const getters = {
     })
     return postListItemDataArray
   },
-  getPostInfo: (state: PostModel, getters: any, rootState: any) => (id: string) => {
+  getPostInfo: (state: PostModel, getters: any) => (id: string) => {
     const postData = getters.selectPostsWithAllDetailsByIds([id])
     return postData[id]
   },

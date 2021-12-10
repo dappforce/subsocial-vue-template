@@ -7,10 +7,10 @@
 <style lang="scss">
 .see-more-button {
   font-weight: 500;
-  font-size: $font-size-normal;
-  line-height: 24px;
+  font-size: $font_normal;
+  line-height: $main_line_height;
   letter-spacing: 0.25px;
-  color: #EB2F96;
+  color: $color_primary;
   text-transform: capitalize;
   text-decoration: none;
   cursor: pointer;
@@ -18,14 +18,13 @@
 }
 </style>
 
-<script>
-export default {
-  name: 'SeeMore',
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
-  props: {
-    link: {
-      type: String
-    }
-  }
+@Component
+export default class SeeMore extends Vue {
+  @Prop({
+    type: String
+  }) link!: string
 }
 </script>

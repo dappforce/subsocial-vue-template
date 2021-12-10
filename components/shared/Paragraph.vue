@@ -26,67 +26,66 @@
 
 <style lang="scss">
   p {
-    line-height: 24px;
-    color: rgba(0, 0, 0, 0.87);
+    line-height: $main_line_height;
+    color: $color_font_normal;
     text-align: left;
-    font-size: $font-size-normal;
+    font-size: $font_normal;
   }
 </style>
 
-<script>
-export default {
-  name: 'Paragraph',
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
-  props: {
-    text: {
-      type: String,
-      default: ''
-    },
-    isShowMore: {
-      type: Boolean,
-      default: false
-    },
-    link: {
-      type: String,
-      default: '/'
-    },
-    marginTop: {
-      type: String,
-      default: '0'
-    },
-    marginBottom: {
-      type: String,
-      default: '0'
-    },
-    redirect: {
-      type: Boolean,
-      default: true
-    },
-    longText: {
-      type: String
-    }
-  },
+@Component
+export default class FollowButton extends Vue {
+  @Prop({
+    type: String,
+    default: ''
+  }) text!: string
 
-  data () {
-    return {
-      spaceAbout: '',
-      showMoreActive: false
-    }
-  },
+  @Prop({
+    type: String
+  }) longText!: string
 
-  created () {
+  @Prop({
+    type: Boolean,
+    default: false
+  }) isShowMore!: boolean
+
+  @Prop({
+    type: Boolean,
+    default: true
+  }) redirect!: boolean
+
+  @Prop({
+    type: String,
+    default: '/'
+  }) link!: string
+
+  @Prop({
+    type: String,
+    default: '0'
+  }) marginTop!: string
+
+  @Prop({
+    type: String,
+    default: '0'
+  }) marginBottom!: string
+
+  spaceAbout: string = ''
+  showMoreActive: boolean = false
+
+  created (): void {
     this.spaceAbout = this.isShowMore ? this.text : this.longText
-  },
+  }
 
-  methods: {
-    showMore (isShowMoreText) {
-      if (isShowMoreText) {
-        this.spaceAbout = this.longText
-        this.showMoreActive = !this.showMoreActive
-      } else {
-        this.spaceAbout = this.text
-        this.showMoreActive = !this.showMoreActive
-      }
+  showMore (isShowMoreText: boolean): void {
+    if (isShowMoreText) {
+      this.spaceAbout = this.longText
+      this.showMoreActive = !this.showMoreActive
+    } else {
+      this.spaceAbout = this.text
+      this.showMoreActive = !this.showMoreActive
     }
   }
 }

@@ -1,7 +1,6 @@
 import { Commit, Dispatch } from 'vuex'
 import { ProfileStruct } from '@subsocial/api/flat-subsocial/flatteners'
 import { ProfileContent } from '@subsocial/api/flat-subsocial/dto'
-import { environment } from '~/environments/environment'
 import ProfileService from '~/services/profile.service'
 import { Content } from '~/types/content'
 import { ProfileComponentData } from '~/types/profile-component-data.type'
@@ -20,6 +19,7 @@ const SET_CURRENT_USER = 'SET_CURRENT_USER'
 const SET_STATUS = 'SET_STATUS'
 const SET_POLKADOT_ACCOUNTS = 'SET_POLKADOT_ACCOUNTS'
 const SET_BALANCE = 'SET_BALANCE'
+const SET_SIGNER = 'SET_SIGNER'
 
 export interface Profile {
   list: ProfileStruct[],
@@ -27,7 +27,8 @@ export interface Profile {
   currentUser: ProfileStruct | undefined,
   status: ACCOUNT_STATUS,
   polkadotAccounts: AccountData[],
-  myBalance: String
+  myBalance: String,
+  signer: any | null
 }
 
 export const state = (): Profile => ({
@@ -36,7 +37,8 @@ export const state = (): Profile => ({
   currentUser: undefined,
   status: ACCOUNT_STATUS.INIT,
   polkadotAccounts: [],
-  myBalance: '0.0000'
+  myBalance: '0.0000',
+  signer: null
 })
 
 export const mutations = {
@@ -63,6 +65,10 @@ export const mutations = {
 
   [SET_BALANCE] (state: any, balance: string) {
     state.myBalance = balance
+  },
+
+  [SET_SIGNER] (state: any, signer: any) {
+    state.signer = signer
   }
 }
 
@@ -79,6 +85,8 @@ export const actions = {
     }
 
     if (!polkadotJs) { return }
+
+    commit(SET_SIGNER, polkadotJs.signer)
 
     const unsub = polkadotJs!.accounts.subscribe(async (accounts) => {
       if (accounts?.length > 0) {
@@ -134,6 +142,7 @@ export const actions = {
 
   signOut ({ commit }: {commit: Commit}) {
     commit(SET_CURRENT_USER, undefined)
+    commit(SET_SIGNER, undefined)
   }
 
 }

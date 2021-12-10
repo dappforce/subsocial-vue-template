@@ -59,10 +59,10 @@
       </v-form>
 
       <div class="button-wp">
-        <v-btn color="#fff" @click="clear">
+        <v-btn class="button-third-color" color="#fff" @click="clear">
           {{ isEdit ? 'Cancel' : 'Reset form' }}
         </v-btn>
-        <v-btn color="#EB2F96" @click="submit">
+        <v-btn class="button-main-color" @click="submit">
           {{ isEdit ? 'Save' : 'Create space' }}
         </v-btn>
       </div>
@@ -78,9 +78,9 @@
 }
 .edit-space-container {
   max-width: 628px;
-  margin: 20px auto 0;
+  margin: $space_large auto 0;
   min-height: 60vh;
-  padding-bottom: 16px;
+  padding-bottom: $space_normal;
 
   .v-card {
     padding: 35px 23px 21px;
@@ -100,7 +100,7 @@
     width: 100%;
     margin-top: -5px;
     position: relative;
-    padding-bottom: 20px;
+    padding-bottom: $space_large;
 
     .upload-photo {
       display: flex;
@@ -116,7 +116,7 @@
       background-position: center;
 
       span {
-        font-size: 14px;
+        font-size: $font_small;
         line-height: 20px;
         letter-spacing: 0.25px;
         margin-top: 3px;
@@ -149,7 +149,7 @@
         }
 
         .v-icon {
-          color: #000;
+          color: $color_black;
         }
       }
 
@@ -197,10 +197,10 @@
             display: block;
 
             button {
-              background: rgba(0, 0, 0, 0.2);
+              background: $button_hover;
               &:before {
                 padding-bottom: 0;
-                color: #fff;
+                color: $color_white;
               }
             }
 
@@ -216,7 +216,7 @@
   .v-select--chips {
     .v-chip {
       &__content {
-        color: rgba(0, 0, 0, 0.6);
+        color: $main_text_color;
       }
 
       .tag-input {
@@ -243,21 +243,29 @@
     display: flex;
     justify-content: flex-end;
     width: 100%;
-    gap: 16px;
+    gap: $space_normal;
     margin-top: 5px;
+
+    .button-main-color {
+      color: $color_primary;
+    }
+
+    .button-third-color {
+      color: $color_white
+    }
 
     button {
       min-width: 110px !important;
-      font-size: 17px;
+      font-size: $font_normal;
       border: 1px solid #E0E0E0;
       border-color: #E0E0E0 !important;
-      border-radius: 4px;
+      border-radius: $border_small;
       box-shadow: none;
       text-transform: capitalize;
 
       &:last-child {
         border: none;
-        color: #fff;
+        color: $color_white;
       }
     }
 

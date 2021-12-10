@@ -9,7 +9,7 @@
         color="basil"
         grow
       >
-        <v-tabs-slider color="#EB2F96" />
+        <v-tabs-slider class="slider-color" />
 
         <v-tab
           v-for="item in items"
@@ -145,7 +145,7 @@
         <v-btn color="#fff" @click="clear">
           {{ isEdit ? 'Cancel' : 'Reset form' }}
         </v-btn>
-        <v-btn color="#EB2F96" @click="submit">
+        <v-btn class="btn-main-color" @click="submit">
           {{ isEdit ? 'Save' : 'Create post' }}
         </v-btn>
       </div>
@@ -156,19 +156,23 @@
 <style lang="scss">
 .edit-post-container {
   max-width: 628px;
-  margin: 0 auto;
+  margin:$space_large auto 0;
   min-height: 60vh;
-  padding-bottom: 16px;margin-top: 20px;
+  padding-bottom: $space_normal;
 
   .v-card {
     padding: 35px 23px 21px;
 
     .v-tabs {
       border-bottom: 1px solid #E0E0E0;
+
+      .slider-color {
+        color: $color_primary;
+      }
     }
 
     .v-tabs-items {
-      background: #fff;
+      background: $color_white;
     }
   }
 
@@ -189,8 +193,8 @@
     justify-content: center;
     width: 100%;
     position: relative;
-    padding-bottom: 20px;
-    margin-top: 15px;
+    padding-bottom: $space_large;
+    margin-top: $space_normal;
 
     .upload-photo {
       display: flex;
@@ -199,11 +203,11 @@
       flex-direction: column;
       width: 100%;
       height: 98px;
-      border-radius: 4px;
+      border-radius: $border_small;
       border: 1px solid rgba(0, 0, 0, 0.38);
 
       span {
-        font-size: 14px;
+        font-size: $font_small;
         line-height: 20px;
         letter-spacing: 0.25px;
         margin-top: 3px;
@@ -213,8 +217,8 @@
       }
 
       .image-recommendations {
-        font-size: 12px;
-        line-height: 16px;
+        font-size: $font_small;
+        line-height: $normal_line_height;
         letter-spacing: 0.4px;
         color: rgba(0, 0, 0, 0.38);
         bottom: 35px;
@@ -262,7 +266,7 @@
         }
 
         .v-icon {
-          color: #000;
+          color: $color_black;
         }
       }
     }
@@ -280,10 +284,10 @@
             display: block;
 
             button {
-              background: rgba(0, 0, 0, 0.2);
+              background: $button_hover;
               &:before {
                 padding-bottom: 0;
-                color: #fff;
+                color: $color_white;
               }
             }
 
@@ -299,7 +303,7 @@
 
   .v-chip {
     &__content {
-      color: rgba(0, 0, 0, 0.6);
+      color: $main_text_color;
     }
   }
 
@@ -307,21 +311,25 @@
     display: flex;
     justify-content: flex-end;
     width: 100%;
-    gap: 16px;
+    gap: $space_normal;
     margin-top: 5px;
+
+    .btn-main-color {
+      color: $color_primary;
+    }
 
     button {
       min-width: 110px !important;
-      font-size: 17px;
+      font-size: $font_normal;
       border: 1px solid #E0E0E0;
       border-color: #E0E0E0 !important;
-      border-radius: 4px;
+      border-radius: $border_small;
       box-shadow: none;
       text-transform: capitalize;
 
       &:last-child {
         border: none;
-        color: #fff;
+        color: $color_white;
       }
     }
 

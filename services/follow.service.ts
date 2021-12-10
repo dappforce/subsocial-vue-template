@@ -1,20 +1,8 @@
 import { FlatSubsocialApi } from '@subsocial/api/flat-subsocial'
 import { AnyAccountId, AnySpaceId } from '@subsocial/types'
-import { AnyId } from '@subsocial/api/flat-subsocial/dto'
 import SubsocialApiService from '~/services/subsocial-api.service'
+import { METHODS, PALLETS } from '~/constants/query'
 const subsocialApiService = new SubsocialApiService()
-
-export const PALLETS = {
-  profileFollows: 'profileFollows',
-  spaceFollows: 'spaceFollows',
-  reactions: 'reactions'
-}
-export const METHODS = {
-  accountFollowers: 'accountFollowers',
-  accountsFollowedByAccount: 'accountsFollowedByAccount',
-  spaceFollowers: 'spaceFollowers',
-  reactionIdsByPostId: 'reactionIdsByPostId'
-}
 
 export default class FollowService {
   async getApi (): Promise<FlatSubsocialApi> {

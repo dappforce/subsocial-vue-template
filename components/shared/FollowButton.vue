@@ -1,70 +1,127 @@
 <template>
-  <v-btn depressed :class="{follow : isFollow, following: !isFollow}" class="follow-btn" @click="onClick">
+  <v-btn
+    depressed
+    :class="{follow : isFollow, following: !isFollow}"
+    :loading="loading"
+    :disabled="loading"
+    class="follow-btn"
+    @click="onClick"
+  >
     {{ isFollow ? 'Follow' : 'Following' }}
   </v-btn>
 </template>
 
 <style lang="scss">
   .follow {
-    background-color: #EB2F96 !important;
+    background-color: $color_primary !important;
   }
   .following {
-    background-color: #fff !important;
+    background-color: $color_white !important;
   }
   .follow-btn {
     width: 99px;
-    height: 36px;
-    border: 1px solid #EB2F96;
+    height: $buttons_height;
+    border: 1px solid $color_primary;
     box-sizing: border-box;
-    border-radius: 4px;
-    font-family: Roboto;
+    border-radius: $border_small;
     font-style: normal;
     font-weight: 500;
-    line-height: 16px;
+    line-height: $normal_line_height;
     letter-spacing: 1.25px;
     text-transform: capitalize;
     .v-btn__content {
-      color: #EB2F96;
-      font-size: $font-size-secondary-text;
+      color: $color_primary;
+      font-size: $font_small;
     }
     &.follow {
       border: none;
       .v-btn__content {
-        color: #fff;
+        color: $color_white;
       }
     }
   }
 </style>
 
-<script>
-export default {
-  name: 'FollowButton',
+<script lang="ts">
 
-  props: {
-    follow: {
-      type: Boolean,
-      default: false
-    }
-  },
+import { Component, Prop, Watch } from 'vue-property-decorator'
+import { SubmittableResult } from '@polkadot/api'
+import TransactionButton from '~/components/abstract/TransactionButton.vue'
+import { METHODS, PALLETS } from '~/constants/query'
 
-  data () {
-    return {
-      isFollow: this.follow,
-      backgroundColor: this.follow ? 'follow' : 'following'
-    }
-  },
+const TYPE = {
+  SPACE: 'space',
+  PROFILE: 'profile'
+}
 
-  watch: {
-    follow () {
-      this.isFollow = this.follow
-    }
-  },
+type FollowButtonType = 'space' | 'profile';
 
-  methods: {
-    onClick () {
-      this.isFollow = !this.isFollow
-      this.backgroundColor = this.follow ? 'follow' : 'following'
+@Component({})
+export default class FollowButton extends TransactionButton {
+  @Prop({
+    type: Boolean,
+    default: false
+  }) follow!: boolean
+
+  @Prop({
+    type: String,
+    default: 'space'
+  }) type!: FollowButtonType
+
+  @Prop({
+    type: String
+  }) entityId!: FollowButtonType
+
+  isFollow: boolean = this.follow
+  loading: boolean = false
+  backgroundColor: string = this.follow ? 'follow' : 'following'
+
+  @Watch('follow')
+  isFollowHandler () {
+    this.isFollow = this.follow
+  }
+
+  onFailed (result: SubmittableResult | null): void {}
+
+  onSuccess (result: SubmittableResult): void {
+    this.isFollow = !this.isFollow
+    this.loading = !this.loading
+  }
+
+  validate (): boolean {
+    return true
+  }
+
+  async onClick () {
+    let pallet = ''
+    let method = ''
+
+    this.loading = !this.loading
+
+    switch (this.type) {
+      case TYPE.SPACE:
+        pallet = PALLETS.spaceFollows
+        method =
+          !this.isFollow
+            ? METHODS.followSpace
+            : METHODS.unfollowSpace
+        break
+      case TYPE.PROFILE:
+        pallet = PALLETS.profileFollows
+        method =
+          !this.isFollow
+            ? METHODS.followAccount
+            : METHODS.unfollowAccount
+        break
     }
+
+    await this.initExtrinsic({
+      pallet,
+      method,
+      params: [this.entityId]
+    })
+
+    await this.sentTransaction()
   }
 }
 </script>

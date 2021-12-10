@@ -14,7 +14,7 @@
   position: relative;
 
   .address-text {
-    font-size: $font-size-secondary-text;
+    font-size: $font_small;
     line-height: 20px;
     letter-spacing: 0.25px;
     color: rgba(0, 0, 0, 0.38);
@@ -25,76 +25,77 @@
     width: 25px;
     height: 25px;
     line-height: 25px;
-    margin-left: 8px;
+    margin-left: $space_tiny;
     top: -2px;
   }
 
 }
 </style>
 
-<script>
-export default {
-  name: 'Address',
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
-  props: {
-    address: {
-      type: String,
-      default: ''
-    },
-    length: {
-      type: Number,
-      default: 17
-    },
-    showIcon: {
-      type: Boolean,
-      default: false
-    },
-    size: {
-      type: String,
-      default: 'small'
-    },
-    showCopyBtn: {
-      type: Boolean,
-      default: true
+export interface AddressInt {
+  showCopy: boolean
+}
+@Component
+
+export default class Address extends Vue implements AddressInt {
+  @Prop({
+    type: String,
+    default: 'ger'
+  }) address!: string
+
+  @Prop({
+    type: Number,
+    default: 17
+  }) length!: number
+
+  @Prop({
+    type: Boolean,
+    default: false
+  }) showIcon!: boolean
+
+  @Prop({
+    type: String,
+    default: 'small'
+  }) size!: string
+
+  @Prop({
+    type: Boolean,
+    default: true
+  }) showCopyBtn!: boolean
+
+  public showCopy: boolean = this.showIcon;
+
+  async copyAddress () {
+    try {
+      await navigator.clipboard.writeText(this.address).then(() => {
+        this.$nuxt.$emit('isShowSnackbar', { show: true, text: 'Address copied!' })
+      })
+    } catch ($e) {
+      console.log('Cannot copy')
     }
-  },
+  }
 
-  data () {
-    return {
-      showCopy: this.showIcon
+  mouseover (): void {
+    if (!this.showIcon) {
+      this.showCopy = true
     }
-  },
+  }
 
-  computed: {
-    shortAddress () {
-      if (this.length > this.address.length) {
-        return this.address
-      } else {
-        const index = Math.floor(this.length / 2)
-        return this.address.substring(0, index) + '...' + this.address.slice(-index)
-      }
+  mouseleave (): void {
+    if (!this.showIcon) {
+      this.showCopy = false
     }
-  },
+  }
 
-  methods: {
-    async copyAddress () {
-      try {
-        await navigator.clipboard.writeText(this.address).then(() => {
-          this.$nuxt.$emit('isShowSnackbar', { show: true, text: 'Address copied!' })
-        })
-      } catch ($e) {
-        console.log('Cannot copy')
-      }
-    },
-    mouseover () {
-      if (!this.showIcon) {
-        this.showCopy = true
-      }
-    },
-    mouseleave () {
-      if (!this.showIcon) {
-        this.showCopy = false
-      }
+  get shortAddress (): string {
+    if (this.length > this.address.length) {
+      return this.address
+    } else {
+      const index = Math.floor(this.length / 2)
+      return this.address.substring(0, index) + '...' + this.address.slice(-index)
     }
   }
 }

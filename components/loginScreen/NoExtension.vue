@@ -39,21 +39,21 @@
 
   .title {
     font-weight: 500;
-    font-size: $font-size-title-details;
+    font-size: $font_huge;
     line-height: 125%;
-    color: #A0A0A0;
+    color: $color_font_secondary;
     width: 100%;
     text-align: center;
     margin-bottom: 14px;
   }
 
   .sub-title {
-    font-size: 17px;
+    font-size: $font_normal;
     line-height: 125%;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: $space_large;
     span {
-      color: #EB2F96;
+      color: $color_primary;
     }
   }
 
@@ -62,7 +62,7 @@
     justify-content: center;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: $space_large;
 
     .signin-button {
       width: 230px;
@@ -70,17 +70,17 @@
       justify-content: flex-start;
       border: 1px solid #D9D9D9;
       box-sizing: border-box;
-      border-radius: 4px;
+      border-radius: $border_small;
       box-shadow: none;
 
       &:first-child {
-        margin-bottom: 16px;
+        margin-bottom: $space_normal;
       }
     }
 
     a {
       text-decoration: none;
-      font-size: $font-size-buttons-text;
+      font-size: $font_normal;
       line-height: 125%;
       color: #262626;
       display: flex;
@@ -97,14 +97,14 @@
   }
 
   .need-help {
-    font-size: $font-size-secondary-text;
+    font-size: $font_small;
     color: #8C8C8C;
     line-height: 125%;
     text-align: center;
 
     a {
       text-decoration: none;
-      color: #EB2F96;
+      color: $color_primary;
       font-weight: 500;
 
       &:hover {
@@ -115,8 +115,10 @@
 }
 </style>
 
-<script>
-export default {
-  name: 'LoginScreenNoExtension'
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+
+@Component
+export default class LoginScreenNoExtension extends Vue {
 }
 </script>

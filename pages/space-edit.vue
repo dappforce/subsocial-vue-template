@@ -2,14 +2,14 @@
   <SpaceEdit :is-edit="isEdit" :space-item="space" />
 </template>
 
-<script>
-export default {
-  data () {
-    return {
-      isEdit: false,
-      space: null
-    }
-  },
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+import { SpaceListItemData } from '~/models/space/space-list-item.model'
+
+@Component
+export default class SpaceEditPage extends Vue {
+  isEdit: boolean = false
+  space: SpaceListItemData = {} as SpaceListItemData
 
   created () {
     this.space = this.$store.getters['space/getSpaceWithContent'](this.$route.query.space)

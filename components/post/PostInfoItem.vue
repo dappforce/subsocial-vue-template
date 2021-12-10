@@ -1,12 +1,12 @@
 <template>
-  <div class="post-info-wp">
-    <Avatar :id="profileLink" :src="avatarSrc" :size="avatarSize" :name="userName" />
+  <div v-if="postItem" class="post-info-wp">
+    <Avatar :id="postItem.ownerId" :src="postItem.ownerImageUrl" :name="postItem.ownerName" />
     <div class="info-container">
-      <Title :link="'/accounts/'+ profileLink" :name="userName" />
+      <Title :link="'/accounts/'+ postItem.ownerId" :name="postItem.ownerName" />
       <div class="post-additional-info">
-        <span class="owner-name"><NuxtLink :to="handle ? '/@'+handle : '/'+spaceId">{{ spaceName }}</NuxtLink></span>
+        <span class="owner-name"><NuxtLink :to="postItem.handle ? '/@'+postItem.handle : '/'+postItem.spaceId">{{ postItem.spaceName }}</NuxtLink></span>
         <span>·</span>
-        <span v-if="postLink"><NuxtLink :to="postLink">{{ toDate }}</NuxtLink></span>
+        <span v-if="postItem.postLink"><NuxtLink :to="postItem.postLink">{{ toDate }}</NuxtLink></span>
       </div>
     </div>
   </div>
@@ -28,13 +28,13 @@
     }
   }
   .post-additional-info {
-    font-size: $font-size-secondary-text;
+    font-size: $font_small;
     line-height: 20px;
     letter-spacing: 0.25px;
-    color: rgba(0, 0, 0, 0.6);
+    color: $main_text_color;
 
     a {
-      color: rgba(0, 0, 0, 0.6);
+      color: $main_text_color;
       text-decoration: none;
     }
 
@@ -45,63 +45,26 @@
 }
 </style>
 
-<script>
-export default {
-  name: 'PostInfoItem',
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
+import { PostListItemData } from '~/models/post/post-list-item.model'
 
-  props: {
-    spaceName: {
-      type: String,
-      default: ''
-    },
-    postsCount: {
-      type: Number,
-      default: 0
-    },
-    followersCount: {
-      type: Number,
-      default: 0
-    },
-    avatarSrc: {
-      type: String
-    },
-    avatarSize: {
-      type: Number,
-      default: 40
-    },
-    userName: {
-      type: String
-    },
-    handle: {
-      type: String
-    },
-    createdAtTime: {
-      type: [String, Number],
-      default: new Date()
-    },
-    profileLink: {
-      type: String,
-      default: '/'
-    },
-    postLink: {
-      type: String
-    },
-    spaceId: {
-      type: String
-    }
-  },
+@Component
+export default class PostInfoItem extends Vue {
+  @Prop({
+    type: Object,
+    default: undefined
+  }) postItem!: PostListItemData
 
-  computed: {
-    toDate () {
-      const diff = this.$dayjs().diff(this.$dayjs(+this.createdAtTime), 'days')
+  get toDate () {
+    const diff = this.$dayjs().diff(this.$dayjs(+this.postItem.createdAtTime), 'days')
 
-      if (diff < 7) {
-        return this.$dayjs(+this.createdAtTime).fromNow().toLowerCase()
-      } else if (diff > 7 && diff < 365) {
-        return this.$dayjs(+this.createdAtTime).format('D MMM')
-      } else {
-        return this.$dayjs(+this.createdAtTime).format('D MMM YY')
-      }
+    if (diff < 7) {
+      return this.$dayjs(+this.postItem.createdAtTime).fromNow().toLowerCase()
+    } else if (diff > 7 && diff < 365) {
+      return this.$dayjs(+this.postItem.createdAtTime).format('D MMM')
+    } else {
+      return this.$dayjs(+this.postItem.createdAtTime).format('D MMM YY')
     }
   }
 }

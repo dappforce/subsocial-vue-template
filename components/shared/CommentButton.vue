@@ -15,32 +15,30 @@
   .count-label {
     margin-left: 9px;
     font-weight: 500;
-    font-size: $font-size-secondary-text;
-    line-height: 24px;
+    font-size: $font_small;
+    line-height: $main_line_height;
     letter-spacing: 0.1px;
     text-transform: capitalize;
   }
 }
 </style>
 
-<script>
-export default {
-  name: 'CommentButton',
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
-  props: {
-    id: {
-      type: String,
-      default: undefined
-    },
-    count: {
-      type: Number
-    }
-  },
+@Component
+export default class CommentButton extends Vue {
+  @Prop({
+    type: String,
+    default: undefined
+  }) id!: string
 
-  methods: {
-    onClick () {
-      this.$nuxt.$emit(this.id, true)
-    }
+  @Prop({
+    type: Number
+  }) count!: number
+
+  onClick () {
+    this.$nuxt.$emit(this.id, true)
   }
 }
 </script>

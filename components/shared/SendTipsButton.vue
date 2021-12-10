@@ -7,22 +7,21 @@
 <style lang="scss">
 .tips-btn {
   width: 99px;
-  height: 36px;
-  border: 1px solid #EB2F96;
+  height: $buttons_height;
+  border: 1px solid $color_primary;
   box-sizing: border-box;
-  border-radius: 4px;
-  font-family: Roboto;
+  border-radius: $border_small;
   font-style: normal;
   font-weight: 500;
-  line-height: 16px;
+  line-height: $normal_line_height;
   letter-spacing: 1.25px;
   text-transform: capitalize;
-  background-color: #fff !important;
+  background-color: $color_white !important;
   .v-btn__content {
-    color: #EB2F96;
-    font-size: $font-size-secondary-text;
+    color: $color_primary;
+    font-size: $font_small;
   }
-  
+
   &:disabled {
     border: none;
     color: #B3B3B3 !important;
@@ -31,8 +30,10 @@
 }
 </style>
 
-<script>
-export default {
-  name: 'SendTipsButton'
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+
+@Component
+export default class SendTipsButton extends Vue {
 }
 </script>

@@ -1,9 +1,55 @@
-// Ref: https://github.com/nuxt-community/vuetify-module#customvariables
-//
-// The variables you want to modify
-$font-size-title-details: 22px;
-$font-size-title-preview: 19px;
-$font-size-profile-name: 17px;
-$font-size-normal: 17px;
-$font-size-secondary-text: 14px;
-$font-size-buttons-text: 17px;
+//Font sizes
+$font_small: .875rem;
+$font_normal: 1.0625rem;
+$font_large: 1.1875rem;
+$font_huge: 1.375rem;
+
+//Box shadows
+$box_shadow_for_tabs: 0 1px 8px rgb(0 0 0 / 20%);
+$box_shadow_card: 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 2px 1px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.2);
+$header_shadow: 0px 3px 10px rgba(153, 153, 153, 0.14), 0px 3px 9px rgba(153, 153, 153, 0.12), 0px 1px 20px rgba(153, 153, 153, 0.2);
+
+//Colors 
+$main_text_color: rgba(0, 0, 0, 0.6);
+$color_page_bg: #f2f2f2;
+$color_font_normal: #222;
+$color_font_secondary: #a0a0a0;
+$color_primary: #eb2f96;
+$color_link_hover: #f759ab;
+$color_light_border: #ddd;
+$color_warn_border: #f3e8ac;
+$color_hover_selectable_bg: #fff0f6;
+$color_border: #e8e8e8;
+$color_shadow: #eeecec;
+$color_yellow: #f3e8ac;
+$color_white: #fff;
+$color_black: #000;
+$color_gray: #5f5f5f;
+$color_red: #d42c19;
+$color_green: #34c759;
+
+//Hover effects
+$button_hover: rgba(0, 0, 0, 0.2);
+
+//Space
+$space_mini: .25rem;
+$space_tiny: .5rem;
+$space_small: .75rem;
+$space_normal: 1rem;
+$space_large: 1.25rem;
+$space_big: 1.5rem;
+$space_huge: 2rem;
+
+//CONTAINER WIDTH
+$general_width: 763px;
+
+//Line-height
+$main_line_height: 1.5rem;
+$normal_line_height: 1rem;
+
+//Buttons
+$buttons_width: 2.25rem;
+$buttons_height: 2.25rem;
+
+//Border radius
+$border_small: 4px;

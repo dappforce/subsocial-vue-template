@@ -2,6 +2,10 @@ body {
   font-family: Roboto, sans-serif
 }
 
+iframe {
+  border: none !important;
+}
+
 .theme--light.v-btn:focus::before {
   opacity: 0 !important;
 }

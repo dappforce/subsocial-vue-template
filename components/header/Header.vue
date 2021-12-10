@@ -52,15 +52,15 @@
 header {
   position: relative;
   z-index: 10;
-  background: #FFFFFF;
-  box-shadow: 0px 3px 10px rgba(153, 153, 153, 0.14), 0px 3px 9px rgba(153, 153, 153, 0.12), 0px 1px 20px rgba(153, 153, 153, 0.2);
+  background: $color_white;
+  box-shadow: $header_shadow;
 
   .header-container {
     display: flex;
     justify-content: space-between;
 
     .tabs-container {
-      width: 763px;
+      width: $general_width;
       position: absolute;
       left: 50%;
       transform: translate(-50%, 0);
@@ -91,9 +91,9 @@ header {
             }
 
             &__title {
-              color: #222222;
+              color: $color_font_normal;
               margin-left: 10px;
-              font-size: $font-size-secondary-text;
+              font-size: $font_small;
               align-self: flex-start;
               line-height: 17px;
 
@@ -101,7 +101,7 @@ header {
                 line-height: 17px;
 
                 span {
-                  color: #A0A0A0 !important;
+                  color: $color_font_secondary !important;
                   font-weight: normal !important;
                 }
               }
@@ -134,19 +134,18 @@ header {
         margin: 13px 30px 13px 15px;
 
         .v-icon {
-          color: rgba(0, 0, 0, 0.87);
+          color: $color_font_normal;
         }
       }
     }
 
     .project-name {
-      font-family: Roboto;
       font-style: normal;
       font-weight: 500;
-      font-size: $font-size-title-details;
-      line-height: 24px;
+      font-size: $font_huge;
+      line-height:$main_line_height;
       letter-spacing: 0.15px;
-      color: rgba(0, 0, 0, 0.87);
+      color: $color_font_normal;
 
       & a {
         text-decoration: none;
@@ -173,53 +172,48 @@ header {
 
 </style>
 
-<script>
+<script lang="ts">
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { environment } from '~/environments/environment'
+import { ProfileItemModel } from '~/models/profile/profile-item.model'
+import { routerParamsLength } from '~/utils/utils'
+@Component
+export default class Header extends Vue {
+  @Prop({
+    type: String,
+    default: environment.appName
+  }) socialName!: string
 
-export default {
-  name: 'Header',
+  @Prop({
+    type: Boolean,
+    default: false
+  }) showTabs!: boolean
 
-  props: {
-    socialName: {
-      type: String,
-      default: environment.appName
-    },
-    showTabs: {
-      type: Boolean,
-      default: false
-    },
-    tabLinks: {
-      type: Array,
-      default: ['my feed', 'posts', 'spaces']
-    }
-  },
+  @Prop({
+    type: Array,
+    default: ['posts', 'spaces']
+  }) tabLinks!: ['posts', 'spaces']
 
-  data () {
-    return {
-      tab: null,
-      isShowTabs: this.showTabs,
-      user: undefined,
-      isOpenDrawer: false,
-      balance: ''
-    }
-  },
+  isShowTabs: boolean = this.showTabs
+  user: ProfileItemModel | null = null
+  isOpenDrawer: boolean = false
+  balance: string = ''
 
-  watch: {
-    showTabs (val, oldval) {
-      this.isShowTabs = this.showTabs
-    }
-  },
+  @Watch('showTabs')
+  showTabsHandler () {
+    this.isShowTabs = this.showTabs
+  }
 
   created () {
-    this.$nuxt.$on('isShowTabs', (data) => {
+    this.$nuxt.$on('isShowTabs', (data: boolean) => {
       this.isShowTabs = data
     })
 
-    if (Object.keys(this.$route.params).length) {
+    if (routerParamsLength(this.$route.params)) {
       this.isShowTabs = false
     }
 
-    this.unsubscribe = this.$store.subscribe((mutation, state) => {
+    this.$store.subscribe((mutation) => {
       if (mutation.type === 'profiles/SET_CURRENT_USER') {
         if (this.$store.state.profiles.currentUser) {
           this.user = this.$store.getters['profiles/selectProfileData'](this.$store.state.profiles.currentUser.id)
@@ -228,22 +222,19 @@ export default {
           }
           this.balance = this.$store.state.profiles.myBalance
         } else {
-          this.user = undefined
+          this.user = null
           this.$store.commit('profiles/SET_STATUS', 3)
         }
       }
     })
-  },
+  }
 
-  methods: {
-    openDrawer () {
-      this.isOpenDrawer = !this.isOpenDrawer
-      this.showMenu = false
-    },
+  openDrawer () {
+    this.isOpenDrawer = !this.isOpenDrawer
+  }
 
-    returnHome () {
-      this.$nuxt.$emit('setTab', this.tabLinks[0])
-    }
+  returnHome () {
+    this.$nuxt.$emit('setTab', this.tabLinks[0])
   }
 }
 </script>

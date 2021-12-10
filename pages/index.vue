@@ -18,7 +18,7 @@
       :value="tabs[1]"
       class="items-list"
     >
-      <PostContainer v-if="currentTab === 'posts' && postsIds" :ids="postsIds" />
+      <PostContainer v-if="currentTab === 'posts' && postsIds.length" :ids="postsIds" />
     </v-tab-item>
 
     <v-tab-item
@@ -38,40 +38,41 @@
     align-items: center
 </style>
 
-<script>
-export default {
-  data () {
-    return {
-      tabs: ['my feed', 'posts', 'spaces'],
-      currentTab: null,
-      currentUser: null,
-      postsIds: null
-    }
-  },
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+import { ProfileItemModel } from '~/models/profile/profile-item.model'
+
+const { routerParamsLength } = require('@/utils/utils')
+
+@Component
+export default class PostEditPage extends Vue {
+  tabs: string [] = ['my feed', 'posts', 'spaces']
+  currentTab: string | null = null
+  currentUser: ProfileItemModel | undefined | null = null
+  postsIds: string[] = []
 
   beforeDestroy () {
-    this.postsIds = null
-  },
+    this.postsIds = []
+  }
 
   created () {
     this.currentUser = this.$store.state.profiles.currentUser
-
     this.currentTab = this.currentUser ? this.tabs[1] : this.tabs[1]
 
-    this.$nuxt.$on('mainPage', (data) => {
+    this.$nuxt.$on('mainPage', (data: string) => {
       this.currentTab = data
     })
 
-    this.$nuxt.$on('setTab', (data) => {
+    this.$nuxt.$on('setTab', (data: string) => {
       this.currentTab = data
     })
 
     if (this.$route.name === 'index') {
-      this.unsubscribe = this.$store.subscribe((mutation, state) => {
+      const unsubscribe = this.$store.subscribe((mutation) => {
         if (mutation.type === 'posts/SET_LOADING_POST_IDS' && !mutation.payload) {
           this.$store.dispatch('posts/getPostsByIds', { ids: this.$store.state.posts.postsIds.slice(0, 20), type: 'public' })
           this.postsIds = this.$store.state.posts.postsIds
-          this.unsubscribe()
+          unsubscribe()
         }
       })
 
@@ -79,10 +80,10 @@ export default {
         this.postsIds = this.$store.state.posts.postsIds
       }
     }
-  },
+  }
 
   mounted () {
-    this.$nuxt.$emit('isShowTabs', Object.keys(this.$route.params).length === 0)
+    this.$nuxt.$emit('isShowTabs', routerParamsLength(this.$route.params) === 0)
   }
 }
 </script>

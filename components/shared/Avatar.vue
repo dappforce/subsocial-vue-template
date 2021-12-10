@@ -1,6 +1,5 @@
 <template>
   <v-avatar
-    :color="color"
     :size="size"
   >
     <img v-if="!showJdentity" :src="link" alt="" @error="onImgError">
@@ -10,57 +9,48 @@
   </v-avatar>
 </template>
 
-<script>
+<script lang="ts">
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { environment } from '~/environments/environment'
-export default {
-  name: 'Avatar',
 
-  props: {
-    name: {
-      type: String,
-      default: 'No Avatar'
-    },
-    src: {
-      type: String
-    },
-    size: {
-      type: Number,
-      default: 40
-    },
-    color: {
-      type: String,
-      default: '#fff'
-    },
-    id: {
-      type: String
-    }
-  },
+@Component
+export default class Avatar extends Vue {
+  @Prop({
+    type: String,
+    default: 'No Avatar'
+  }) name!: string
 
-  data () {
-    return {
-      showJdentity: false,
-      url: environment.ipfsUrl,
-      userId: '',
-      link: ''
-    }
-  },
+  @Prop({
+    type: String
+  }) id!: string
 
-  watch: {
-    src (newVal, oldVal) {
-      this.showJdentity = false
-      this.link = this.url + this.src
-    }
-  },
+  @Prop({
+    type: String
+  }) src!: string
 
-  created () {
+  @Prop({
+    type: Number,
+    default: 40
+  }) size!: number
+
+  showJdentity: boolean = false
+  url: string = environment.ipfsUrl
+  userId: string = ''
+  link: string = ''
+
+  @Watch('src')
+  srcHandle () {
+    this.showJdentity = false
+    this.link = this.url + this.src
+  }
+
+  created (): void {
     this.link = this.url + this.src
     this.userId = this.id
-  },
+  }
 
-  methods: {
-    onImgError () {
-      this.showJdentity = true
-    }
+  onImgError (): void {
+    this.showJdentity = true
   }
 }
 </script>

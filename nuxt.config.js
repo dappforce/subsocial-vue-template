@@ -34,6 +34,7 @@ export default {
     '~/plugin/linkService.ts',
     '@/plugin/day.js',
     '@/plugin/numeral.ts',
+    '@/plugin/linkFilters.ts',
     { src: '~/plugin/numeral.ts', ssr: false },
     { src: '~/plugin/infiniteloading.ts', ssr: false }
   ],

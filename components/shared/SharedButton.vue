@@ -16,34 +16,34 @@
   .share-label {
     margin-left: 9px;
     font-weight: 500;
-    font-size: $font-size-secondary-text;
-    line-height: 24px;
+    font-size: $font_small;
+    line-height: $main_line_height;
     letter-spacing: 0.1px;
   }
 
   .count-label {
     margin-left: 9px;
     font-weight: 500;
-    font-size: $font-size-secondary-text;
-    line-height: 24px;
+    font-size: $font_small;
+    line-height: $main_line_height;
     letter-spacing: 0.1px;
     text-transform: capitalize;
   }
 }
 </style>
 
-<script>
-export default {
-  name: 'SharedButton',
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
-  props: {
-    isShowLabel: {
-      type: Boolean,
-      default: false
-    },
-    count: {
-      type: Number
-    }
-  }
+@Component
+export default class SharedButton extends Vue {
+  @Prop({
+    type: Boolean,
+    default: false
+  }) isShowLabel!: boolean
+
+  @Prop({
+    type: Number
+  }) count!: number
 }
 </script>

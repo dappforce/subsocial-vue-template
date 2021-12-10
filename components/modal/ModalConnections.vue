@@ -18,7 +18,7 @@
           centered
           slider-color="yellow"
         >
-          <v-tabs-slider color="#EB2F96" />
+          <v-tabs-slider class="slider-color" />
           <v-tab
             v-for="i in tabs"
             :key="i"
@@ -62,12 +62,16 @@
     padding-left: 10px;
   }
 
+  .slider-color {
+    color: $color_primary;
+  }
+
   .v-tab--active {
-    color: #EB2F96;
+    color: $color_primary;
   }
 
   .v-tabs {
-    box-shadow: 0 1px 8px rgb(0 0 0 / 20%);
+    box-shadow: $box_shadow_for_tabs;
     position: relative;
     z-index: 1;
   }
@@ -87,7 +91,7 @@
       }
 
       &::-webkit-scrollbar-thumb {
-        background-color: rgba(0, 0, 0, 0.12);;
+        background-color: rgba(0, 0, 0, 0.12);
         width: 6px;
       }
     }
@@ -96,37 +100,32 @@
 
 </style>
 
-<script>
-export default {
-  name: 'ModalConnections',
+<script lang="ts">
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
-  props: {
-    isModal: {
-      type: Boolean,
-      default: false
-    },
-    accountId: {
-      type: String
-    }
-  },
+@Component
+export default class ModalConnections extends Vue {
+  @Prop({
+    type: Boolean,
+    default: false
+  }) isModal!: boolean
 
-  data () {
-    return {
-      openModal: false,
-      followersUserIds: [],
-      followingUserIds: [],
-      tabs: ['FOLLOWING', 'FOLLOWERS'],
-      activeTab: ''
-    }
-  },
+  @Prop({
+    type: String
+  }) accountId!: string
 
-  watch: {
-    isModal (newVal, oldVal) {
-      this.onClick()
-    }
-  },
+  openModal: boolean = false
+  followersUserIds: string[] = []
+  followingUserIds: string[] = []
+  tabs: string[] = ['FOLLOWING', 'FOLLOWERS']
+  activeTab: string = ''
 
-  created () {
+  @Watch('isModal')
+  isModalHandler () {
+    this.onClick()
+  }
+
+  created (): void {
     this.activeTab = this.tabs[0]
 
     this.$store.dispatch('accountFollower/getAccountFollowers', this.accountId).then((ids) => {
@@ -136,12 +135,10 @@ export default {
     this.$store.dispatch('accountFollower/getAccountFollowing', this.accountId).then((ids) => {
       this.followingUserIds = ids || []
     })
-  },
+  }
 
-  methods: {
-    onClick () {
-      this.openModal = !this.openModal
-    }
+  onClick (): void {
+    this.openModal = !this.openModal
   }
 }
 </script>

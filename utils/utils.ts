@@ -7,6 +7,7 @@ import {
 import slug from 'slugify'
 import BN from 'bn.js'
 
+import { SubmittableResult } from '@polkadot/api'
 import { TransformDataArray } from '~/types/transform-dto'
 import { Content } from '~/types/content'
 
@@ -90,4 +91,28 @@ export function convertToBNArray (array: string[]) {
 
 export function convertToBN (value: string) {
   return new BN(value)
+}
+
+export function routerParamsLength (value: object) {
+  return Object.keys(value).length
+}
+
+export function getNewIdsFromEvent (txResult: SubmittableResult): BN[] {
+  const newIds: BN[] = []
+
+  txResult.events.find((event) => {
+    const { event: { data, method } } = event
+    if (method.includes('Created')) {
+      const [, ...ids] = data.toArray()
+      newIds.push(...ids as unknown as BN[])
+      return true
+    }
+    return false
+  })
+
+  return newIds
+}
+
+export function getPostIdFromLink (link: string | null) {
+  return link ? link.trim().split('-').pop() : ''
 }

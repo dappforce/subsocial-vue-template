@@ -19,7 +19,7 @@
           grow
           centered
         >
-          <v-tabs-slider color="#EB2F96" />
+          <v-tabs-slider class="slider-color" />
           <v-tab
             v-for="i in tabs"
             :key="i"
@@ -64,13 +64,17 @@
   }
 
   .v-tab--active {
-    color: #EB2F96;
+    color: $color_primary;
   }
 
   .v-tabs {
-    box-shadow: 0 1px 8px rgb(0 0 0 / 20%);
+    box-shadow: $box_shadow_for_tabs;
     position: relative;
     z-index: 1;
+  }
+
+  .slider-color {
+    color: $color_primary;
   }
 
   .v-tabs-items {
@@ -88,7 +92,7 @@
       }
 
       &::-webkit-scrollbar-thumb {
-        background-color: rgba(0, 0, 0, 0.12);;
+        background-color: rgba(0, 0, 0, 0.12);
         width: 6px;
       }
     }
@@ -97,66 +101,62 @@
 
 </style>
 
-<script>
-export default {
-  name: 'ModalLikes',
+<script lang="ts">
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
-  props: {
-    isModal: {
-      type: Boolean,
-      default: false
-    },
-    postId: {
-      type: String
-    },
-    accountId: {
-      type: String
-    }
-  },
+@Component
+export default class ModalLikes extends Vue {
+  @Prop({
+    type: Boolean,
+    default: false
+  }) isModal!: boolean
 
-  data () {
-    return {
-      openModal: false,
-      users: undefined,
-      tabs: ['upvotes', 'downvotes'],
-      activeTab: '',
-      currentUser: undefined,
-      reactions: null,
-      upvote: [],
-      downvote: []
-    }
-  },
+  @Prop({
+    type: String
+  }) postId!: string
 
-  watch: {
-    isModal (newVal, oldVal) {
-      this.openModal = !this.openModal
-    }
-  },
+  @Prop({
+    type: String
+  }) accountId!: string
 
-  created () {
+  openModal: boolean = false
+  users: undefined
+  tabs: string[] = ['upvotes', 'downvotes']
+  activeTab: string = ''
+  currentUser: undefined
+  reactions: any = null
+  upvote: string[] = []
+  downvote: string[] = []
+
+  @Watch('isModal')
+  isModalHandler () {
+    this.openModal = !this.openModal
+  }
+
+  created (): void {
     this.users = this.$store.state.profiles.list
     this.currentUser = this.$store.state.profiles.currentUser
     this.activeTab = this.tabs[0]
     this.$store.dispatch('reaction/getPostReactionIdsByAccount', { postId: this.postId }).then((data) => {
       this.reactions = data
-      data.forEach(reaction =>
+      data.forEach((reaction: any) =>
         reaction.isUpvote
           ? this.upvote.push(reaction.profileId)
           : this.downvote.push(reaction.profileId)
       )
     })
-  },
+  }
 
-  methods: {
-    onClick () {
-      this.$nuxt.$emit('isModalClose-' + this.postId)
-    },
-    isUpvote (reaction) {
-      return reaction && reaction.kind.toString() === 'Upvote'
-    },
-    clickOutside () {
-      this.$nuxt.$emit('isModalClose-' + this.postId)
-    }
+  onClick (): void {
+    this.$nuxt.$emit('isModalClose-' + this.postId)
+  }
+
+  isUpvote (reaction: any): void {
+    return reaction && reaction.kind.toString() === 'Upvote'
+  }
+
+  clickOutside (): void {
+    this.$nuxt.$emit('isModalClose-' + this.postId)
   }
 }
 </script>

@@ -10,42 +10,35 @@
 
 <style lang="scss">
 .signin-button {
-  border: 1px solid #EB2F96;
-  border-radius: 4px;
-  background-color: #fff !important;
+  border: 1px solid $color_primary;
+  border-radius: $border_small;
+  background-color: $color_white !important;
 
   .v-btn__content {
     font-weight: 500;
-    font-size: 17px;
+    font-size: $font_normal;
     line-height: 125%;
     text-align: center;
-    color: #EB2F96;
+    color: $color_primary;
     text-transform: capitalize;
   }
 
 }
 </style>
 
-<script>
-export default {
-  name: 'QrCodeButton',
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
-  props: {
-    address: {
-      type: String
-    }
-  },
+@Component
+export default class QrCodeButton extends Vue {
+  @Prop({
+    type: String
+  }) address!: string
 
-  data () {
-    return {
-      isOpenModal: false
-    }
-  },
+  isOpenModal: boolean = false
 
-  methods: {
-    openModal () {
-      this.isOpenModal = !this.isOpenModal
-    }
+  openModal (): void {
+    this.isOpenModal = !this.isOpenModal
   }
 }
 </script>

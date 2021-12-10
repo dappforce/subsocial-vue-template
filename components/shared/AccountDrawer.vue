@@ -27,7 +27,7 @@
         <v-icon size="24" class="account-icon">
           mdi-wallet-outline
         </v-icon>
-        <Address :address="user.address || user.id" :size="'large'" :length="13" :show-icon="true" />
+        <Address :address="user.address || user.id" :size="'large'" :length="addressLength" :show-icon="true" />
         <QrCodeButton :address="user.address || user.id" />
       </div>
 
@@ -135,7 +135,7 @@
 <style lang="scss">
 .drawer-container {
   width: 420px !important;
-  padding: 16px 16px;
+  padding: $space_normal $space_normal;
   z-index: 10;
 
   .account-icon {
@@ -145,8 +145,8 @@
 
   .close {
     position: absolute;
-    right: 16px;
-    top: 16px;
+    right: $space_normal;
+    top: $space_normal;
     cursor: pointer;
   }
 
@@ -156,27 +156,25 @@
     align-items: flex-start;
     justify-content: center;
     min-height: 0;
-    padding-bottom: 16px;
+    padding-bottom: $space_normal;
 
     .profile-info-wp {
       display: flex;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: $space_large;
 
       .info-container {
         margin-left: 13px;
 
         .profile-name-wp {
           display: flex;
-          align-items: center;
-          font-family: Roboto;
           font-style: normal;
           font-weight: 500;
-          font-size: $font-size-title-preview;
-          line-height: 24px;
+          font-size: $font_large;
+          line-height: $main_line_height;
           align-items: center;
           letter-spacing: 0.15px;
-          color: rgba(0, 0, 0, 0.87);
+          color: $color_font_normal;
 
           a {
             text-decoration: none;
@@ -184,7 +182,7 @@
         }
 
         .profile-stats-wp {
-          font-size: $font-size-secondary-text;
+          font-size: $font_small;
           line-height: 20px;
           letter-spacing: 0.25px;
           margin-top: 5px;
@@ -200,19 +198,19 @@
     .account-info-wp {
       display: flex;
       align-items: center;
-      font-size: 16px;
+      font-size: $font_normal;
 
       .address-container {
         display: flex;
         align-items: center;
 
         .address-text {
-          color: rgba(0, 0, 0, 0.87);
-          font-size: $font-size-normal;
+          color: $color_font_normal;
+          font-size: $font_normal;
         }
 
         .v-icon {
-          color: #000000;
+          color: $color_black;
           margin-left: 10px;
         }
       }
@@ -228,19 +226,19 @@
 
       .qr-icon {
         margin-left: 10px;
-        color: #000;
+        color: $color_black;
       }
     }
 
     .account-amount {
-      font-size: $font-size-normal;
-      margin-top: 8px;
+      font-size: $font_normal;
+      margin-top: $space_tiny;
       font-weight: 500;
       display: flex;
       align-items: center;
 
       .gray {
-        color: #A0A0A0;
+        color: $color_font_secondary;
         font-weight: normal;
       }
     }
@@ -248,23 +246,23 @@
 
   .account-btn {
     .v-list-item {
-      color: #000000;
+      color: $color_black;
       padding: 0;
 
       .v-icon {
-        color: #000000;
-        margin-right: 12px;
+        color: $color_black;
+        margin-right: $space_small;
       }
 
       &__title {
-        font-size: $font-size-normal;
+        font-size: $font_normal;
         font-weight: normal;
         letter-spacing: 0.25px;
         line-height: 1.1rem;
 
         a {
           text-decoration: none;
-          color: #000000;
+          color: $color_black;
         }
       }
     }
@@ -275,7 +273,7 @@
     overflow: hidden;
     overflow-y: auto;
     position: relative;
-    margin-bottom: 20px;
+    margin-bottom: $space_large;
 
     &::-webkit-scrollbar {
       width: 6px;
@@ -298,7 +296,7 @@
         &:hover {
           background-color: rgba(238, 236, 236, 0.7);
           cursor: pointer;
-          padding: 8px 5px;
+          padding: $space_tiny 5px;
         }
       }
     }
@@ -317,17 +315,17 @@
 
   .sign-out {
     &__btn {
-      border: 1px solid #EB2F96;
+      border: 1px solid $color_primary;
       box-sizing: border-box;
-      border-radius: 4px;
+      border-radius: $border_small;
       width: 100%;
-      height: 36px;
-      color: #EB2F96;
-      font-size: $font-size-buttons-text;
+      height: $buttons_height;
+      color: $color_primary;
+      font-size: $font_normal;
       font-weight: 500;
       letter-spacing: 1.25px;
       box-shadow: none;
-      background-color: #fff !important;
+      background-color: $color_white !important;
     }
   }
 }
@@ -337,69 +335,68 @@
 }
 </style>
 
-<script>
+<script lang="ts">
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import StorageService from '../../services/storage.service'
+import { ProfileItemModel } from '~/models/profile/profile-item.model'
+import { AccountData } from '~/types/account.types'
+import { environment } from '~/environments/environment'
 const storageService = new StorageService()
-export default {
-  name: 'AccountDrawer',
 
-  props: {
-    isOpen: {
-      type: Boolean,
-      default: false
-    },
-    user: {
-      type: Object
-    },
-    balance: {
-      type: String
-    }
-  },
+@Component
+export default class AccountDrawer extends Vue {
+  @Prop({
+    type: String
+  }) balance!: string
 
-  data () {
-    return {
-      drawer: false,
-      isOpenModal: false,
-      accounts: []
-    }
-  },
+  @Prop({
+    type: Boolean
+  }) isOpen!: boolean
 
-  watch: {
-    isOpen (newVal, oldVal) {
-      this.drawer = !this.drawer
-    },
-    user (newVal, oldVal) {
-      this.filterAccounts(newVal)
-    }
-  },
+  @Prop({
+    type: Object
+  }) user!: ProfileItemModel
+
+  drawer: boolean = false
+  isOpenModal: boolean = false
+  accounts: AccountData[] = []
+  addressLength: number = environment.addressLengthShort
 
   created () {
     const currentAcc = this.$store.state.profiles.currentUser
     this.filterAccounts(currentAcc)
-  },
+  }
 
-  methods: {
-    closeDrawer () {
-      this.drawer = false
-    },
+  @Watch('isOpen')
+  isOpenDrawer () {
+    this.drawer = !this.drawer
+  }
 
-    openModal () {
-      this.isOpenModal = !this.isOpenModal
-    },
+  @Watch('user')
+  userChanged (newVal: ProfileItemModel) {
+    this.filterAccounts(newVal)
+  }
 
-    setAccount (account) {
-      this.$store.dispatch('profiles/setCurrentAccount', account)
-    },
+  closeDrawer (): void {
+    this.drawer = false
+  }
 
-    filterAccounts (currentUser) {
-      this.accounts = this.$store.state.profiles.polkadotAccounts.filter(i => i.id !== currentUser.id)
-    },
+  openModal (): void {
+    this.isOpenModal = !this.isOpenModal
+  }
 
-    signOut () {
-      storageService.removeAccountId()
-      this.$store.dispatch('profiles/signOut')
-      this.drawer = false
-    }
+  setAccount (account: ProfileItemModel): void {
+    this.$store.dispatch('profiles/setCurrentAccount', account)
+  }
+
+  filterAccounts (currentUser: ProfileItemModel): void {
+    this.accounts = this.$store.state.profiles.polkadotAccounts.filter((i: AccountData) => i.id !== currentUser.id)
+  }
+
+  signOut () {
+    storageService.removeAccountId()
+    this.$store.dispatch('profiles/signOut')
+    this.drawer = false
   }
 }
 </script>

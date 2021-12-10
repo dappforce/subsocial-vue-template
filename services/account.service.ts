@@ -1,7 +1,5 @@
 import { asAccountId } from '@subsocial/api'
 import { FlatSubsocialApi } from '@subsocial/api/flat-subsocial'
-import { AnyAccountId } from '@subsocial/types'
-import { ProfileData } from '@subsocial/api/flat-subsocial/dto'
 import SubsocialApiService from '~/services/subsocial-api.service'
 import { AccountData, AccountRawData, Balance, PolkadotAccount } from '~/types/account.types'
 import { environment } from '~/environments/environment'

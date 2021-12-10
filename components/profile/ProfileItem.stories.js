@@ -1,4 +1,3 @@
-import AddressComponent from '~/components/shared/Address'
 import ProfileItemComponent from '~/components/profile/ProfileItem'
 
 export default {

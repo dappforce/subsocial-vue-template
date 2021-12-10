@@ -49,6 +49,7 @@
     "@nuxtjs/storybook": "^4.1.1",
     "@nuxtjs/vuetify": "^1.12.1",
     "@storybook/vue": "^6.3.12",
+    "@types/vuelidate": "^0.7.15",
     "babel-loader": "^8.2.2",
     "babel-preset-vue": "^2.0.2",
     "dotenv": "^10.0.0",

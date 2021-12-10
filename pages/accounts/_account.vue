@@ -1,5 +1,5 @@
 <template>
-  <div v-if="accountData" class="account-container">
+  <div v-if="!showSpinner" class="account-container">
     <ProfileItem :profile-data="accountData" :tabs-event="'accountPage'" />
 
     <v-tabs-items v-model="currentTab">
@@ -42,104 +42,99 @@
   justify-content: center;
 
   .no-posts {
-    color: rgba(0, 0, 0, 0.87);
+    color: $color_font_normal;
     line-height: 125%;
     display: flex;
     align-items: center;
     width: 100%;
-    padding: 34px 16px;
+    padding: 34px $space_normal;
     justify-content: center;
-    background-color: #fff;
-    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 2px 1px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-    margin-top: 16px;
-    font-size: $font-size-normal;
+    background-color: $color_white;
+    box-shadow: $box_shadow_card;
+    border-radius: $border_small;
+    margin-top: $space_normal;
+    font-size: $font_normal;
   }
 }
 </style>
 
-<script>
-export default {
-  data () {
-    return {
-      accountData: null,
-      spaces: [],
-      tabs: ['posts', 'spaces'],
-      currentTab: 'posts',
-      allPostsIds: [],
-      currentUser: null,
-      showSpinner: false
-    }
-  },
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+import { ProfileStruct } from '@subsocial/api/flat-subsocial/flatteners'
+import { routerParamsLength } from '~/utils/utils'
 
-  created () {
+@Component
+export default class Account extends Vue {
+  accountData: ProfileStruct | undefined
+  spaces: [] = []
+  tabs: string[] = ['posts', 'spaces']
+  currentTab: string = 'posts'
+  allPostsIds: [] = []
+  currentUser?: ProfileStruct
+  showSpinner: boolean = false
+
+  created (): void {
+    this.showSpinner = true
     this.currentUser = this.$store.state.profiles.currentUser
     if (this.$store.state.loading.isLoading) {
       this.load()
     } else {
-      this.unsubscribe = this.$store.subscribe((mutation, state) => {
+      const unsubscribe = this.$store.subscribe((mutation) => {
         if (mutation.type === 'profiles/SET_POLKADOT_ACCOUNTS') {
           this.load().then(() => {
-            this.unsubscribe()
+            unsubscribe()
           })
         }
       })
     }
 
-    this.unsubscribeSpaces = this.$store.subscribe((mutation, state) => {
+    const unsubscribeSpaces = this.$store.subscribe((mutation, state) => {
       if (mutation.type === 'space/SET_LOADING_ACCOUNT_SPACES' && !state.space.isLoading) {
         this.getSpacesData().then((data) => {
           this.spaces = data
-          this.unsubscribeSpaces()
+          unsubscribeSpaces()
         })
       }
     })
 
-    this.$nuxt.$emit('isShowTabs', !Object.keys(this.$route.params).length)
+    this.$nuxt.$emit('isShowTabs', !routerParamsLength(this.$route.params))
 
-    this.$nuxt.$on('accountPage', (data) => {
+    this.$nuxt.$on('accountPage', (data: string) => {
       this.currentTab = data
     })
-  },
+  }
 
-  beforeDestroy () {
-    this.startIndex = 20
-    this.endIndex = 40
-    this.postList = []
-    this.postsIds = []
+  beforeDestroy (): void {
     this.$store.commit('posts/CLEAR_SELECTED_POSTS')
     this.allPostsIds = []
-  },
+  }
 
-  methods: {
-    async load () {
-      this.showSpinner = true
-      return await this.$store.dispatch('profiles/getProfile', { id: this.$route.params.account }).then(() => {
-        this.getAccount().then((data) => {
-          this.accountData = data
-          this.getSpaces().then(() => {
-            this.$store.dispatch('posts/getAccountPosts', this.$store.state.space.accountSpaceIds).then((ids) => {
-              setTimeout(() => {
-                this.allPostsIds = this.$store.state.posts.accountPostsIds
-                this.showSpinner = false
-              }, 500)
-            })
+  async load () {
+    return await this.$store.dispatch('profiles/getProfile', { id: this.$route.params.account }).then(() => {
+      this.getAccount().then((data) => {
+        this.accountData = data
+        this.getSpaces().then(() => {
+          this.$store.dispatch('posts/getAccountPosts', this.$store.state.space.accountSpaceIds).then(() => {
+            setTimeout(() => {
+              this.allPostsIds = this.$store.state.posts.accountPostsIds
+              this.showSpinner = false
+            }, 500)
           })
         })
       })
-    },
+    })
+  }
 
-    async getAccount () {
-      return await this.$store.getters['profiles/selectProfileData'](this.$route.params.account)
-    },
+  async getAccount () {
+    return await this.$store.getters['profiles/selectProfileData'](this.$route.params.account)
+  }
 
-    async getSpacesData () {
-      return await this.$store.getters['space/getSpacesWithContentByIds'](this.$store.state.space.accountSpaceIds)
-    },
+  async getSpacesData () {
+    return await this.$store.getters['space/getSpacesWithContentByIds'](this.$store.state.space.accountSpaceIds)
+  }
 
-    async getSpaces () {
-      return await this.$store.dispatch('space/getSpacesByAccount', this.$route.params.account)
-    }
+  async getSpaces () {
+    return await this.$store.dispatch('space/getSpacesByAccount', this.$route.params.account)
   }
 }
 </script>

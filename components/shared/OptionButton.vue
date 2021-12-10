@@ -38,7 +38,7 @@
 .options-button {
   width: 24px;
   height: 24px;
-  line-height: 24px;
+  line-height: $main_line_height;
 }
 .option-items {
   .v-list-item {
@@ -51,57 +51,50 @@
 }
 </style>
 
-<script>
-export default {
-  name: 'OptionButton',
+<script lang="ts">
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
-  props: {
-    postId: {
-      type: String
-    },
-    accountId: {
-      type: String
-    },
-    noReactions: {
-      type: Boolean,
-      default: false
-    }
-  },
+@Component
+export default class OptionButton extends Vue {
+  @Prop({
+    type: String
+  }) postId!: string
 
-  data () {
-    return {
-      closeOnClick: true,
-      showMenu: false,
-      isOpenReaction: false,
-      isOpen: false
-    }
-  },
+  @Prop({
+    type: String
+  }) accountId!: string
 
-  watch: {
-    isOpen (newVal, oldVal) {
-      this.isOpen = newVal
-    }
-  },
+  @Prop({
+    type: Boolean,
+    default: false
+  }) noReactions!: boolean
 
-  created () {
+  showMenu: boolean = false
+  isOpenReaction: boolean = false
+  isOpen: boolean = false
+
+  @Watch('isOpen')
+  isOpenHandler (newVal: boolean) {
+    this.isOpen = newVal
+  }
+
+  created (): void {
     this.$nuxt.$on('isModalClose-' + this.postId, () => {
       this.isOpen = false
     })
-  },
+  }
 
-  beforeDestroy () {
+  beforeDestroy (): void {
     this.isOpenReaction = false
-  },
+  }
 
-  methods: {
-    openReactions () {
-      this.isOpenReaction = !this.isOpenReaction
-      this.showMenu = false
-    },
+  openReactions (): void {
+    this.isOpenReaction = !this.isOpenReaction
+    this.showMenu = false
+  }
 
-    openMenu () {
-      this.isOpen = true
-    }
+  openMenu (): void {
+    this.isOpen = true
   }
 }
 </script>

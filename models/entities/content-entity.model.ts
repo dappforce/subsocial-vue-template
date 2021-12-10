@@ -5,7 +5,7 @@ export interface ContentEntity {
   image: string;
   tags: Array<string>;
   title: string;
-  summary:  string;
+  summary: string;
   isShowMore: boolean;
   name: string;
   avatar?: string;

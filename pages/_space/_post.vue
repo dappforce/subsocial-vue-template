@@ -9,12 +9,7 @@
           <div class="post-data">
             <div class="post-item-header">
               <PostInfoItem
-                :avatar-size="post.avatarSize"
-                :avatar-src="post.ownerImageUrl"
-                :created-at-time="post.createdAtTime"
-                :space-name="post.spaceName"
-                :user-name="post.ownerName"
-                :profile-link="post.ownerId"
+                :post-item="post"
               />
               <OptionButton :post-id="post.id" :account-id="post.ownerId" />
             </div>
@@ -40,12 +35,12 @@
       elevation="2"
       class="comment-container"
     >
-      <Comment :id="post.id" :avatar-src="'fwefwe'" :handle="post.handle" :count="post.visibleRepliesCount" />
+      <Comment :id="post.id" :avatar-src="post.ownerImageUrl" :handle="post.handle" :count="post.visibleRepliesCount" />
     </v-card>
   </div>
 </template>
 
-<style module lang="scss">
+<style lang="scss">
 .post-container {
   display: flex;
   flex-direction: column;
@@ -54,8 +49,8 @@
 
   .comment-container {
     width: 100%;
-    padding: 16px;
-    margin-top: 16px;
+    padding: $space_normal;
+    margin-top: $space_normal;
 
     .divider {
       display: none;
@@ -64,10 +59,10 @@
 
   .post-item-wp {
     width: 100%;
-    margin-top: 16px;
+    margin-top: $space_normal;
 
     .post-item {
-      padding: 16px 16px 16px;
+      padding: $space_normal;
     }
 
     .post-main-wp {
@@ -78,13 +73,13 @@
         width: 100%;
 
         .title {
-          font-size: $font-size-title-details;
+          font-size: $font_huge;
         }
       }
     }
 
     .markdown-body {
-      margin-top: 12px;
+      margin-top: $space_small;
       margin-bottom: 22px;
     }
 
@@ -92,7 +87,7 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 16px;
+      margin-bottom: $space_normal;
     }
   }
 
@@ -102,31 +97,31 @@
 }
 </style>
 
-<script>
-export default {
-  data () {
-    return {
-      space: null,
-      post: null,
-      unsubscribe: null,
-      currentUser: null
-    }
-  },
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+import { ProfileStruct, SpaceStruct } from '@subsocial/api/flat-subsocial/flatteners'
+import { PostListItemData } from '~/models/post/post-list-item.model'
+import { getPostIdFromLink } from '~/utils/utils'
 
-  created () {
+@Component({})
+export default class PostPage extends Vue {
+  space: SpaceStruct | undefined | null = null
+  post: PostListItemData | undefined | null = null
+  currentUser?: ProfileStruct
+
+  created (): void {
     this.currentUser = this.$store.state.profiles.currentUser
-    this.post = this.$store.getters['posts/getPostInfo'](this.$getPostId(this.$route.params.post))
-    this.$store.dispatch('space/findSpaceById', this.$route.params.space.substring(1)).then((space) => {
+    this.post = this.$store.getters['posts/getPostInfo'](getPostIdFromLink(this.$route.params.post))
+    this.$store.dispatch('space/findSpaceById', this.$route.params.space).then((space) => {
       this.space = space
     })
 
-    this.unsubscribe = this.$store.subscribe((mutation, state) => {
+    const unsubscribe = this.$store.subscribe((mutation, state) => {
       if (mutation.type === 'posts/SET_SUGGESTED_POST_IDS' && this.post === undefined) {
-        this.$store.dispatch('posts/getPostById', this.$getPostId(this.$route.params.post)).then(() => {
-          this.post = this.$store.getters['posts/getPostInfo'](this.$getPostId(this.$route.params.post))
+        this.$store.dispatch('posts/getPostById', getPostIdFromLink(this.$route.params.post)).then(() => {
+          this.post = this.$store.getters['posts/getPostInfo'](getPostIdFromLink(this.$route.params.post))
           this.currentUser = this.$store.state.profiles.currentUser
-
-          this.unsubscribe()
+          unsubscribe()
         })
         this.$store.dispatch('space/getSpaceById', this.$route.params.space).then((space) => {
           this.space = space

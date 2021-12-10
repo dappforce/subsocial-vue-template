@@ -44,10 +44,10 @@
 <style lang="scss">
 .post-item-wp.shared {
   width: 100%;
-  margin-top: 16px;
+  margin-top: $space_normal;
 
   .post-item {
-    padding: 16px 16px 16px;
+    padding: $space_normal;
 
     .shared-post {
         margin-top: 0;
@@ -67,12 +67,12 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 16px;
+    margin-bottom: $space_normal;
 
     .button-wp {
       display: flex;
       align-items: center;
-      height: 36px;
+      height: $buttons_height;
     }
   }
 }

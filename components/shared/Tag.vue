@@ -7,47 +7,43 @@
 <style lang="scss">
 .tag {
   display: inline-flex;
-  padding: 6px 12px;
-  margin-right: 8px;
-  color: rgba(0, 0, 0, 0.6);
+  padding: 6px $space_small;
+  margin-right: $space_tiny;
+  color: $main_text_color;
   background: rgba(33, 33, 33, 0.08);
   border-radius: 16px;
   letter-spacing: 0.25px;
-  font-size: $font-size-secondary-text;
+  font-size: $font_small;
   cursor: pointer;
 }
 
-.tag.small {
-  font-size: 12px;
-}
-
 .tag.medium {
-  font-size: $font-size-secondary-text;
+  font-size: $font_small;
 }
 
 .tag.large {
-  font-size: $font-size-normal;
+  font-size: $font_normal;
 }
 
 .tag.huge {
-  font-size: $font-size-title-preview;
+  font-size: $font_large;
 }
 
 </style>
 
-<script>
-export default {
-  name: 'Tag',
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
-  props: {
-    tagName: {
-      type: String,
-      default: ''
-    },
-    size: {
-      type: String,
-      default: 'medium'
-    }
-  }
+@Component
+export default class Tag extends Vue {
+  @Prop({
+    type: String,
+    default: ''
+  }) tagName!: string
+
+  @Prop({
+    type: String,
+    default: 'medium'
+  }) size!: string
 }
 </script>

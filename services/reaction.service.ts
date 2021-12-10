@@ -1,10 +1,9 @@
 import { FlatSubsocialApi } from '@subsocial/api/flat-subsocial'
 import { AnyAccountId, AnyPostId, AnyReactionId } from '@subsocial/types'
-import { Reaction, ReactionId } from '@subsocial/types/substrate/interfaces'
+import { ReactionId } from '@subsocial/types/substrate/interfaces'
 import SubsocialApiService from '~/services/subsocial-api.service'
-import { METHODS, PALLETS } from '~/services/follow.service'
 import { flatMyReaction, FlatReaction, flatReaction } from '~/utils/flatten.map'
-import { bnToId, idToBn } from '~/utils/utils'
+import { METHODS, PALLETS } from '~/constants/query'
 const subsocialApiService = new SubsocialApiService()
 
 export default class ReactionService {

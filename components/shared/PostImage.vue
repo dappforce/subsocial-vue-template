@@ -1,6 +1,6 @@
-<template >
-  <NuxtLink :to="link" v-if="imageSrc && imageSrc.length">
-    <div class="post-image" v-bind:style="{ backgroundImage: 'url(' + imageSrc +')'}"></div>
+<template>
+  <NuxtLink v-if="imageSrc && imageSrc.length" :to="link">
+    <div class="post-image" :style="{ backgroundImage: 'url(' + imageSrc +')'}" />
   </NuxtLink>
 </template>
 
@@ -8,8 +8,8 @@
 .post-image {
   width: 174px;
   height: 174px;
-  margin-left: 16px;
-  border-radius: 4px;
+  margin-left: $space_normal;
+  border-radius: $border_small;
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -24,18 +24,18 @@
 }
 </style>
 
-<script>
-export default {
-  name: 'PostImage',
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
-  props: {
-    link: {
-      type: String,
-      default: '/'
-    },
-    imageSrc: {
-      type: String
-    }
-  }
+@Component
+export default class PostImage extends Vue {
+  @Prop({
+    type: String,
+    default: '/'
+  }) link!: string
+
+  @Prop({
+    type: String
+  }) imageSrc!: string
 }
 </script>

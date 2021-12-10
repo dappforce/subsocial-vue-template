@@ -20,15 +20,7 @@
         <div class="post-data">
           <div class="post-item-header">
             <PostInfoItem
-              :avatar-size="postItemData.avatarSize"
-              :avatar-src="postItemData.ownerImageUrl"
-              :created-at-time="postItemData.createdAtTime"
-              :space-name="postItemData.spaceName"
-              :handle="postItemData.handle"
-              :user-name="postItemData.ownerName"
-              :profile-link="postItemData.ownerId"
-              :post-link="postItemData.postLink"
-              :space-id="postItemData.spaceId"
+              :post-item="postItemData"
             />
             <div class="button-wp">
               <EditButton v-if="isPostOwner" :link="'post-edit/?post=' + postItemData.id" />
@@ -61,18 +53,18 @@
 <style lang="scss">
 .post-item-wp {
   width: 100%;
-  margin-top: 16px;
+  margin-top: $space_normal;
 
   .hidden-post {
-    margin: -16px -16px 16px;
+    margin: -$space_normal -$space_normal $space_normal;
     height: 40px;
     background: #FEFBE8;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 16px;
-    color: rgba(0, 0, 0, 0.87);
-    font-size: $font-size-secondary-text;
+    padding: 0 $space_normal;
+    color: $color_font_normal;
+    font-size: $font_small;
 
     .v-icon {
       margin-right: 10px;
@@ -81,8 +73,8 @@
     .make-visible {
       border: 1px solid #D9D9D9;
       box-sizing: border-box;
-      border-radius: 4px;
-      color: #222222;
+      border-radius: $border_small;
+      color: $color_font_normal;
       font-weight: 500;
       line-height: 125%;
       padding: 3px 5px;
@@ -90,19 +82,19 @@
 
       &:hover {
         cursor: pointer;
-        color: #EB2F96;
+        color: $color_primary;
       }
     }
   }
 
   .post-item {
-    padding: 16px 16px 16px;
-    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 2px 1px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.2) !important;
+    padding: $space_normal;
+    box-shadow: $box_shadow_card !important;
   }
 
   .post-main-wp {
     display: flex;
-    padding-bottom: 15px;
+    padding-bottom: $space_normal;
 
     .post-data {
       width: 100%;
@@ -113,12 +105,12 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 16px;
+    margin-bottom: $space_normal;
 
     .button-wp {
       display: flex;
       align-items: center;
-      height: 36px;
+      height: $buttons_height;
     }
   }
 }
@@ -131,31 +123,31 @@
 
 </style>
 
-<script>
-export default {
-  name: 'PostListItem',
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
+import { PostListItemData } from '~/models/post/post-list-item.model'
 
-  props: {
-    postItemData: {
-      type: Object,
-      default: undefined
-    },
-    currentUserId: {
-      type: String
-    },
-    isSharedPost: {
-      type: Boolean,
-      default: false
-    }
-  },
+@Component
+export default class PostListItem extends Vue {
+  @Prop({
+    type: Object,
+    default: undefined
+  }) postItemData!: PostListItemData
 
-  computed: {
-    isPostOwner () {
-      if (this.currentUserId) {
-        return this.postItemData.ownerId === this.currentUserId
-      } else {
-        return false
-      }
+  @Prop({
+    type: Boolean,
+    default: false
+  }) isSharedPost!: boolean
+
+  @Prop({
+    type: String
+  }) currentUserId!: string
+
+  get isPostOwner () {
+    if (this.currentUserId) {
+      return this.postItemData.ownerId === this.currentUserId
+    } else {
+      return false
     }
   }
 }

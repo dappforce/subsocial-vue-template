@@ -8,55 +8,46 @@
 </template>
 <style lang="scss">
 .tokens-wp {
-  line-height: 24px;
-  color: rgba(0, 0, 0, 0.38);
+  line-height: $main_line_height;
+  color: $color_font_normal;
   display: flex;
   align-items: center;
   font-weight: 500;
 
   .strong{
-    color: #222222;
+    color: $color_font_normal;
   }
 
   &>span:last-child {
     margin-left: 4px;
-    color: #222222;
+    color: $color_font_normal;
   }
 }
 </style>
-<script>
-export default {
-  name: 'Tokens',
+<script lang="ts">
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
-  props: {
-    balance: {
-      type: String || Number
-    }
+@Component
+export default class Tokens extends Vue {
+  @Prop({
+    type: String || Number
+  }) balance!: string | number
 
-  },
+  dividedTokens: string[] = []
 
-  data () {
-    return {
-      dividedTokens: []
-    }
-  },
-
-  watch: {
-    balance (newVal, oldVal) {
-      this.divideTokens()
-    }
-  },
-
-  created () {
+  @Watch('balance')
+  balanceHandler () {
     this.divideTokens()
-  },
+  }
 
-  methods: {
-    divideTokens () {
-      this.dividedTokens = this.balance
-        ? this.balance.toString().split('.')
-        : ['0', '0000']
-    }
+  created (): void {
+    this.divideTokens()
+  }
+
+  divideTokens (): void {
+    this.dividedTokens = this.balance
+      ? this.balance.toString().split('.')
+      : ['0', '0000']
   }
 }
 </script>

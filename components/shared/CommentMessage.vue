@@ -67,17 +67,17 @@
     width: 100%;
 
     .message-wp {
-      margin-left: 8px;
-      padding: 10px 16px;
-      background: #F2F2F2;
-      border-radius: 4px;
+      margin-left: $space_tiny;
+      padding: 10px $space_normal;
+      background: $color_page_bg;
+      border-radius: $border_small;
 
       .message-data {
-        font-size: $font-size-profile-name;
+        font-size: $font_normal;
 
         span {
           margin-right: 4px;
-          line-height: 24px;
+          line-height: $main_line_height;
         }
 
         span:first-child {
@@ -86,17 +86,17 @@
 
         .owner-name {
           text-decoration: none;
-          color: rgba(0, 0, 0, 0.87);
+          color: $color_font_normal;
         }
 
         .comment-date {
-          color: #A0A0A0;
+          color:$color_font_secondary;
         }
 
         .options-button {
           &.mdi-dots-vertical::before {
             transform: rotate(90deg);
-            color: #A0A0A0 !important;
+            color: $color_font_secondary !important;
           }
         }
       }
@@ -104,80 +104,67 @@
   }
 
   .action-wp {
-    margin: 8px;
+    margin: 0 $space_tiny;
     display: flex;
 
     .v-btn {
-      color: rgba(0, 0, 0, 0.6);
+      color: $main_text_color;
     }
   }
 
   .show-reply {
     cursor: pointer;
-    color: #F759AB;
-    font-size: $font-size-secondary-text;
+    color: $color_link_hover;
+    font-size: $font_small;
     font-weight: 500;
-    line-height: 24px;
+    line-height: $main_line_height;
     margin-left: 15px;
   }
 }
 
 @media only screen and (max-width: 768px) {
   .message-container {
-    width: calc(100% - 36px);
+    width: calc(100% - $buttons_width);
   }
 }
 
 </style>
 
-<script>
-export default {
-  name: 'CommentMessage',
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
+import { PostListItemData } from '~/models/post/post-list-item.model'
+import { ReplyIdStruct } from '~/types/reply-id.type'
 
-  props: {
-    id: {
-      type: String
-    },
-    avatarSrc: {
-      type: String
-    },
-    handle: {
-      type: String
-    },
-    comment: {
-      type: Object
-    }
-  },
+@Component
+export default class CommentMessage extends Vue {
+  @Prop({
+    type: String
+  }) id!: string
 
-  data () {
-    return {
-      showReplyBlock: false,
-      commentIds: [],
-      commentsList: [],
-      commentsIds: [],
-      isShowReplies: false
-    }
-  },
-  computed: {
-    toDate () {
-      const diff = this.$dayjs().diff(this.$dayjs(+this.comment.createdAtTime), 'days')
+  @Prop({
+    type: String
+  }) avatarSrc!: string
 
-      if (diff < 7) {
-        return this.$dayjs(+this.comment.createdAtTime).fromNow().toLowerCase()
-      } else if (diff > 7 && diff < 365) {
-        return this.$dayjs(+this.comment.createdAtTime).format('d MMM')
-      } else {
-        return this.$dayjs(+this.comment.createdAtTime).format('d MMM YY')
-      }
-    }
-  },
+  @Prop({
+    type: String
+  }) handle!: string
+
+  @Prop({
+    type: Object
+  }) comment!: PostListItemData
+
+  showReplyBlock: boolean = false
+  commentIds: [] = []
+  commentsList: PostListItemData[] = []
+  commentsIds: [] = []
+  isShowReplies: boolean = false
 
   created () {
-    this.$nuxt.$on(this.comment.id + 'reply', (data) => {
+    this.$nuxt.$on(this.comment.id + 'reply', () => {
       this.showReplyBlock = !this.showReplyBlock
     })
-    this.$store.dispatch('comment/getPostReplyId', this.comment.id).then((res) => {
-      const replyIds = this.$store.state.comment.replies.find(i => i.id === this.comment.id)?.replyIds
+    this.$store.dispatch('comment/getPostReplyId', this.comment.id).then(() => {
+      const replyIds = this.$store.state.comment.replies.find((i: ReplyIdStruct) => i.id === this.comment.id)?.replyIds
       if (replyIds.length) {
         this.commentIds = replyIds
         this.getNewPosts(replyIds).then(() => {
@@ -187,22 +174,32 @@ export default {
         })
       }
     })
-  },
+  }
 
-  methods: {
-    async getNewPosts (ids) {
-      return await this.$store.dispatch('posts/getPostsByIds', { ids, type: 'public' })
-    },
+  async getNewPosts (ids: []) {
+    return await this.$store.dispatch('posts/getPostsByIds', { ids, type: 'public' })
+  }
 
-    addUniquePostToPostArray (postsDictionary, ids) {
-      const newPosts = ids
-        .map(id => postsDictionary[id])
-        .filter(post => post !== undefined)
-      this.commentsList.push(...newPosts)
-    },
+  addUniquePostToPostArray (postsDictionary: [], ids: []) {
+    const newPosts = ids
+      .map(id => postsDictionary[id])
+      .filter(post => post !== undefined)
+    this.commentsList.push(...newPosts)
+  }
 
-    showReplies () {
-      this.isShowReplies = !this.isShowReplies
+  showReplies (): void {
+    this.isShowReplies = !this.isShowReplies
+  }
+
+  get toDate () {
+    const diff = this.$dayjs().diff(this.$dayjs(+this.comment.createdAtTime), 'days')
+
+    if (diff < 7) {
+      return this.$dayjs(+this.comment.createdAtTime).fromNow().toLowerCase()
+    } else if (diff > 7 && diff < 365) {
+      return this.$dayjs(+this.comment.createdAtTime).format('d MMM')
+    } else {
+      return this.$dayjs(+this.comment.createdAtTime).format('d MMM YY')
     }
   }
 }

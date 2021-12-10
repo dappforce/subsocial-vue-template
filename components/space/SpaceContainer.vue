@@ -16,70 +16,74 @@
     <BounceSpinner v-if="!spaceList.length" />
   </div>
 </template>
-<script>
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
 import { environment } from '@/environments/environment'
+import { ProfileItemModel } from '~/models/profile/profile-item.model'
+import { SpaceListItemData } from '~/models/space/space-list-item.model'
 
-export default {
-  name: 'SpaceContainer',
+const stepNumber = environment.stepForLoading
 
-  data () {
-    return {
-      spaceList: [],
-      startIndex: 20,
-      endIndex: 40,
-      step: 20,
-      max: environment.recommendedSpaceIds.length,
-      currentUser: null
-    }
-  },
+@Component
+export default class SpaceContainer extends Vue {
+  defaultStart: number = 0
+  defaultEnd: number = stepNumber
+  startIndex: number = stepNumber
+  endIndex: number = stepNumber * 2
+  step: number = stepNumber
+  max: number = environment.recommendedSpaceIds.length
+  currentUser: ProfileItemModel | null = null
+  spaceList: SpaceListItemData[] = []
 
-  created () {
+  created (): void {
     if (this.$store.state.loading.isLoading) {
-      this.getNewSpace(0, 20).then(() => {
+      this.getNewSpace(this.defaultStart, this.defaultEnd).then(() => {
         this.setCurrentUser()
-        this.spaceList = this.$store.getters['space/getSpacesWithContent'](0, 20)
+        this.spaceList = this.$store.getters['space/getSpacesWithContent'](this.defaultStart, this.defaultEnd)
       })
     } else {
-      this.unsubscribe = this.$store.subscribe((mutation, state) => {
-        if (mutation.type === 'posts/SET_SUGGESTED_POST_IDS' && this.spaceList === null) {
+      const unsubscribe = this.$store.subscribe((mutation) => {
+        if (mutation.type === 'posts/SET_SUGGESTED_POST_IDS' && !this.spaceList.length) {
           this.setCurrentUser()
-          this.getNewSpace(0, 20).then(() => {
-            this.spaceList = this.$store.getters['space/getSpacesWithContent'](0, 20)
-            this.unsubscribe()
+          this.getNewSpace(this.defaultStart, this.defaultEnd).then(() => {
+            this.spaceList = this.$store.getters['space/getSpacesWithContent'](this.defaultStart, this.defaultEnd)
+            unsubscribe()
           })
         }
       })
     }
-  },
-  beforeDestroy () {
-    this.startIndex = 20
-    this.endIndex = 40
+  }
+
+  beforeDestroy (): void {
+    this.startIndex = stepNumber
+    this.endIndex = stepNumber * 2
     this.$store.commit('content/CLEAR_SPACE_CONTENT', [])
-    this.spaceList = null
-  },
-  methods: {
-    infiniteScroll ($state) {
-      setTimeout(async () => {
-        await this.getNewSpace(this.startIndex, this.endIndex).then(() => {
-          this.spaceList.push(...this.$store.getters['space/getSpacesWithContent'](this.startIndex, this.endIndex))
+    this.spaceList = []
+  }
 
-          $state.loaded()
-          if (this.spaceList.length >= environment.recommendedSpaceIds.length) {
-            $state.complete()
-          }
+  infiniteScroll ($state: any) {
+    setTimeout(async () => {
+      await this.getNewSpace(this.startIndex, this.endIndex).then(() => {
+        this.spaceList.push(...this.$store.getters['space/getSpacesWithContent'](this.startIndex, this.endIndex))
 
-          this.startIndex += this.step
-          this.endIndex += this.step
-        })
-      }, 600)
-    },
-    async getNewSpace (start, end) {
-      return await this.$store.dispatch('space/getSpacesByIds', environment.recommendedSpaceIds.slice(start, end))
-    },
-    setCurrentUser () {
-      if (this.$store.state.profiles.currentUser) {
-        this.currentUser = this.$store.state.profiles.currentUser
-      }
+        $state.loaded()
+        if (this.spaceList.length >= environment.recommendedSpaceIds.length) {
+          $state.complete()
+        }
+
+        this.startIndex += this.step
+        this.endIndex += this.step
+      })
+    }, 500)
+  }
+
+  async getNewSpace (start: number, end: number) {
+    return await this.$store.dispatch('space/getSpacesByIds', environment.recommendedSpaceIds.slice(start, end))
+  }
+
+  setCurrentUser (): void {
+    if (this.$store.state.profiles.currentUser) {
+      this.currentUser = this.$store.state.profiles.currentUser
     }
   }
 }

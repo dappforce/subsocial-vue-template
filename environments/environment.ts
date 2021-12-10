@@ -12,6 +12,9 @@ export const environment = {
   ipfsNodeUrl: 'https://staging.subsocial.network/ipfs-1',
   currency: 'SUB',
   decimals: 11,
+  addressLengthShort: 13,
+  addressLengthLong: 17,
+  stepForLoading: 20,
   recommendedSpaceIds: [
     '1',
     '1354',

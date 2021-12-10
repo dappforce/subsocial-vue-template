@@ -7,42 +7,43 @@
 <style lang="scss">
 .title {
   font-weight: 500;
-  font-size: $font-size-normal;
+  font-size: $font_normal;
   line-height: 20px;
   letter-spacing: 0.25px;
-  color: rgba(0, 0, 0, 0.87);
+  color: $color_font_normal;
   text-transform: capitalize;
   text-decoration: none;
 }
 
 .medium {
-  font-size: $font-size-profile-name;
+  font-size: $font_normal;
   letter-spacing: 0.25px;
 }
 
 .large {
-  font-size: $font-size-title-preview;
+  font-size: $font_large;
   letter-spacing: 0.15px;
 }
 </style>
 
-<script>
-export default {
-  name: 'Title',
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
-  props: {
-    name: {
-      type: String,
-      default: ''
-    },
-    size: {
-      type: String,
-      default: ''
-    },
-    link: {
-      type: String,
-      default: '/'
-    }
-  }
+@Component
+export default class Title extends Vue {
+  @Prop({
+    type: String,
+    default: ''
+  }) name!: string
+
+  @Prop({
+    type: String,
+    default: ''
+  }) size!: string
+
+  @Prop({
+    type: String,
+    default: '/'
+  }) link!: string
 }
 </script>
