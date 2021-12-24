@@ -65,19 +65,13 @@
           </v-icon>
         </v-list-item-icon>
 
-        <v-tooltip top>
-          <template #activator="{ on, attrs }">
-            <v-list-item-content>
-              <v-list-item-title
-                v-bind="attrs"
-                v-on="on"
-              >
-                Edit my profile
-              </v-list-item-title>
-            </v-list-item-content>
-          </template>
-          <span>Coming soon</span>
-        </v-tooltip>
+        <v-list-item-content>
+          <v-list-item-title>
+            <NuxtLink :to="'/profile/?id=' + user.id">
+              Edit my profile
+            </NuxtLink>
+          </v-list-item-title>
+        </v-list-item-content>
       </v-list-item>
 
       <v-list-item link>
@@ -340,7 +334,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import StorageService from '../../services/storage.service'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
 import { AccountData } from '~/types/account.types'
-import { environment } from '~/environments/environment'
+import { config } from '~/config/config'
 const storageService = new StorageService()
 
 @Component
@@ -360,7 +354,7 @@ export default class AccountDrawer extends Vue {
   drawer: boolean = false
   isOpenModal: boolean = false
   accounts: AccountData[] = []
-  addressLength: number = environment.addressLengthShort
+  addressLength: number = config.addressLengthShort
 
   created () {
     const currentAcc = this.$store.state.profiles.currentUser

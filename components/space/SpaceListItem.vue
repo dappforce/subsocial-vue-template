@@ -4,6 +4,18 @@
       elevation="2"
       class="space-item"
     >
+      <div v-if="spaceItemData.struct.hidden && isMyOwnSpace" class="hidden-space">
+        <div class="alert-text">
+          <v-icon color="#EFB041">
+            mdi-alert-circle
+          </v-icon>This space is unlisted and only you can see it
+        </div>
+        <div class="unhidden-btn">
+          <span class="make-visible">
+            <ToggleVisibilityButton :space="spaceItemData" :toggle-type="'space'" />
+          </span>
+        </div>
+      </div>
       <div class="space-item-header">
         <SpaceInfoItem
           :space-item="spaceItemData"
@@ -12,7 +24,7 @@
         <div class="button-wp">
           <EditButton v-if="isMyOwnSpace && isSpaceView" :link="'space-edit/?space=' + spaceItemData.struct.id" />
           <FollowButton v-if="!isSpaceView" :follow="isFollowing" class="follow-btn" type="space" :entity-id="spaceItemData.struct.id" />
-          <OptionButton :no-reactions="true" />
+          <OptionButton :no-reactions="true" :space="spaceItemData" :can-edit="isMyOwnSpace" :toggle-type="'space'" />
         </div>
       </div>
       <div v-if="spaceItemData.content.summary.length" class="description">
@@ -25,7 +37,7 @@
           margin-top="10"
         />
       </div>
-      <LinkIcons v-if="isSpaceView" :links="spaceItemData.content.links" class="links-container" />
+      <LinkIcons v-if="isSpaceView && spaceItemData.content.links.length" :links="spaceItemData.content.links" class="links-container" />
       <div v-if="spaceItemData.content.tags.length" class="tags-container">
         <Tag v-for="tag in spaceItemData.content.tags" :key="tag" :tag-name="tag" size="medium" />
       </div>
@@ -45,50 +57,80 @@
 
   .space-item {
     padding: $space_normal;
-  }
 
-  .space-item-header {
-    display: flex;
-    justify-content: space-between;
-
-    .button-wp {
+    .hidden-space {
+      margin: (-$space_normal) (-$space_normal) $space_normal;
+      height: 40px;
+      background: #FEFBE8;
       display: flex;
       align-items: center;
-      height: $buttons_height;
+      justify-content: space-between;
+      padding: 0 $space_normal;
+      color: $color_font_normal;
+      font-size: $font_small;
 
-      .follow-btn {
+      .v-icon {
         margin-right: 10px;
       }
+
+      .make-visible {
+        border: 1px solid #D9D9D9;
+        box-sizing: border-box;
+        border-radius: $border_small;
+        color: $color_font_normal;
+        font-weight: 500;
+        line-height: 125%;
+        padding: 3px 5px;
+        transition: all .2s ease;
+
+        &:hover {
+          cursor: pointer;
+          color: $color_primary;
+        }
+      }
     }
-  }
 
-  .description {
-    margin: 13px 0 0;
-    font-size: $font_normal;
-    line-height: $main_line_height;
-    letter-spacing: 0.25px;
-    color: $color_font_normal;
-  }
+    .space-item-header {
+      display: flex;
+      justify-content: space-between;
 
-  .tags-container {
-    margin-top: 10px;
+      .button-wp {
+        display: flex;
+        align-items: center;
+        height: $buttons_height;
 
-    .tag {
-      margin-top: 10px;
+        .follow-btn {
+          margin-right: 10px;
+        }
+      }
     }
-  }
 
-  .links-container {
-    margin-top: $space_normal;
-  }
+    .description {
+      margin: 13px 0 0;
+      font-size: $font_normal;
+      line-height: $main_line_height;
+      letter-spacing: 0.25px;
+      color: $color_font_normal;
+    }
 
-  .action-row {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 22px;
+    .tags-container {
+      .tag {
+        margin-top: $space_normal;
+      }
+    }
 
-    & button {
-      width: calc(50% - 8px);
+    .links-container {
+      margin-top: $space_normal;
+    }
+
+    .action-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 22px;
+
+      & button {
+        width: calc(50% - 8px);
+      }
     }
   }
 }
@@ -119,7 +161,11 @@ export default class SpaceListItem extends Vue {
     type: Object
   }) currentUser!: ProfileItemModel
 
-  isSpaceView: boolean = false
+  @Prop({
+    type: Boolean,
+    default: false
+  }) isSpaceView!: boolean
+
   isFollowing: boolean = false
   user: ProfileItemModel | null = null
 
@@ -128,19 +174,13 @@ export default class SpaceListItem extends Vue {
     this.getIsFollowing()
   }
 
-  mounted (): void {
-    if (this.$route.fullPath.includes('@') && this.$route.name !== 'space-post') {
-      this.isSpaceView = true
-    }
-  }
-
   created (): void {
     if (this.currentUser) {
       this.user = this.currentUser
       this.getIsFollowing()
     }
 
-    this.$store.subscribe((mutation, state) => {
+    this.$store.subscribe((mutation) => {
       if (mutation.type === 'profiles/SET_CURRENT_USER') {
         this.setCurrentUser()
         this.getIsFollowing()

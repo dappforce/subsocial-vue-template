@@ -18,6 +18,10 @@ theme--light.v-btn:hover::before {
   display: none !important;
 }
 
+.container .theme--light.v-btn.v-btn--disabled.v-btn--has-bg {
+  background-color: $color_disabled !important;;
+}
+
 .action-panel-wp {
   button.v-btn.v-btn--has-bg {
     background-color: transparent;

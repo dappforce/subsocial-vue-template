@@ -9,7 +9,7 @@
           <Avatar :id="profileData.id" :src="profileData.avatar" :size="46" :name="profileData.name" />
           <div class="info-container">
             <div class="profile-name-wp">
-              <Title size="large" :name="profileData.name" />
+              <Title size="large" :name="profileData.name || profileData.id | addressShortness(addressLength)" />
             </div>
             <div class="profile-stats-wp">
               <span @click="openModal"><b>{{ profileData.followingCount | numeral('0,0a') }}</b> {{ profileData.followingCount | pluralize('en', ['Following', 'Following']) }}</span>
@@ -23,7 +23,7 @@
       </div>
 
       <div class="general-information">
-        <Paragraph v-if="profileData.summary.length" :text="profileData.summary" :margin-bottom="'17'" />
+        <Paragraph v-if="profileData.summary" :text="profileData.summary" :margin-bottom="'17'" />
         <LinkIcons v-if="profileData.links" :links="profileData.links" />
         <div class="account-info-wp">
           <v-icon size="24" class="account-icon">
@@ -48,7 +48,7 @@
       <v-divider
         class="mx-4"
       />
-      <Tabs :tab-links="tabLinks" :event-name="tabsEvent" />
+      <Tabs class="profile-tabs" :tab-links="tabLinks" :event-name="tabsEvent" />
     </v-card>
     <ModalConnections :is-modal="isOpenModal" :account-id="profileData.id" />
   </div>
@@ -168,13 +168,25 @@
       width: calc(50% - 8px);
     }
   }
+
+  .profile-tabs {
+    &.tabs-container {
+      padding-top: 0 !important;
+      background-color: transparent;
+      margin-bottom: 0;
+
+      & .v-tabs-bar {
+        box-shadow: none;
+      }
+    }
+  }
 }
 </style>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
-import { environment } from '~/environments/environment'
+import { config } from '~/config/config'
 
 @Component
 export default class ProfileItem extends Vue {
@@ -197,7 +209,7 @@ export default class ProfileItem extends Vue {
   isFollowing: boolean = false
   balance: string = ''
   user: ProfileItemModel = {} as ProfileItemModel
-  addressLength: number = environment.addressLengthLong
+  addressLength: number = config.addressLengthLong
 
   created () {
     this.load()
@@ -219,14 +231,13 @@ export default class ProfileItem extends Vue {
       if (!this.user) {
         this.user = this.$store.state.profiles.currentUser
       }
-
-      this.$store.dispatch('accountFollower/isAccountFollower', { myAddress: this.user.id, followedAddress: this.profileData.id })
+      this.$store.dispatch('accountFollower/isAccountFollower', { myAddress: this.user.id, followedAddress: this.profileData ? this.profileData.id : this.$route.params.account })
         .then((data) => {
           this.isFollowing = data
         })
     }
 
-    this.$store.dispatch('profiles/getAccountBalance', this.profileData.id).then((res) => {
+    this.$store.dispatch('profiles/getAccountBalance', this.profileData ? this.profileData.id : this.$route.params.account).then((res) => {
       this.balance = res
     })
   }

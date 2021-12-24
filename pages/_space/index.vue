@@ -1,13 +1,14 @@
 <template>
   <div v-if="space" class="space-item-container">
-    <SpaceListItem :space-item-data="space" :avatar-size="46" :is-my-own-space="isMyOwnSpace" :current-user="currentUser" />
+    <SpaceListItem :space-item-data="space" :avatar-size="46" :is-my-own-space="isMyOwnSpace" :current-user="currentUser" :is-space-view="true" />
     <div v-if="postListIds.length" class="post-list-container">
       <PostContainer :ids="postListIds" :type="isMyOwnSpace ? 'all' : 'public'" />
     </div>
+    <NoPosts v-if="!postListIds.length" />
   </div>
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
 .space-item-container {
   display: flex;
   flex-direction: column;
@@ -51,7 +52,7 @@ export default class SpacePage extends Vue {
       })
     } else {
       const unsubscribe = this.$store.subscribe((mutation) => {
-        if (mutation.type === 'profiles/SET_POLKADOT_ACCOUNTS' && this.space === null) {
+        if (mutation.type === 'profiles/SET_CURRENT_USER' && this.space === null) {
           this.$store.dispatch('space/getSpaceById', this.$route.params.space).then((space) => {
             this.setCurrentUser()
             this.space = space
@@ -67,10 +68,6 @@ export default class SpacePage extends Vue {
 
   beforeDestroy () {
     this.$store.commit('posts/CLEAR_SELECTED_POSTS')
-  }
-
-  mounted () {
-    this.$nuxt.$emit('isShowTabs', !(this.$route.name === 'space'))
   }
 
   async getSpacePosts (space: SpaceListItemData) {

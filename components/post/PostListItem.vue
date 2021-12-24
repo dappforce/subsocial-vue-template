@@ -4,7 +4,7 @@
       elevation="2"
       class="post-item"
     >
-      <div v-if="postItemData.hidden" class="hidden-post">
+      <div v-if="postItemData.hidden && isPostOwner" class="hidden-post">
         <div class="alert-text">
           <v-icon color="#EFB041">
             mdi-alert-circle
@@ -12,7 +12,7 @@
         </div>
         <div class="unhidden-btn">
           <span class="make-visible">
-            Make visible
+            <ToggleVisibilityButton :post="postItemData" :toggle-type="'post'" />
           </span>
         </div>
       </div>
@@ -23,8 +23,8 @@
               :post-item="postItemData"
             />
             <div class="button-wp">
-              <EditButton v-if="isPostOwner" :link="'post-edit/?post=' + postItemData.id" />
-              <OptionButton :post-id="postItemData.id" :account-id="postItemData.ownerId" />
+              <EditButton v-if="isPostOwner" :link="'/post-edit/?post=' + postItemData.id" />
+              <OptionButton :post-id="postItemData.id" :account-id="postItemData.ownerId" :post="postItemData" :can-edit="isPostOwner" :toggle-type="'post'" />
             </div>
           </div>
           <Title size="large" :link="postItemData.postLink" :name="postItemData.title" />
@@ -56,7 +56,7 @@
   margin-top: $space_normal;
 
   .hidden-post {
-    margin: -$space_normal -$space_normal $space_normal;
+    margin: (-$space_normal) (-$space_normal) $space_normal;
     height: 40px;
     background: #FEFBE8;
     display: flex;
@@ -126,6 +126,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { PostListItemData } from '~/models/post/post-list-item.model'
+import { getIsPostOwner } from '~/utils/utils'
 
 @Component
 export default class PostListItem extends Vue {
@@ -143,12 +144,6 @@ export default class PostListItem extends Vue {
     type: String
   }) currentUserId!: string
 
-  get isPostOwner () {
-    if (this.currentUserId) {
-      return this.postItemData.ownerId === this.currentUserId
-    } else {
-      return false
-    }
-  }
+  isPostOwner : boolean = getIsPostOwner(this.postItemData.ownerId, this.currentUserId)
 }
 </script>

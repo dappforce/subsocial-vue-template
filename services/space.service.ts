@@ -20,6 +20,11 @@ export default class SpaceService {
     return transformEntityDataArray(spaceData)
   }
 
+  async getUnlistedSpaces (ids: AnyId[]): Promise<TransformDataArray> {
+    const spaceData = await (await this.getApi()).findUnlistedSpaces(ids)
+    return transformEntityDataArray(spaceData)
+  }
+
   async getSpace (id: string): Promise<TransformData | undefined> {
     const spaceData = await (await this.getApi()).findSpace({ id: new BN(id) })
     if (spaceData && spaceData.struct.contentId) {

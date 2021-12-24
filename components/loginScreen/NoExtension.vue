@@ -33,9 +33,9 @@
 
 <style lang="scss">
 .no-extension {
-  width: 432px;
+  width: $modal_width;
   height: 267px;
-  padding: 18px;
+  padding: $space_normal;
 
   .title {
     font-weight: 500;

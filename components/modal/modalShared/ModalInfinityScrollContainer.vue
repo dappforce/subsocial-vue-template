@@ -26,9 +26,9 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { ProfileStruct } from '@subsocial/api/flat-subsocial/flatteners'
-import { environment } from '~/environments/environment'
+import { config } from '~/config/config'
 
-const stepNumber = environment.stepForLoading
+const stepNumber = config.stepForLoading
 
 @Component
 export default class ModalInfinityScrollContainer extends Vue {
