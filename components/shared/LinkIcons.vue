@@ -32,86 +32,29 @@
 }
 </style>
 
-<script>
-export default {
-  name: 'LinkIcons',
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
-  filters: {
-    linkToIcon (link) {
-      function getLinkBrand (link) {
-        for (const key in socialLinksRegExp) {
-          if (isSocialBrandLink(key, link)) {
-            return key
-          }
-        }
-        return 'web'
-      }
+@Component
+export default class LinkIcons extends Vue {
+  @Prop({
+    type: Array
+  }) links!: []
 
-      function isSocialBrandLink (brand, link) {
-        if (!link) {
-          return false
-        }
-
-        link = link.trim().toLowerCase()
-        return !!socialLinksRegExp[brand].find(r => r.test(link))
-      }
-
-      const newSocialLinkRegExp = (brandDomain) => {
-        return new RegExp(linkPrefix + brandDomain)
-      }
-
-      const linkPrefix = '^(https?://)?([a-z0-9-]+.)?'
-
-      const socialLinksRegExp = {
-        facebook: [
-          newSocialLinkRegExp('facebook.com'),
-          newSocialLinkRegExp('fb.me'),
-          newSocialLinkRegExp('fb.com'),
-          newSocialLinkRegExp('facebook.me')
-        ],
-        twitter: [newSocialLinkRegExp('twitter.com')],
-        medium: [newSocialLinkRegExp('medium.com')],
-        linkedin: [
-          newSocialLinkRegExp('linkedin.com'),
-          newSocialLinkRegExp('linked.in')
-        ],
-        github: [newSocialLinkRegExp('github.com')],
-        reddit: [newSocialLinkRegExp('reddit.com')],
-        youtube: [
-          newSocialLinkRegExp('youtube.com'),
-          newSocialLinkRegExp('youtu.be')
-        ],
-        telegram: [
-          newSocialLinkRegExp('t.me'),
-          newSocialLinkRegExp('telegram.me')
-        ]
-      }
-      return getLinkBrand(link)
+  isTelegramOrMedium (link: string): string | boolean {
+    const linkPrefix = '^(https?://)?([a-z0-9-]+.)?'
+    const newSocialLinkRegExp = (brandDomain: string) => {
+      return new RegExp(linkPrefix + brandDomain)
     }
-  },
 
-  props: {
-    links: {
-      type: Array
+    if (newSocialLinkRegExp('medium.com').test(link)) {
+      return 'medium'
+    } else if (newSocialLinkRegExp('t.me').test(link) ||
+      newSocialLinkRegExp('telegram.me').test(link)) {
+      return 'telegram'
     }
-  },
 
-  methods: {
-    isTelegramOrMedium (link) {
-      const linkPrefix = '^(https?://)?([a-z0-9-]+.)?'
-      const newSocialLinkRegExp = (brandDomain) => {
-        return new RegExp(linkPrefix + brandDomain)
-      }
-
-      if (newSocialLinkRegExp('medium.com').test(link)) {
-        return 'medium'
-      } else if (newSocialLinkRegExp('t.me').test(link) ||
-        newSocialLinkRegExp('telegram.me').test(link)) {
-        return 'telegram'
-      }
-
-      return true
-    }
+    return true
   }
 }
 </script>

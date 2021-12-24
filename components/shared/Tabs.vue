@@ -4,7 +4,7 @@
     centered
     class="tabs-container"
   >
-    <v-tabs-slider color="#EB2F96" />
+    <v-tabs-slider class="slider-color" />
 
     <v-tab
       v-for="item in tabLinks"
@@ -21,11 +21,20 @@
 <style lang="scss">
 .tabs-container {
   height: 100%;
-  min-height: 48px;
+  min-height: 56px;
+  padding-top: $space_normal;
+  background-color: $color_page_bg;
+  margin-bottom: $space_normal;
 
   .v-tabs-bar {
     height: 100%;
-    min-height: 48px;
+    min-height: 56px;
+    box-shadow: $box_shadow_card;
+    width: $general_width;
+  }
+
+  .slider-color {
+    color: $color_primary;
   }
 
   .v-slide-group__content {
@@ -36,62 +45,55 @@
     font-family: Roboto;
     font-style: normal;
     font-weight: 500;
-    font-size: 16px;
+    font-size: $font_normal;
     line-height: 16px;
     text-align: center;
     letter-spacing: 1.25px;
     text-transform: uppercase;
-    color: rgba(0, 0, 0, 0.6);
+    color: $main_text_color;
 
     &.v-tab--active {
-      color: #EB2F96;
+      color: $color_primary;
     }
   }
 }
 </style>
 
-<script>
-export default {
-  name: 'Tabs',
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
-  props: {
-    tabLinks: {
-      type: Array,
-      default: ['posts', 'spaces']
-    },
-    eventName: {
-      type: String,
-      default: 'mainPage'
-    }
-  },
-  data () {
-    return {
-      tab: this.tabLinks[1],
-      newTabValue: null
-    }
-  },
+@Component
+export default class Tabs extends Vue {
+  @Prop({
+    type: Array
+  }) tabLinks!: ['posts', 'spaces']
 
-  mounted () {
+  @Prop({
+    type: String,
+    default: 'mainPage'
+  }) eventName!: string
+
+  tab: string = this.tabLinks[1]
+
+  mounted (): void {
     if (this.$route.params.length) {
       this.tab = this.tabLinks[0]
     } else {
       this.tab = this.$store.state.profiles.currentUser ? this.tabLinks[0] : this.tabLinks[0]
     }
     this.$nuxt.$emit(this.eventName, this.tab)
-  },
+  }
 
-  created () {
-    this.$nuxt.$on('setTab', (data) => {
+  created (): void {
+    this.$nuxt.$on('setTab', (data: string) => {
       setTimeout(() => {
         this.tab = data
       }, 100)
     })
-  },
+  }
 
-  methods: {
-    onClick (item) {
-      this.$nuxt.$emit(this.eventName, item)
-    }
+  onClick (item: string): void {
+    this.$nuxt.$emit(this.eventName, item)
   }
 }
 </script>

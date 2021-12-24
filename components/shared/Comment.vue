@@ -1,6 +1,7 @@
 <template>
   <div class="comments-wp">
     <v-divider
+      v-if="showDivider"
       class="mx-4 divider"
     />
     <div class="comments-counter">
@@ -14,7 +15,15 @@
 
       <div class="action-wp">
         <div class="text-area-wp">
+          <client-only>
+            <vue-easymde
+              v-if="showEditor"
+              v-model="comment"
+              class="easy-mde"
+            />
+          </client-only>
           <v-textarea
+            v-if="!showEditor"
             v-model="comment"
             auto-grow
             outlined
@@ -38,7 +47,8 @@
       :key="index"
       :comment="item"
       :handle="handle"
-      :avatar-src="'fqwefqwe'"
+      :avatar-src="item.ownerImageUrl"
+      :is-post-owner="isPostOwner"
     />
   </div>
 </template>
@@ -62,32 +72,32 @@
   .placeholder {
     position: absolute;
     top: 6px;
-    left: 16px;
-    font-size: 16px;
-    line-height: 24px;
+    left: $space_normal;
+    font-size: $font_normal;
+    line-height: $main_line_height;
     letter-spacing: 0.25px;
-    color: rgba(0, 0, 0, 0.6);
+    color: $main_text_color;
     pointer-events: none;
   }
 }
 
 .comments-wp {
   .divider {
-    margin-bottom: 12px;
+    margin-bottom: $space_small;
   }
 
   .comments-counter {
     font-weight: 500;
-    font-size: 20px;
-    line-height: 24px;
+    font-size: $font_large;
+    line-height: $main_line_height;
     letter-spacing: 0.15px;
-    color: rgba(0, 0, 0, 0.87);
+    color: $color_font_normal;
   }
 
   .send-message-wp {
     display: flex;
     width: 100%;
-    margin-top: 16px;
+    margin-top: $space_normal;
 
     .avatar-wp {
       display: flex;
@@ -99,22 +109,36 @@
       flex-direction: column;
       gap: 4px;
       width: 100%;
-      margin-left: 8px;
+      margin-left: $space_tiny;
+
+      .easy-mde {
+        .EasyMDEContainer .CodeMirror {
+          min-height: 30px;
+        }
+
+        .CodeMirror-scroll {
+          min-height: 30px !important;
+        }
+
+        .editor-statusbar {
+          display: none;
+        }
+      }
 
       .send-button {
-        background-color: #EB2F96;
-        border-radius: 4px;
+        background-color: $color_primary;
+        border-radius: $border_small;
         width: 78px;
-        height: 36px;
-        color: #fff;
+        height: $buttons_height;
+        color: $color_white;
         text-align: center;
         font-weight: normal;
-        margin-top: 8px;
-        margin-bottom: 7px;
+        margin-top: $space_tiny;
+        margin-bottom: $space_tiny;
 
         &:disabled {
           background-color: #F597CA!important;
-          color: #fff !important;
+          color: $color_white !important;
         }
       }
     }
@@ -123,38 +147,49 @@
 
 </style>
 
-<script>
-export default {
-  name: 'Comment',
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
+import { PostListItemData } from '~/models/post/post-list-item.model'
+import { ReplyIdStruct } from '~/types/reply-id.type'
 
-  props: {
-    id: {
-      type: String
-    },
-    avatarSrc: {
-      type: String
-    },
-    handle: {
-      type: String
-    },
-    count: {
-      type: Number
-    }
-  },
+@Component
+export default class Comment extends Vue {
+  @Prop({
+    type: String
+  }) id!: string
 
-  data () {
-    return {
-      comment: '',
-      showBtn: false,
-      commentIds: [],
-      commentsList: [],
-      showSpinner: true
-    }
-  },
+  @Prop({
+    type: String
+  }) avatarSrc!: string
+
+  @Prop({
+    type: String
+  }) handle!: string
+
+  @Prop({
+    type: Number
+  }) count!: number
+
+  @Prop({
+    type: Boolean,
+    default: false
+  }) isPostOwner!: boolean
+
+  @Prop({
+    type: Boolean,
+    default: true
+  }) showDivider!: boolean
+
+  comment: string = ''
+  showBtn: boolean = false
+  commentIds: [] = []
+  commentsList: PostListItemData[] = []
+  showSpinner: boolean = true
+  showEditor: boolean = false
 
   created () {
     this.$store.dispatch('comment/getPostReplyId', this.id).then(() => {
-      const replyIds = this.$store.state.comment.replies.find(i => i.id === this.id)?.replyIds
+      const replyIds = this.$store.state.comment.replies.find((i: ReplyIdStruct) => i.id === this.id)?.replyIds
       if (replyIds.length) {
         this.commentIds = replyIds
         this.getNewPosts(replyIds).then(() => {
@@ -166,31 +201,32 @@ export default {
         this.showSpinner = false
       }
     })
-  },
+  }
 
-  methods: {
-    showButton () {
-      if (!this.comment.length) {
-        this.showBtn = true
-      }
-    },
-    hideButton () {
-      if (!this.comment.length) {
-        this.showBtn = false
-      }
-    },
+  showButton (): void {
+    this.showEditor = !this.showEditor
+    this.showBtn = true
+    if (!this.comment.length) {
 
-    async getNewPosts (ids) {
-      return await this.$store.dispatch('posts/getPostsByIds', { ids, type: 'public' })
-    },
-
-    addUniquePostToPostArray (postsDictionary, ids) {
-      const newPosts = ids
-        .map(id => postsDictionary[id])
-        .filter(post => post !== undefined)
-      this.commentsList.push(...newPosts)
-      this.showSpinner = false
     }
+  }
+
+  hideButton (): void {
+    // if (!this.comment.length) {
+    //   this.showBtn = false
+    // }
+  }
+
+  async getNewPosts (ids: []) {
+    return await this.$store.dispatch('posts/getPostsByIds', { ids, type: this.isPostOwner ? 'all' : 'public' })
+  }
+
+  addUniquePostToPostArray (postsDictionary: [], ids: []) {
+    const newPosts = ids
+      .map(id => postsDictionary[id])
+      .filter(post => post !== undefined)
+    this.commentsList.push(...newPosts)
+    this.showSpinner = false
   }
 }
 </script>

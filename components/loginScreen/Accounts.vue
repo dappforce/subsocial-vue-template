@@ -34,14 +34,14 @@
 
 <style lang="scss">
 .account-present {
-  width: 432px;
-  padding: 18px;
+  width: $modal_width;
+  padding: $space_normal;
 
   .title {
     font-weight: 500;
-    font-size: $font-size-title-details;
+    font-size: $font_huge;
     line-height: 125%;
-    color: #A0A0A0;
+    color: $color_font_secondary;
     width: 100%;
     text-align: center;
     margin-bottom: 14px;
@@ -50,7 +50,7 @@
   .message {
     width: 100%;
     text-align: center;
-    font-size: $font-size-normal;
+    font-size: $font_normal;
     line-height: 125%;
     color: #262626;
     margin-bottom: 10px;
@@ -64,7 +64,7 @@
       display: flex;
       align-items: center;
       padding: 10px 0;
-      border-bottom: 1px solid #EEECEC;
+      border-bottom: 1px solid $color_shadow;
 
       &:hover {
         background-color: rgba(238, 236, 236, 0.7);
@@ -74,17 +74,17 @@
       .info {
         display: flex;
         flex-direction: column;
-        margin-left: 16px;
+        margin-left: $space_normal;
 
         .name {
           font-weight: 500;
-          font-size: $font-size-profile-name;
+          font-size: $font_normal;
           line-height: 125%;
-          color: #222222;
+          color: $color_font_normal;
         }
 
         .balance {
-          font-size: $font-size-secondary-text;
+          font-size: $font_small;
         }
       }
 
@@ -100,54 +100,60 @@
 
     a {
       text-decoration: none;
-      color: #A0A0A0;
-      font-size: $font-size-secondary-text;
+      color: $color_font_secondary;
+      font-size: $font_small;
       line-height: 125%;
 
       &:hover {
-        color: #EB2F96;
+        color: $color_primary;
       }
     }
   }
 }
 </style>
 
-<script>
-export default {
-  name: 'LoginScreenAccounts',
-  data () {
-    return {
-      accounts: [],
-      balances: []
-    }
-  },
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+import { AccountData } from '~/types/account.types'
+
+export interface Balance {
+  id: string,
+  balance: any
+}
+
+@Component
+export default class LoginScreenAccounts extends Vue {
+  accounts: AccountData[] = []
+  balances: Balance[] = []
+
   created () {
     this.accounts = this.$store.state.profiles.polkadotAccounts
     this.getBalance(this.$store.state.profiles.polkadotAccounts)
-  },
-  methods: {
-    getBalance (accounts) {
-      accounts.map(async (i) => {
-        await new Promise((resolve) => {
-          resolve(i.balance)
-        }).then((res) => {
-          const account = {
-            id: i.id,
-            balance: res
-          }
-          this.balances.push(account)
-        })
+  }
+
+  getBalance (accounts: AccountData[]) {
+    accounts.map(async (i) => {
+      await new Promise((resolve) => {
+        resolve(i.balance)
+      }).then((res) => {
+        const account = {
+          id: i.id,
+          balance: res
+        }
+        this.balances.push(account)
       })
-    },
-    findBalance (id) {
-      const bal = this.balances.find(i => i.id === id)
-      if (bal) {
-        return bal.balance
-      }
-    },
-    setAccount (account) {
-      this.$store.dispatch('profiles/setCurrentAccount', account)
+    })
+  }
+
+  findBalance (id: string) {
+    const bal = this.balances.find(i => i.id === id)
+    if (bal) {
+      return bal.balance
     }
+  }
+
+  setAccount (account: AccountData) {
+    this.$store.dispatch('profiles/setCurrentAccount', account)
   }
 }
 </script>

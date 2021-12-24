@@ -6,11 +6,24 @@
 
     <div class="message-container">
       <div class="message-wp">
+        <div v-if="comment.hidden && (isCommentOwner || isPostOwner)" class="hidden-bar">
+          <alert-text>
+            <v-icon color="#EFB041">
+              mdi-alert-circle
+            </v-icon>
+            This comment is unlisted and only you can see it
+          </alert-text>
+          <div class="unhidden-btn">
+            <span class="make-visible">
+              <ToggleVisibilityButton :post="comment" :toggle-type="'post'" />
+            </span>
+          </div>
+        </div>
         <div class="message-data">
           <span><NuxtLink :to="'/accounts/'+ comment.ownerId" class="owner-name">{{ comment.ownerName }}</NuxtLink></span>
           <span>·</span>
           <span class="comment-date">{{ toDate }}</span>
-          <OptionButton :post-id="comment.id" :account-id="comment.ownerId" />
+          <OptionButton :post-id="comment.id" :account-id="comment.ownerId" :post="comment" :can-edit="(isCommentOwner || isPostOwner)" :toggle-type="'post'" />
         </div>
         <Paragraph
           :margin-top="'5'"
@@ -67,17 +80,50 @@
     width: 100%;
 
     .message-wp {
-      margin-left: 8px;
-      padding: 10px 16px;
-      background: #F2F2F2;
-      border-radius: 4px;
+      margin-left: $space_tiny;
+      padding: 10px $space_normal;
+      background: $color_page_bg;
+      border-radius: $border_small;
+
+      .hidden-bar {
+        margin: (-$space_normal) (-$space_normal) $space_tiny;
+        height: 40px;
+        background: #FEFBE8;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 $space_normal;
+        color: $color_font_normal;
+        font-size: $font_small;
+        border-radius: $border_small $border_small 0 0;
+
+        .v-icon {
+          margin-right: 10px;
+        }
+
+        .make-visible {
+          border: 1px solid #D9D9D9;
+          box-sizing: border-box;
+          border-radius: $border_small;
+          color: $color_font_normal;
+          font-weight: 500;
+          line-height: 125%;
+          padding: 3px 5px;
+          transition: all .2s ease;
+
+          &:hover {
+            cursor: pointer;
+            color: $color_primary;
+          }
+        }
+      }
 
       .message-data {
-        font-size: $font-size-profile-name;
+        font-size: $font_normal;
 
         span {
           margin-right: 4px;
-          line-height: 24px;
+          line-height: $main_line_height;
         }
 
         span:first-child {
@@ -86,17 +132,17 @@
 
         .owner-name {
           text-decoration: none;
-          color: rgba(0, 0, 0, 0.87);
+          color: $color_font_normal;
         }
 
         .comment-date {
-          color: #A0A0A0;
+          color:$color_font_secondary;
         }
 
         .options-button {
           &.mdi-dots-vertical::before {
             transform: rotate(90deg);
-            color: #A0A0A0 !important;
+            color: $color_font_secondary !important;
           }
         }
       }
@@ -104,20 +150,20 @@
   }
 
   .action-wp {
-    margin: 8px;
+    margin: 0 $space_tiny;
     display: flex;
 
     .v-btn {
-      color: rgba(0, 0, 0, 0.6);
+      color: $main_text_color;
     }
   }
 
   .show-reply {
     cursor: pointer;
-    color: #F759AB;
-    font-size: $font-size-secondary-text;
+    color: $color_link_hover;
+    font-size: $font_small;
     font-weight: 500;
-    line-height: 24px;
+    line-height: $main_line_height;
     margin-left: 15px;
   }
 }
@@ -130,54 +176,49 @@
 
 </style>
 
-<script>
-export default {
-  name: 'CommentMessage',
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
+import { PostListItemData } from '~/models/post/post-list-item.model'
+import { ReplyIdStruct } from '~/types/reply-id.type'
+import { getIsPostOwner } from '~/utils/utils'
 
-  props: {
-    id: {
-      type: String
-    },
-    avatarSrc: {
-      type: String
-    },
-    handle: {
-      type: String
-    },
-    comment: {
-      type: Object
-    }
-  },
+@Component
+export default class CommentMessage extends Vue {
+  @Prop({
+    type: String
+  }) id!: string
 
-  data () {
-    return {
-      showReplyBlock: false,
-      commentIds: [],
-      commentsList: [],
-      commentsIds: [],
-      isShowReplies: false
-    }
-  },
-  computed: {
-    toDate () {
-      const diff = this.$dayjs().diff(this.$dayjs(+this.comment.createdAtTime), 'days')
+  @Prop({
+    type: String
+  }) avatarSrc!: string
 
-      if (diff < 7) {
-        return this.$dayjs(+this.comment.createdAtTime).fromNow().toLowerCase()
-      } else if (diff > 7 && diff < 365) {
-        return this.$dayjs(+this.comment.createdAtTime).format('d MMM')
-      } else {
-        return this.$dayjs(+this.comment.createdAtTime).format('d MMM YY')
-      }
-    }
-  },
+  @Prop({
+    type: String
+  }) handle!: string
+
+  @Prop({
+    type: Object
+  }) comment!: PostListItemData
+
+  @Prop({
+    type: Boolean,
+    default: false
+  }) isPostOwner!: boolean
+
+  showReplyBlock: boolean = false
+  commentIds: [] = []
+  commentsList: PostListItemData[] = []
+  commentsIds: [] = []
+  isShowReplies: boolean = false
+  isCommentOwner : boolean = false
+  currentUserId: string | undefined = undefined
 
   created () {
-    this.$nuxt.$on(this.comment.id + 'reply', (data) => {
+    this.$nuxt.$on(this.comment.id + 'reply', () => {
       this.showReplyBlock = !this.showReplyBlock
     })
-    this.$store.dispatch('comment/getPostReplyId', this.comment.id).then((res) => {
-      const replyIds = this.$store.state.comment.replies.find(i => i.id === this.comment.id)?.replyIds
+    this.$store.dispatch('comment/getPostReplyId', this.comment.id).then(() => {
+      const replyIds = this.$store.state.comment.replies.find((i: ReplyIdStruct) => i.id === this.comment.id)?.replyIds
       if (replyIds.length) {
         this.commentIds = replyIds
         this.getNewPosts(replyIds).then(() => {
@@ -187,22 +228,35 @@ export default {
         })
       }
     })
-  },
 
-  methods: {
-    async getNewPosts (ids) {
-      return await this.$store.dispatch('posts/getPostsByIds', { ids, type: 'public' })
-    },
+    this.currentUserId = this.$store.state.profiles.currentUser.id
+    this.isCommentOwner = getIsPostOwner(this.comment.ownerId, this.currentUserId)
+  }
 
-    addUniquePostToPostArray (postsDictionary, ids) {
-      const newPosts = ids
-        .map(id => postsDictionary[id])
-        .filter(post => post !== undefined)
-      this.commentsList.push(...newPosts)
-    },
+  async getNewPosts (ids: []) {
+    return await this.$store.dispatch('posts/getPostsByIds', { ids, type: this.isPostOwner ? 'all' : 'public' })
+  }
 
-    showReplies () {
-      this.isShowReplies = !this.isShowReplies
+  addUniquePostToPostArray (postsDictionary: [], ids: []) {
+    const newPosts = ids
+      .map(id => postsDictionary[id])
+      .filter(post => post !== undefined)
+    this.commentsList.push(...newPosts)
+  }
+
+  showReplies (): void {
+    this.isShowReplies = !this.isShowReplies
+  }
+
+  get toDate () {
+    const diff = this.$dayjs().diff(this.$dayjs(+this.comment.createdAtTime), 'days')
+
+    if (diff < 7) {
+      return this.$dayjs(+this.comment.createdAtTime).fromNow().toLowerCase()
+    } else if (diff > 7 && diff < 365) {
+      return this.$dayjs(+this.comment.createdAtTime).format('d MMM')
+    } else {
+      return this.$dayjs(+this.comment.createdAtTime).format('d MMM YY')
     }
   }
 }

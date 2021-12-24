@@ -4,7 +4,7 @@
     max-width="432"
   >
     <v-card class="login-modal-container">
-      <v-icon medium class="close-icon" size="14" @click="onClick">
+      <v-icon medium class="close-icon" size="24" @click="onClick">
         mdi-close
       </v-icon>
       <LoginScreenNoExtension v-if="status === statusEnum.EXTENSION_NOT_FOUND" />
@@ -18,58 +18,50 @@
 .login-modal-container {
   .close-icon {
     position: absolute;
-    right: 16px;
-    top: 16px;
+    right: $space_normal;
+    top: $space_normal;
   }
 }
 
 </style>
 
-<script>
+<script lang="ts">
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { ACCOUNT_STATUS } from '~/models/enum/account-status.enum'
 
-export default {
-  name: 'ModalLogin',
+@Component
+export default class ModalLogin extends Vue {
+  @Prop({
+    type: Boolean,
+    default: false
+  }) isModal!: boolean
 
-  props: {
-    isModal: {
-      type: Boolean,
-      default: false
-    }
-  },
+  openModal: boolean = false
+  status: string = ''
 
-  data () {
-    return {
-      openModal: false,
-      status: ''
-    }
-  },
+  @Watch('isModal')
+  isModalHandler () {
+    this.onClick()
+  }
 
-  computed: {
-    statusEnum () {
-      return ACCOUNT_STATUS
-    }
-  },
-
-  watch: {
-    isModal () {
-      this.onClick()
-    }
-  },
-
-  created () {
+  created (): void {
     this.status = this.$store.state.profiles.status
-    this.unsubscribe = this.$store.subscribe((mutation, state) => {
+    this.$store.subscribe((mutation) => {
       if (mutation.type === 'profiles/SET_STATUS') {
         this.status = this.$store.state.profiles.status
       }
     })
-  },
+    this.$nuxt.$on('isShowLoginModal', (data: boolean) => {
+      this.openModal = data
+    })
+  }
 
-  methods: {
-    onClick () {
-      this.openModal = !this.openModal
-    }
+  onClick (): void {
+    this.openModal = !this.openModal
+  }
+
+  get statusEnum () {
+    return ACCOUNT_STATUS
   }
 }
 </script>

@@ -21,44 +21,42 @@
   }
 
   .v-snack__content {
-    color: #222222;
+    color: $color_font_normal;
   }
 }
 </style>
 
-<script>
-export default {
-  name: 'Snackbar',
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
-  props: {
-    defaultText: {
-      type: String,
-      default: ''
-    },
-    defaultTimeout: {
-      type: Number,
-      default: 2000
-    },
-    defaultShow: {
-      type: Boolean,
-      default: false
-    }
-  },
+@Component
+export default class Snackbar extends Vue {
+  @Prop({
+    type: String,
+    default: ''
+  }) defaultText!: string
 
-  data () {
-    return {
-      snackbar: false,
-      text: '',
-      timeout: 2000
-    }
-  },
+  @Prop({
+    type: Number,
+    default: 2000
+  }) defaultTimeout!: number
+
+  @Prop({
+    type: Boolean,
+    default: false
+  }) defaultShow!: boolean
+
+  snackbar: boolean = false
+  text: string = ''
+  timeout: number = 2000
 
   created () {
-    this.$nuxt.$on('isShowSnackbar', (data) => {
+    this.$nuxt.$on('isShowSnackbar', (data: any) => {
       this.snackbar = data.show
       this.text = data.text
+      this.timeout = data.timeout ? data.timeout : this.defaultTimeout
     })
-  },
+  }
 
   mounted () {
     this.text = this.defaultText

@@ -6,11 +6,11 @@
       <div class="user-info-wp">
         <span class="user-name">{{ userInfo.name }}</span>
 
-        <Address :address="userInfo.id" :length="17" :show-icon="false" />
+        <Address :address="userInfo.id" :length="addressLength" :show-icon="false" />
       </div>
     </div>
 
-    <FollowButton v-if="type === 'follow'" :follow="userInfo.isFollowing" />
+    <FollowButton v-if="type === 'follow'" :follow="userInfo.isFollowing" type="profile" :entity-id="userInfo.id" />
 
     <div v-if="type === 'account'" class="sub-wb">
       <Tokens :balance="balance" />
@@ -23,7 +23,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 0;
+  padding: $space_tiny 0;
 
   &>div {
     display: flex;
@@ -34,10 +34,10 @@
 
     .user-name {
       font-weight: 500;
-      font-size: 16px;
+      font-size: $font_normal;
       line-height: 22px;
       letter-spacing: 0.25px;
-      color: rgba(0, 0, 0, 0.87);
+      color: $color_font_normal;
       width: 200px;
       text-overflow: ellipsis;
       overflow: hidden;
@@ -48,54 +48,50 @@
 
   .sub-wb {
     font-weight: 500;
-    font-size: 14px;
+    font-size: $font_small;
     padding-left: 4px;
 
     .gray {
-      color: #A0A0A0;
+      color: $color_font_secondary;
       font-weight: normal;
     }
   }
 }
 </style>
 
-<script>
-export default {
-  name: 'VoteUserItem',
+<script lang="ts">
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { ProfileItemModel } from '~/models/profile/profile-item.model'
+import { config } from '~/config/config'
 
-  props: {
-    userInfo: {
-      type: Object,
-      default: undefined
-    },
-    type: {
-      type: String
-    }
-  },
+@Component
+export default class VoteUserItem extends Vue {
+  @Prop({
+    type: Object,
+    default: undefined
+  }) userInfo!: ProfileItemModel
 
-  data () {
-    return {
-      balance: ''
-    }
-  },
+  @Prop({
+    type: String
+  }) type!: string
 
-  watch: {
-    userInfo () {
-      this.getBalance()
-    }
-  },
+  balance: string = ''
+  addressLength: number = config.addressLengthLong
+
+  @Watch('userInfo')
+  userInfoHandler () {
+    this.getBalance()
+  }
 
   created () {
     this.getBalance()
-  },
+  }
 
-  methods: {
-    getBalance () {
-      new Promise(resolve => resolve(this.userInfo.balance)
-      ).then((res) => {
-        this.balance = res
-      })
-    }
+  getBalance () {
+    new Promise(resolve => resolve(this.userInfo.balance)
+    ).then((res) => {
+      this.balance = res as string
+    })
   }
 }
 </script>

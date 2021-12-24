@@ -9,7 +9,7 @@
           <Avatar :id="profileData.id" :src="profileData.avatar" :size="46" :name="profileData.name" />
           <div class="info-container">
             <div class="profile-name-wp">
-              <Title size="large" :name="profileData.name" />
+              <Title size="large" :name="profileData.name || profileData.id | addressShortness(addressLength)" />
             </div>
             <div class="profile-stats-wp">
               <span @click="openModal"><b>{{ profileData.followingCount | numeral('0,0a') }}</b> {{ profileData.followingCount | pluralize('en', ['Following', 'Following']) }}</span>
@@ -23,13 +23,13 @@
       </div>
 
       <div class="general-information">
-        <Paragraph v-if="profileData.summary.length" :text="profileData.summary" :margin-bottom="'17'" />
+        <Paragraph v-if="profileData.summary" :text="profileData.summary" :margin-bottom="'17'" />
         <LinkIcons v-if="profileData.links" :links="profileData.links" />
         <div class="account-info-wp">
           <v-icon size="24" class="account-icon">
             mdi-wallet-outline
           </v-icon>
-          <Address :address="profileData.address" :size="'large'" :length="17" :show-icon="true" />
+          <Address :address="profileData.address" :size="'large'" :length="addressLength" :show-icon="true" />
           <QrCodeButton :address="profileData.address || profileData.id" />
         </div>
         <div class="account-amount">
@@ -42,13 +42,13 @@
 
       <div class="action-row">
         <SendTipsButton />
-        <FollowButton :follow="isFollowing" />
+        <FollowButton :follow="isFollowing" type="profile" :entity-id="profileData.id" />
       </div>
 
       <v-divider
         class="mx-4"
       />
-      <Tabs :tab-links="tabLinks" :event-name="tabsEvent" />
+      <Tabs class="profile-tabs" :tab-links="tabLinks" :event-name="tabsEvent" />
     </v-card>
     <ModalConnections :is-modal="isOpenModal" :account-id="profileData.id" />
   </div>
@@ -57,20 +57,20 @@
 <style lang="scss">
 .profile-item-wp {
   width: 100%;
-  margin-top: 16px;
+  margin-top: $space_normal;
 
   .account-icon {
-    color: #A0A0A0;
+    color: $color_font_secondary;
     margin-right: 5px;
   }
 
   .gray {
-    color: #A0A0A0;
+    color: $color_font_secondary;
     font-weight: normal;
   }
 
   .profile-item {
-    padding: 16px 16px 0;
+    padding: $space_normal $space_normal 0;
     z-index: 9;
 
     .profile-item-header {
@@ -81,7 +81,7 @@
 
   .profile-info-wp {
     display: flex;
-    margin-bottom: 20px;
+    margin-bottom: $space_large;
 
     .info-container {
       margin-left: 13px;
@@ -91,15 +91,13 @@
 
       .profile-name-wp {
         display: flex;
-        align-items: center;
-        font-family: Roboto;
         font-style: normal;
         font-weight: 500;
-        font-size: $font-size-title-preview;
-        line-height: 24px;
+        font-size: $font_large;
+        line-height: $main_line_height;
         align-items: center;
         letter-spacing: 0.15px;
-        color: rgba(0, 0, 0, 0.87);
+        color: $color_font_normal;
 
         a {
           text-decoration: none;
@@ -107,7 +105,7 @@
       }
 
       .profile-stats-wp {
-        font-size: $font-size-secondary-text;
+        font-size: $font_small;
         letter-spacing: 0.25px;
 
         span {
@@ -122,14 +120,14 @@
     .link {
       font-weight: 500;
       letter-spacing: 0.25px;
-      color: #EB2F96;
+      color: $color_primary;
       text-decoration: none;
     }
 
     .account-info-wp {
       display: flex;
       align-items: center;
-      font-size: 16px;
+      font-size: $font_normal;
       margin-bottom: 13px;
 
       & > span {
@@ -143,7 +141,7 @@
 
       .qr-icon {
         margin-left: 10px;
-        color: #000;
+        color: $color_black;
       }
     }
 
@@ -153,85 +151,95 @@
   }
 
   .address-text {
-    color: rgba(0, 0, 0, 0.87);
+    color: $color_font_normal;
   }
 
   .mdi-content-copy {
-    color: #000;
+    color: $color_black;
   }
 
   .action-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 24px;
-    margin-top: 24px;
+    margin-bottom: $space_big;
+    margin-top: $space_big;
 
     & button {
       width: calc(50% - 8px);
     }
   }
+
+  .profile-tabs {
+    &.tabs-container {
+      padding-top: 0 !important;
+      background-color: transparent;
+      margin-bottom: 0;
+
+      & .v-tabs-bar {
+        box-shadow: none;
+      }
+    }
+  }
 }
 </style>
 
-<script>
-export default {
-  name: 'ProfileItem',
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
+import { ProfileItemModel } from '~/models/profile/profile-item.model'
+import { config } from '~/config/config'
 
-  props: {
-    profileData: {
-      type: Object,
-      default: undefined
-    },
-    tabLinks: {
-      type: Array,
-      default: () => ['posts', 'spaces']
-    },
-    tabsEvent: {
-      type: String,
-      default: 'accountPage'
-    }
-  },
+@Component
+export default class ProfileItem extends Vue {
+  @Prop({
+    type: Object,
+    default: undefined
+  }) profileData!: ProfileItemModel
 
-  data () {
-    return {
-      isOpenModal: false,
-      isFollowing: false,
-      balance: null
-    }
-  },
+  @Prop({
+    type: Array,
+    default: () => ['posts', 'spaces']
+  }) tabLinks!: []
+
+  @Prop({
+    type: String,
+    default: 'accountPage'
+  }) tabsEvent!: string
+
+  isOpenModal: boolean = false
+  isFollowing: boolean = false
+  balance: string = ''
+  user: ProfileItemModel = {} as ProfileItemModel
+  addressLength: number = config.addressLengthLong
 
   created () {
     this.load()
-    this.unsubscribe = this.$store.subscribe((mutation, state) => {
+    this.$store.subscribe((mutation) => {
       if (mutation.type === 'profiles/UPDATE_PROFILES') {
         this.load()
       }
     })
-  },
+  }
 
-  methods: {
-    openModal () {
-      this.isOpenModal = !this.isOpenModal
-    },
+  openModal (): void {
+    this.isOpenModal = !this.isOpenModal
+  }
 
-    load () {
-      if (this.$store.state.profiles.currentUser) {
-        this.user = this.$store.getters['profiles/selectProfileData'](this.$store.state.profiles.currentUser.id)
+  load (): void {
+    if (this.$store.state.profiles.currentUser) {
+      this.user = this.$store.getters['profiles/selectProfileData'](this.$store.state.profiles.currentUser.id)
 
-        if (!this.user) {
-          this.user = this.$store.state.profiles.currentUser
-        }
-
-        this.$store.dispatch('accountFollower/isAccountFollower', { myAddress: this.user.id, followedAddress: this.profileData.id })
-          .then((data) => {
-            this.isFollowing = data
-          })
+      if (!this.user) {
+        this.user = this.$store.state.profiles.currentUser
       }
-
-      this.$store.dispatch('profiles/getAccountBalance', this.profileData.id).then((res) => {
-        this.balance = res
-      })
+      this.$store.dispatch('accountFollower/isAccountFollower', { myAddress: this.user.id, followedAddress: this.profileData ? this.profileData.id : this.$route.params.account })
+        .then((data) => {
+          this.isFollowing = data
+        })
     }
+
+    this.$store.dispatch('profiles/getAccountBalance', this.profileData ? this.profileData.id : this.$route.params.account).then((res) => {
+      this.balance = res
+    })
   }
 }
 </script>

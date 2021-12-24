@@ -8,14 +8,14 @@
 
 <style lang="scss">
 .bounce-spinner {
-  margin: 30px auto 20px;
+  margin: 30px auto $space_large;
   width: 70px;
   text-align: center;
 
   &  > div {
     width: 18px;
     height: 18px;
-    background-color: #EB2F96;
+    background-color: $color_primary;
 
     border-radius: 100%;
     display: inline-block;
@@ -51,8 +51,11 @@
 
 </style>
 
-<script>
-export default {
-  name: 'BounceSpinner'
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+
+@Component
+export default class BounceSpinner extends Vue {
+
 }
 </script>

@@ -54,48 +54,40 @@
 
 </style>
 
-<script>
-export default {
-  name: 'ModalFollower',
+<script lang="ts">
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
-  props: {
-    isModal: {
-      type: Boolean,
-      default: false
-    },
+@Component
+export default class ModalFollower extends Vue {
+  @Prop({
+    type: Boolean,
+    default: false
+  }) isModal!: boolean
 
-    spaceId: {
-      type: String
-    }
-  },
+  @Prop({
+    type: String
+  }) spaceId!: string
 
-  data () {
-    return {
-      openModal: false,
-      usersIds: undefined,
-      tabs: ['upvotes', 'downvotes'],
-      activeTab: ''
-    }
-  },
+  openModal: boolean = false
+  usersIds: [] = []
+  tabs: string[] = ['upvotes', 'downvotes']
+  activeTab: string = ''
 
-  watch: {
-    isModal (newVal, oldVal) {
-      this.onClick()
-    }
-  },
+  @Watch('isModal')
+  isModalHandler () {
+    this.onClick()
+  }
 
-  created () {
+  created (): void {
     this.activeTab = this.tabs[0]
 
     this.$store.dispatch('accountFollower/getSpaceFollowers', this.spaceId).then((ids) => {
       this.usersIds = ids
     })
-  },
+  }
 
-  methods: {
-    onClick () {
-      this.openModal = !this.openModal
-    }
+  onClick (): void {
+    this.openModal = !this.openModal
   }
 }
 </script>

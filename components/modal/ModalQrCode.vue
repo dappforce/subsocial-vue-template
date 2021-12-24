@@ -29,19 +29,19 @@
 
 <style lang="scss">
 .qr-container {
-  padding: 12px 16px 16px;
+  padding: $space_small $space_normal $space_normal;
 
   .close-icon {
     position: absolute;
-    right: 16px;
-    top: 12px;
+    right: $space_normal;
+    top: $space_small;
   }
 
   .title {
     font-weight: 500;
-    font-size: $font-size-title-preview;
+    font-size: $font_large;
     line-height: 125%;
-    color: #222222;
+    color: $color_font_normal;
   }
 
   .qr {
@@ -49,41 +49,41 @@
     align-items: center;
     justify-content: center;
     margin-top: 18px;
-    margin-bottom: 20px;
+    margin-bottom: $space_large;
   }
 
   .address {
     font-weight: 500;
-    font-size: $font-size-secondary-text;
+    font-size: $font_small;
     line-height: 125%;
-    color: #222222;
+    color: $color_font_normal;
     text-align: center;
     display: block;
   }
 
   .btn-container {
-    margin-top: 20px;
+    margin-top: $space_large;
     display: flex;
     justify-content: space-between;
 
     .v-btn {
       width: 140px;
-      border: 1px solid #EB2F96;
+      border: 1px solid $color_primary;
       box-sizing: border-box;
       border-radius: 5px;
 
       &.close-btn {
-        background: #FFFFFF;
-        color: #EB2F96;
+        background: $color_white;
+        color: $color_primary;
         box-shadow: none;
       }
 
       &.copy-btn {
-        background: #EB2F96;
-        color: #fff;
+        background: $color_primary;
+        color: $color_white;
 
         .v-icon {
-          margin-right: 12px;
+          margin-right: $space_small;
         }
       }
     }
@@ -91,51 +91,45 @@
 }
 </style>
 
-<script>
+<script lang="ts">
 import QrcodeVue from 'qrcode.vue'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
-export default {
-  name: 'ModalQrCode',
+@Component({
   components: {
     QrcodeVue
-  },
+  }
+})
+export default class ModalQrCode extends Vue {
+  @Prop({
+    type: Boolean,
+    default: false
+  }) isModal!: boolean
 
-  props: {
-    isModal: {
-      type: Boolean,
-      default: false
-    },
-    address: {
-      type: String
-    }
-  },
+  @Prop({
+    type: String
+  }) address!: string
 
-  data () {
-    return {
-      value: 'https://example.com',
-      size: 170,
-      openModal: false
-    }
-  },
+  value: string = 'https://example.com'
+  size: number = 170
+  openModal: boolean = false
 
-  watch: {
-    isModal (newVal, oldVal) {
-      this.onClick()
-    }
-  },
+  @Watch('isModal')
+  isModalHandler () {
+    this.onClick()
+  }
 
-  methods: {
-    onClick () {
-      this.openModal = !this.openModal
-    },
-    async copyAddress () {
-      try {
-        await navigator.clipboard.writeText(this.address).then(() => {
-          this.$nuxt.$emit('isShowSnackbar', { show: true, text: 'Address copied!' })
-        })
-      } catch ($e) {
-        console.log('Cannot copy')
-      }
+  onClick () {
+    this.openModal = !this.openModal
+  }
+
+  async copyAddress () {
+    try {
+      await navigator.clipboard.writeText(this.address).then(() => {
+        this.$nuxt.$emit('isShowSnackbar', { show: true, text: 'Address copied!' })
+      })
+    } catch ($e) {
+      console.log('Cannot copy')
     }
   }
 }

@@ -7,25 +7,14 @@ import {
 import slug from 'slugify'
 import BN from 'bn.js'
 
+import { SubmittableResult } from '@polkadot/api'
 import { TransformDataArray } from '~/types/transform-dto'
 import { Content } from '~/types/content'
 
-// export const getStateEntityFromArray = <T>(
-//   array: Array<AnySubsocialData>,
-//   type: 'struct' | 'content' = 'struct'
-// ): StateEntity<T> => {
-//   const ids: string[] = []
-//   const entities: Entity<any> = {}
-//   array.map((elem) => {
-//     const id: string | undefined =
-//       type === 'struct' ? elem.struct.id.toString() : elem.struct.contentId
-//     if (id) {
-//       ids.push(id)
-//       entities[id] = elem[type]
-//     }
-//   })
-//   return { ids, entities }
-// }
+export function getNewIdFromEvent (txResult: SubmittableResult): BN | undefined {
+  const [newId] = getNewIdsFromEvent(txResult)
+  return newId
+}
 
 export const transformEntityDataArray = (
   array: Array<SpaceData> | Array<PostData>
@@ -63,9 +52,10 @@ export const sliceEntityArray = (
 export const getPostLink = (
   spaceHandle: string,
   title: string,
-  id: string
+  id: string,
+  isHandle: boolean
 ): string => {
-  return title ? `/@${spaceHandle}/${slug(title)}-${id}` : ''
+  return title ? `/${isHandle ? '@' : ''}${spaceHandle}/${slug(title)}-${id}` : ''
 }
 
 export function idToBn (id: AnyId): BN {
@@ -90,4 +80,35 @@ export function convertToBNArray (array: string[]) {
 
 export function convertToBN (value: string) {
   return new BN(value)
+}
+
+export function routerParamsLength (value: object) {
+  return Object.keys(value).length
+}
+
+export function getNewIdsFromEvent (txResult: SubmittableResult): BN[] {
+  const newIds: BN[] = []
+
+  txResult.events.find((event) => {
+    const { event: { data, method } } = event
+    if (method.includes('Created')) {
+      const [, ...ids] = data.toArray()
+      newIds.push(...ids as unknown as BN[])
+      return true
+    }
+    return false
+  })
+
+  return newIds
+}
+
+export function getPostIdFromLink (link: string | null) {
+  return link ? link.trim().split('-').pop() : ''
+}
+
+export function getIsPostOwner (ownerId: string, currentUseId: string | undefined): boolean {
+  if (currentUseId) {
+    return ownerId === currentUseId
+  }
+  return false
 }

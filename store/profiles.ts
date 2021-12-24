@@ -1,12 +1,11 @@
 import { Commit, Dispatch } from 'vuex'
 import { ProfileStruct } from '@subsocial/api/flat-subsocial/flatteners'
 import { ProfileContent } from '@subsocial/api/flat-subsocial/dto'
-import { environment } from '~/environments/environment'
 import ProfileService from '~/services/profile.service'
 import { Content } from '~/types/content'
 import { ProfileComponentData } from '~/types/profile-component-data.type'
 import { ACCOUNT_STATUS } from '~/models/enum/account-status.enum'
-import { AccountData, PolkadotAccount } from '~/types/account.types'
+import { AccountData, Balance, PolkadotAccount } from '~/types/account.types'
 import StorageService from '~/services/storage.service'
 import AccountService from '~/services/account.service'
 
@@ -20,6 +19,8 @@ const SET_CURRENT_USER = 'SET_CURRENT_USER'
 const SET_STATUS = 'SET_STATUS'
 const SET_POLKADOT_ACCOUNTS = 'SET_POLKADOT_ACCOUNTS'
 const SET_BALANCE = 'SET_BALANCE'
+const SET_SIGNER = 'SET_SIGNER'
+let unsub: (() => void) | undefined
 
 export interface Profile {
   list: ProfileStruct[],
@@ -27,7 +28,8 @@ export interface Profile {
   currentUser: ProfileStruct | undefined,
   status: ACCOUNT_STATUS,
   polkadotAccounts: AccountData[],
-  myBalance: String
+  myBalance: String,
+  signer: any | null
 }
 
 export const state = (): Profile => ({
@@ -36,7 +38,8 @@ export const state = (): Profile => ({
   currentUser: undefined,
   status: ACCOUNT_STATUS.INIT,
   polkadotAccounts: [],
-  myBalance: '0.0000'
+  myBalance: '0.0000',
+  signer: null
 })
 
 export const mutations = {
@@ -63,6 +66,10 @@ export const mutations = {
 
   [SET_BALANCE] (state: any, balance: string) {
     state.myBalance = balance
+  },
+
+  [SET_SIGNER] (state: any, signer: any) {
+    state.signer = signer
   }
 }
 
@@ -79,6 +86,8 @@ export const actions = {
     }
 
     if (!polkadotJs) { return }
+
+    commit(SET_SIGNER, polkadotJs.signer)
 
     const unsub = polkadotJs!.accounts.subscribe(async (accounts) => {
       if (accounts?.length > 0) {
@@ -100,11 +109,19 @@ export const actions = {
       if (payload.isSetAccount) {
         commit(SET_CURRENT_USER, data?.struct)
       }
-    } else {
+    } else if (payload.isSetAccount) {
       const account = state.polkadotAccounts.find(i => i.id === payload.id)
       if (payload.isSetAccount) {
         commit(SET_CURRENT_USER, account)
       }
+    } else {
+      const anonymous = {
+        id: payload.id,
+        address: payload.id,
+        followersCount: 0,
+        followingCount: 0
+      }
+      commit(UPDATE_PROFILES, [anonymous])
     }
   },
 
@@ -116,9 +133,12 @@ export const actions = {
     }
   },
 
-  async setCurrentAccount ({ commit, getters, dispatch }: {commit: Commit, getters: any, dispatch: any}, account: AccountData) {
-    const balance = await accountService.setBalance(account.id)
-    commit(SET_BALANCE, balance)
+  setCurrentAccount ({ commit, getters, dispatch }: {commit: Commit, getters: any, dispatch: any}, account: AccountData) {
+    if (unsub) {
+      unsub()
+    }
+
+    dispatch('subscribeOnBalance', account.id)
     dispatch('getProfile', { id: account.id, isSetAccount: true })
     storage.setCurrentAccountId(account.id)
   },
@@ -134,6 +154,16 @@ export const actions = {
 
   signOut ({ commit }: {commit: Commit}) {
     commit(SET_CURRENT_USER, undefined)
+    commit(SET_SIGNER, undefined)
+  },
+
+  async subscribeOnBalance ({ commit }: {commit: Commit}, address: string) {
+    const api = await (await profileService.getApi()).subsocial.substrate.api
+    unsub = await api.derive.balances.all(address, (data: Balance | undefined) => {
+      accountService.getFormattedBalance(data).then((balance) => {
+        commit(SET_BALANCE, balance)
+      })
+    })
   }
 
 }
@@ -149,7 +179,7 @@ export const getters = {
         followingCount: struct.followingAccountsCount
       }
       if (struct?.contentId) {
-        const content = rootState.content.contents.find((i: Content) => i.id === struct.contentId) as ProfileContent
+        const content = rootState.content.contents.find((i: Content) => i?.id === struct.contentId) as ProfileContent
         if (content) {
           profileComponentData.avatar = content.avatar
           profileComponentData.name = content.name

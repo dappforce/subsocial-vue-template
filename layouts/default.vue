@@ -1,10 +1,11 @@
 <template>
   <div data-app>
     <LoadSpinner v-if="showHideSpinner" />
-    <Header :show-tabs="true" :tab-links="['posts', 'spaces']" />
+    <Header />
     <div class="container">
       <Nuxt />
-      <Snackbar />
+      <LeftSideMenu />
+      <Snackbar ref="snackbar" />
     </div>
   </div>
 </template>
@@ -15,12 +16,12 @@
 }
 
 #__layout, .theme--light.v-tabs-items {
-  background: #F2F2F2;
+  background: $color_page_bg;
   width: 100%;
 }
 .container {
-  width: 763px;
-  padding: 0 0 20px;
+  width: $general_width;
+  padding: 56px 0 $space_large;
 
   .v-window {
     overflow: visible;
@@ -36,22 +37,19 @@
 }
 </style>
 
-<script>
-export default {
-  name: 'Default',
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
 
-  data () {
-    return {
-      showHideSpinner: false
-    }
-  },
+@Component
+export default class Default extends Vue {
+  showHideSpinner: boolean = false
 
-  created () {
-    this.showHideSpinner = true
+  created (): void {
+    this.showHideSpinner = !this.showHideSpinner
     this.$store.dispatch('posts/getSuggestedPostIds').then(() => {
       this.$store.dispatch('profiles/initAccount')
       this.$store.dispatch('loading/setLoading', true)
-      this.showHideSpinner = false
+      this.showHideSpinner = !this.showHideSpinner
     })
 
     this.$store.dispatch('notifications/getNotifications')

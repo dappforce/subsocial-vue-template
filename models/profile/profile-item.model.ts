@@ -1,13 +1,13 @@
-export interface ProfileItem {
-  id: string;
-  contentId: string;
+export interface ProfileItemModel {
+  address: string;
   followersCount: number;
-  followingAccountsCount: number;
-  followingSpacesCount: number;
-  hasProfile: boolean;
-  reputation: number;
-  name?: string;
-  avatarSrc?: string;
+  followingCount: number;
+  links?: Array<string>;
   summary?: string;
-  about?: string;
+  tokens?: string;
+  name?: string;
+  avatar?: string;
+  id: string;
+  balance?: string;
+  isFollowing?: boolean;
 }

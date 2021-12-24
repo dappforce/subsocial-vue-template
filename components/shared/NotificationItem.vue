@@ -4,8 +4,8 @@
     <div class="notification-info">
       <div class="notification-text">
         <span class="name">{{ notification.userName ? notification.userName : notification.account }}</span>
-        <span>{{getMessage}}</span>
-        <span class="name">{{getName}}</span>
+        <span>{{ getMessage }}</span>
+        <span class="name">{{ getName }}</span>
       </div>
       <span class="date">{{ toDate }}</span>
     </div>
@@ -16,7 +16,7 @@
 <style lang="scss">
 .notification-container {
   display: flex;
-  padding: 16px;
+  padding: $space_normal;
   border-bottom: 1px solid rgba(33, 33, 33, 0.08);
 
   .notification-info {
@@ -28,18 +28,18 @@
     .notification-text {
       .name {
         font-weight: 500;
-        font-size: 16px;
-        line-height: 24px;
+        font-size: $font_normal;
+        line-height: $main_line_height;
         letter-spacing: 0.25px;
-        color: rgba(0, 0, 0, 0.87);
+        color: $color_font_normal;
       }
     }
 
     .date {
-      font-size: 14px;
+      font-size: $font_small;
       line-height: 20px;
       letter-spacing: 0.25px;
-      color: rgba(0, 0, 0, 0.6);
+      color: $main_text_color;
     }
   }
 
@@ -50,36 +50,33 @@
 }
 </style>
 
-<script>
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
 import { NotificationEntity } from '~/models/enum/notification-entity.enum'
 import { OwnerNotificationEntity } from '~/models/enum/owner-notification-entity.enum'
+@Component
+export default class NotificationItem extends Vue {
+  @Prop({
+    type: Object
+  }) notification!: {}
 
-export default {
-  name: 'NotificationItem',
-
-  props: {
-    notification: {
-      type: Object
-    }
-  },
-
-  computed: {
-    toDate () {
-      const days = 7
-      return Math.round(this.$dayjs().diff(this.$dayjs(this.notification.date), 'day', true)) < days
-        ? this.$dayjs(this.notification.date).fromNow()
-        : this.$dayjs(this.notification.date).format('MMM D, YYYY HH:mm A')
-    },
-    getMessage () {
-      return this.notification.isOwnerPost
-        ? OwnerNotificationEntity[this.notification.event]
-        : this.notification.isOwnerSpace
-          ? OwnerNotificationEntity[this.notification.event]
-          : NotificationEntity[this.notification.event]
-    },
-    getName () {
-      return this.notification.isOwnerPost ? this.notification.postName : this.notification.isOwnerSpace ? this.notification.spaceName : ''
-    }
-  }
+  // toDate () {
+  //   const days = 7
+  //   return Math.round(this.$dayjs().diff(this.$dayjs(this.notification.date), 'day', true)) < days
+  //     ? this.$dayjs(this.notification.date).fromNow()
+  //     : this.$dayjs(this.notification.date).format('MMM D, YYYY HH:mm A')
+  // }
+  //
+  // getMessage () {
+  //   return this.notification.isOwnerPost
+  //     ? OwnerNotificationEntity[this.notification.event]
+  //     : this.notification.isOwnerSpace
+  //       ? OwnerNotificationEntity[this.notification.event]
+  //       : NotificationEntity[this.notification.event]
+  // }
+  //
+  // getName () {
+  //   return this.notification.isOwnerPost ? this.notification.postName : this.notification.isOwnerSpace ? this.notification.spaceName : ''
+  // }
 }
 </script>

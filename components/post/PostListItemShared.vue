@@ -4,6 +4,18 @@
       elevation="2"
       class="post-item"
     >
+      <div v-if="postItemData.hidden && isPostOwner" class="hidden-post">
+        <div class="alert-text">
+          <v-icon color="#EFB041">
+            mdi-alert-circle
+          </v-icon>This post is unlisted and only you can see it
+        </div>
+        <div class="unhidden-btn">
+          <span class="make-visible">
+            Make visible
+          </span>
+        </div>
+      </div>
       <div class="post-main-wp">
         <div class="post-data">
           <div class="post-item-header">
@@ -18,7 +30,7 @@
             />
             <div class="button-wp">
               <EditButton v-if="isPostOwner" :link="'post-edit/?post=' + postItemData.id" />
-              <OptionButton />
+              <OptionButton :post-id="postItemData.id" :account-id="postItemData.ownerId" :post="postItemData" :can-edit="isPostOwner" :toggle-type="'post'" />
             </div>
           </div>
         </div>
@@ -44,13 +56,45 @@
 <style lang="scss">
 .post-item-wp.shared {
   width: 100%;
-  margin-top: 16px;
+  margin-top: $space_normal;
 
   .post-item {
-    padding: 16px 16px 16px;
+    padding: $space_normal;
 
     .shared-post {
         margin-top: 0;
+    }
+  }
+
+  .hidden-post {
+    margin: (-$space_normal) (-$space_normal) $space_normal;
+    height: 40px;
+    background: #FEFBE8;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 $space_normal;
+    color: $color_font_normal;
+    font-size: $font_small;
+
+    .v-icon {
+      margin-right: 10px;
+    }
+
+    .make-visible {
+      border: 1px solid #D9D9D9;
+      box-sizing: border-box;
+      border-radius: $border_small;
+      color: $color_font_normal;
+      font-weight: 500;
+      line-height: 125%;
+      padding: 3px 5px;
+      transition: all .2s ease;
+
+      &:hover {
+        cursor: pointer;
+        color: $color_primary;
+      }
     }
   }
 
@@ -67,12 +111,12 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 16px;
+    margin-bottom: $space_normal;
 
     .button-wp {
       display: flex;
       align-items: center;
-      height: 36px;
+      height: $buttons_height;
     }
   }
 }
@@ -85,41 +129,31 @@
 
 </style>
 
-<script>
-export default {
-  name: 'PostListItemShared',
+<script lang="ts">
 
-  props: {
-    postItemData: {
-      type: Object,
-      default: undefined
-    },
-    currentUserId: {
-      type: String
-    }
-  },
+import { Component, Prop, Vue } from 'vue-property-decorator'
+import { PostListItemData } from '~/models/post/post-list-item.model'
+import { getIsPostOwner } from '~/utils/utils'
 
-  data () {
-    return {
-      sharedPost: null
-    }
-  },
+@Component
+export default class PostListItemShared extends Vue {
+  @Prop({
+    type: Object,
+    default: undefined
+  }) postItemData!: PostListItemData
 
-  computed: {
-    isPostOwner () {
-      if (this.currentUserId) {
-        return this.postItemData.ownerId === this.currentUserId
-      } else {
-        return false
-      }
-    }
-  },
+  @Prop({
+    type: String
+  }) currentUserId!: string
+
+  sharedPost: PostListItemData | null = null
+  isPostOwner : boolean = getIsPostOwner(this.postItemData.ownerId, this.currentUserId)
 
   created () {
     const sharedPostId = this.postItemData.sharedPostId
     if (sharedPostId) {
-      this.$store.dispatch('posts/getPostById', this.$getPostId(this.postItemData.sharedPostId)).then(() => {
-        this.sharedPost = this.$store.getters['posts/getPostInfo'](this.$getPostId(this.postItemData.sharedPostId))
+      this.$store.dispatch('posts/getPostById', this.postItemData.sharedPostId).then(() => {
+        this.sharedPost = this.$store.getters['posts/getPostInfo'](this.postItemData.sharedPostId)
       })
     }
   }

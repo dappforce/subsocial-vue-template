@@ -15,14 +15,14 @@
 
 <style lang="scss">
 .no-account {
-  width: 432px;
-  padding: 18px;
+  width: $modal_width;
+  padding: $space_normal;
 
   .title {
     font-weight: 500;
-    font-size: $font-size-title-details;
+    font-size: $font_huge;
     line-height: 125%;
-    color: #A0A0A0;
+    color: $color_font_secondary;
     width: 100%;
     text-align: center;
     margin-bottom: 14px;
@@ -33,7 +33,7 @@
     padding: 21px;
     background-color: #FFFAD5;
     text-align: center;
-    font-size: $font-size-normal;
+    font-size: $font_normal;
     line-height: 125%;
     color: #262626;
     margin-bottom: 22px;
@@ -45,20 +45,22 @@
 
     a {
       text-decoration: none;
-      color: #A0A0A0;
-      font-size: $font-size-secondary-text;
+      color: $color_font_secondary;
+      font-size: $font_small;
       line-height: 125%;
 
       &:hover {
-        color: #EB2F96;
+        color: $color_primary;
       }
     }
   }
 }
 </style>
 
-<script>
-export default {
-  name: 'LoginScreenNoAccount'
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+
+@Component
+export default class LoginScreenNoAccount extends Vue {
 }
 </script>

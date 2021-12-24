@@ -19,52 +19,52 @@
 .no-reactions {
   display: flex;
   justify-content: center;
-  font-size: $font-size-secondary-text;
+  font-size: $font_small;
 }
 </style>
 
-<script>
-export default {
-  name: 'ModalInfinityScrollContainer',
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
+import { ProfileStruct } from '@subsocial/api/flat-subsocial/flatteners'
+import { config } from '~/config/config'
 
-  props: {
-    userIds: {
-      type: Array
-    }
-  },
+const stepNumber = config.stepForLoading
 
-  data () {
-    return {
-      startIndex: 20,
-      endIndex: 40,
-      step: 20,
-      list: []
-    }
-  },
+@Component
+export default class ModalInfinityScrollContainer extends Vue {
+  @Prop({
+    type: Array
+  }) userIds!: string[]
+
+  defaultStart: number = 0
+  defaultEnd: number = stepNumber
+  startIndex: number = stepNumber
+  endIndex: number = stepNumber * 2
+  step: number = stepNumber
+  list: ProfileStruct[] = []
 
   created () {
-    this.getUsersProfile(0, 20)
-  },
-  methods: {
-    infiniteScroll ($state) {
-      setTimeout(async () => {
-        await this.getUsersProfile(this.startIndex, this.endIndex).then(() => {
-          $state.loaded()
-          if (this.list.length >= this.userIds.length) {
-            $state.complete()
-          }
+    this.getUsersProfile(this.defaultStart, this.defaultEnd)
+  }
 
-          this.startIndex += this.step
-          this.endIndex += this.step
-        })
-      }, 100)
-    },
+  infiniteScroll ($state: any) {
+    setTimeout(async () => {
+      await this.getUsersProfile(this.startIndex, this.endIndex).then(() => {
+        $state.loaded()
+        if (this.list.length >= this.userIds.length) {
+          $state.complete()
+        }
 
-    async getUsersProfile (start, end) {
-      return await this.$store.dispatch('profiles/getProfiles', this.userIds.slice(start, end)).then((res) => {
-        this.list.push(...res)
+        this.startIndex += this.step
+        this.endIndex += this.step
       })
-    }
+    }, 100)
+  }
+
+  async getUsersProfile (start: number, end: number) {
+    return await this.$store.dispatch('profiles/getProfiles', this.userIds.slice(start, end)).then((res) => {
+      this.list.push(...res)
+    })
   }
 }
 </script>

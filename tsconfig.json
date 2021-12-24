@@ -36,7 +36,9 @@
       "@nuxtclub/slugify",
       "vuetify",
       "@nuxtjs/dayjs",
+      "@nuxtjs/i18n",
       "dayjs/plugin/relativeTime",
+      "@nuxtjs/axios"
     ]
   },
   "exclude": [

@@ -1,12 +1,13 @@
 <template>
   <v-card class="notification">
-    <div class="title">Notifications</div>
+    <div class="title">
+      Notifications
+    </div>
     <NotificationItem
       v-for="(item, index) in notifications"
       :key="index"
       :notification="item"
-    >
-    </NotificationItem>
+    />
   </v-card>
 </template>
 
@@ -14,31 +15,26 @@
 .notification {
   .title {
     font-weight: 500;
-    font-size: $font-size-title-preview;
-    line-height: 24px;
+    font-size: $font_large;
+    line-height: $main_line_height;
     letter-spacing: 0.15px;
-    color: rgba(0, 0, 0, 0.87);
-    padding: 16px 16px 8px;
+    color: $color_font_normal;
+    padding: $space_normal;
   }
 }
 </style>
 
-<script>
-export default {
-  data () {
-    return {
-      notifications: null,
-      users: null
-    }
-  },
-  
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+import { ProfileItemModel } from '~/models/profile/profile-item.model'
+
+@Component
+export default class NotificationsPage extends Vue {
+  notifications: Notification | null = null
+  users: ProfileItemModel | undefined | null = null
   created () {
     this.notifications = this.$store.state.notifications.list
     this.users = this.$store.state.profiles.list
-  },
-
-  mounted () {
-    this.$nuxt.$emit('isShowTabs', false)
   }
 }
 </script>

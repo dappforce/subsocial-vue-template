@@ -1,16 +1,16 @@
 <template>
   <div class="space-info-wp">
-    <Avatar :id="id" :src="avatarSrc" :size="avatarSize" :name="userName" />
+    <Avatar :id="spaceItem.struct.id" :src="spaceItem.content.image" :size="avatarSize" />
     <div class="info-container">
       <div class="space-name-wp">
-        <Title size="medium" :link="handle ? '/@'+handle : '/'+id" :name="spaceName" />
+        <Title size="medium" :link="spaceItem.struct.handle ? '/@'+spaceItem.struct.handle : '/'+spaceItem.struct.id" :name="spaceItem.content.name" />
       </div>
       <div class="space-stats-wp">
-        <span v-if="hidePostCount" class="post-count"><span class="count">{{ postsCount | numeral('0,0a') }} </span>{{ postsCount | pluralize('en', ['post', 'posts']) }}</span>
-        <span class="followers-count" @click="openModal"><span class="count">{{ followersCount | numeral('0,0a') }}</span> {{ followersCount | pluralize('en', ['follower', 'followers']) }}</span>
+        <span v-if="hidePostCount" class="post-count"><span class="count">{{ spaceItem.struct.postsCount | numeral('0,0a') }} </span>{{ spaceItem.struct.postsCount | pluralize('en', ['post', 'posts']) }}</span>
+        <span class="followers-count" @click="openModal"><span class="count">{{ spaceItem.struct.followersCount | numeral('0,0a') }}</span> {{ spaceItem.struct.followersCount | pluralize('en', ['follower', 'followers']) }}</span>
       </div>
     </div>
-    <ModalFollower :is-modal="isOpenModal" :space-id="id" />
+    <ModalFollower :is-modal="isOpenModal" :space-id="spaceItem.struct.id" />
   </div>
 </template>
 
@@ -23,14 +23,12 @@
     .space-name-wp {
       display: flex;
       align-items: center;
-      font-family: Roboto;
       font-style: normal;
       font-weight: 500;
-      font-size: $font-size-title-details;
-      line-height: 24px;
-      align-items: center;
+      font-size: $font_huge;
+      line-height: $main_line_height;
       letter-spacing: 0.15px;
-      color: rgba(0, 0, 0, 0.87);
+      color: $color_font_normal;
 
       a {
         text-decoration: none;
@@ -38,13 +36,13 @@
     }
 
     .space-stats-wp {
-      font-size: $font-size-secondary-text;
+      font-size: $font_small;
       line-height: 20px;
       letter-spacing: 0.25px;
-      color: rgba(0, 0, 0, 0.6);
+      color: $main_text_color;
 
       span{
-        margin-right: 12px;
+        margin-right: $space_small;
 
         &.count {
           margin-right: 0;
@@ -59,65 +57,42 @@
 }
 </style>
 
-<script>
-export default {
-  name: 'SpaceInfoItem',
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
+import { SpaceListItemData } from '~/models/space/space-list-item.model'
+import { routerParamsLength } from '~/utils/utils'
 
-  props: {
-    spaceName: {
-      type: String,
-      default: ''
-    },
-    postsCount: {
-      type: Number,
-      default: 0
-    },
-    followersCount: {
-      type: Number,
-      default: 0
-    },
-    avatarSrc: {
-      type: String
-    },
-    avatarSize: {
-      type: Number,
-      default: 40
-    },
-    userName: {
-      type: String
-    },
-    handle: {
-      type: String
-    },
-    id: {
-      type: String
-    }
-  },
+@Component
+export default class SpaceInfoItem extends Vue {
+  @Prop({
+    type: Object,
+    default: undefined
+  }) spaceItem!: SpaceListItemData
 
-  data () {
-    return {
-      hidePostCount: false,
-      isOpenModal: false
-    }
-  },
+  @Prop({
+    type: Number,
+    default: 40
+  }) avatarSize!: Number
 
-  created () {
+  hidePostCount: boolean = false
+  isOpenModal: boolean = false
+
+  created (): void {
     this.isMobile()
-  },
+  }
 
-  methods: {
-    isMobile () {
-      if (process.browser) {
-        if (window.innerWidth <= 760 && Object.keys(this.$route.params).length) {
-          this.hidePostCount = false
-        } else {
-          this.hidePostCount = true
-        }
+  isMobile (): void {
+    if (process.browser) {
+      if (window.innerWidth <= 760 && routerParamsLength(this.$route.params)) {
+        this.hidePostCount = false
+      } else {
+        this.hidePostCount = true
       }
-    },
-    openModal () {
-      this.isOpenModal = !this.isOpenModal
     }
+  }
+
+  openModal (): void {
+    this.isOpenModal = !this.isOpenModal
   }
 }
 </script>
