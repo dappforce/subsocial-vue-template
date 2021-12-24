@@ -62,7 +62,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
-import { environment } from '~/environments/environment'
+import { config } from '~/config/config'
 
 @Component
 export default class VoteUserItem extends Vue {
@@ -76,7 +76,7 @@ export default class VoteUserItem extends Vue {
   }) type!: string
 
   balance: string = ''
-  addressLength: number = environment.addressLengthLong
+  addressLength: number = config.addressLengthLong
 
   @Watch('userInfo')
   userInfoHandler () {

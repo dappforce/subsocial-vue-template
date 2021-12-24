@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="spaces-container">
     <div v-if="spaceList.length">
       <SpaceListItem
         v-for="(item, index) in spaceList"
@@ -7,6 +7,7 @@
         :space-item-data="item"
         :avatar-size="40"
         :current-user="currentUser"
+        :is-my-own-space="item.struct.ownerId === currentUser.id"
       />
       <infinite-loading
         spinner="spiral"
@@ -16,13 +17,20 @@
     <BounceSpinner v-if="!spaceList.length" />
   </div>
 </template>
+
+<style scoped lang="scss">
+.spaces-container {
+  width: 100%;
+}
+</style>
+
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { environment } from '@/environments/environment'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
 import { SpaceListItemData } from '~/models/space/space-list-item.model'
+import { config } from '~/config/config'
 
-const stepNumber = environment.stepForLoading
+const stepNumber = config.stepForLoading
 
 @Component
 export default class SpaceContainer extends Vue {
@@ -31,7 +39,7 @@ export default class SpaceContainer extends Vue {
   startIndex: number = stepNumber
   endIndex: number = stepNumber * 2
   step: number = stepNumber
-  max: number = environment.recommendedSpaceIds.length
+  max: number = config.recommendedSpaceIds.length
   currentUser: ProfileItemModel | null = null
   spaceList: SpaceListItemData[] = []
 
@@ -67,7 +75,7 @@ export default class SpaceContainer extends Vue {
         this.spaceList.push(...this.$store.getters['space/getSpacesWithContent'](this.startIndex, this.endIndex))
 
         $state.loaded()
-        if (this.spaceList.length >= environment.recommendedSpaceIds.length) {
+        if (this.spaceList.length >= config.recommendedSpaceIds.length) {
           $state.complete()
         }
 
@@ -78,7 +86,7 @@ export default class SpaceContainer extends Vue {
   }
 
   async getNewSpace (start: number, end: number) {
-    return await this.$store.dispatch('space/getSpacesByIds', environment.recommendedSpaceIds.slice(start, end))
+    return await this.$store.dispatch('space/getSpacesByIds', config.recommendedSpaceIds.slice(start, end))
   }
 
   setCurrentUser (): void {

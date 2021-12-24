@@ -19,12 +19,12 @@
         :is-show-label="isShowLabel"
         :count="post.downvotesCount"
       />
-      <CommentButton v-if="isShowCommentBtn" :id="id" :count="post.visibleRepliesCount" />
+      <CommentButton v-if="isShowCommentBtn" :id="id" :count="isPostOwner ? post.repliesCount : post.visibleRepliesCount" />
       <ReplyButton v-if="isShowReplyBtn" :id="id" :is-show-label="isShowLabel" />
       <SharedButton v-if="isShowSharedBtn" :is-show-label="isShowLabel" :count="post.sharesCount" />
     </div>
     <div v-if="showCommentBlock" class="comment-container">
-      <Comment :id="id" :avatar-src="isAvatar(currentUser)" :handle="handle" :count="post.visibleRepliesCount" />
+      <Comment :id="id" :avatar-src="isAvatar(currentUser)" :handle="handle" :count="isPostOwner ? post.repliesCount : post.visibleRepliesCount" :is-post-owner="isPostOwner" />
     </div>
   </div>
 </template>
@@ -90,7 +90,7 @@ export default class ActionPanel extends Vue implements ActionPanelInt {
 
   @Prop({
     type: Boolean,
-    default: true
+    default: false
   }) isShowReplyBtn!: boolean
 
   @Prop({
@@ -101,6 +101,7 @@ export default class ActionPanel extends Vue implements ActionPanelInt {
   showCommentBlock: boolean = false
   currentUser: ProfileItemModel | null = null
   myReaction: any = {}
+  isPostOwner: boolean = false
 
   created (): void {
     this.$nuxt.$on(this.id, () => {
@@ -108,7 +109,7 @@ export default class ActionPanel extends Vue implements ActionPanelInt {
       this.showCommentBlock = !this.showCommentBlock
     })
     if (this.$store.state.profiles.currentUser) {
-      this.currentUser = this.$store.state.profiles.currentUser
+      this.setCurrentUser()
       this.getMyReaction()
     }
 
@@ -137,6 +138,8 @@ export default class ActionPanel extends Vue implements ActionPanelInt {
     } else {
       this.currentUser = null
     }
+
+    this.isPostOwner = this.post.ownerId === this.currentUser?.id
   }
 
   getMyReaction (): void {

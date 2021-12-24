@@ -1,69 +1,54 @@
 <template>
   <section class="edit-space-container">
     <v-card>
-      <h2>{{ isEdit ? 'Edit' : 'New' }} space</h2>
+      <h2 class="edit-space-title">
+        {{ isEdit ? 'Edit' : 'New' }} {{ isProfile ? 'profile' : 'space' }}
+      </h2>
 
-      <div class="upload-photo-wp" :class="{ loaded: !!previewImage }">
-        <div class="upload-photo" :style="{ backgroundImage: 'url(' + previewImage + ')' }">
-          <v-file-input
-            v-model="avatar"
-            prepend-icon="mdi-camera-outline"
-            color="#000"
-            :rules="avatarRules"
-            @change="selectImage"
-          />
-          <span v-if="!previewImage">Upload</span>
-        </div>
-        <span v-if="previewImage" class="delete-image">
-          <v-icon @click="clearImage()">mdi-delete-outline</v-icon>
-        </span>
-      </div>
-      <v-form v-model="valid">
-        <div class="form-row">
-          <v-text-field
-            v-model="spaceName"
-            :error-messages="spaceNameErrors"
-            :counter="50"
-            outlined
-            label="* Space name"
-            required
-            @input="$v.spaceName.$touch()"
-            @blur="$v.spaceName.$touch()"
-          />
-        </div>
-        <div class="form-row">
-          <v-textarea
-            v-model="description"
-            outlined
-            name="input-7-4"
-            label="Description"
-            rows="9"
-          />
-        </div>
-        <div class="form-row">
-          <v-combobox
-            v-model="selectTags"
-            multiple
-            outlined
-            label="Tags"
-            append-icon
-            chips
-            deletable-chips
-            class="tag-input"
-            :search-input.sync="search"
-            placeholder="Press 'Enter' or 'Tab' key to add tags"
-            @keyup.tab="updateTags"
-            @paste="updateTags"
-          />
-        </div>
-      </v-form>
+      <ImageLoader :avatar="avatar" :type="'round'" @avatar="updateImageCID" />
+      <ValidationObserver ref="form" v-slot="{ handleSubmit, handleReset }">
+        <form @submit.prevent="handleSubmit(submit)" @reset.prevent="handleReset(clear)">
+          <div class="form-row">
+            <ValidationProvider v-slot="{ errors }" name="Space name" rules="required">
+              <v-text-field
+                v-model="name"
+                outlined
+                :label="'* ' + (isProfile ? 'Profile' : 'Space') + ' name'"
+                required
+                hide-details="auto"
+                :messages="errors[0]"
+              />
+            </ValidationProvider>
+          </div>
+          <div class="form-row">
+            <mde-editor :show-editor="true" :text="description" :height="'200px'" @contentUpdate="updateDescription" />
+          </div>
+          <div v-if="!isProfile" class="form-row">
+            <v-combobox
+              v-model="selectTags"
+              multiple
+              outlined
+              label="Tags"
+              append-icon
+              chips
+              deletable-chips
+              class="tag-input"
+              :search-input.sync="search"
+              placeholder="Press 'Enter' or 'Tab' key to add tags"
+              hide-details="auto"
+              @keyup.tab="updateTags"
+              @paste="updateTags"
+            />
+          </div>
+        </form>
+      </ValidationObserver>
 
       <div class="button-wp">
-        <v-btn class="button-third-color" color="#fff" @click="clear">
-          {{ isEdit ? 'Cancel' : 'Reset form' }}
+        <v-btn class="button-third-color" @click="clear">
+          {{ isEdit ? 'Cancel' : 'Reset' }}
         </v-btn>
         <v-btn class="button-main-color" @click="submit">
-          {{ isEdit ? 'Save' : 'Create space' }}
+          {{ isEdit ? 'Save' : 'Create' }}
         </v-btn>
       </div>
     </v-card>
@@ -83,133 +68,39 @@
   padding-bottom: $space_normal;
 
   .v-card {
-    padding: 35px 23px 21px;
+    padding: $space_huge $space_big $space_big;
   }
 
-  h2 {
+  .edit-space-title {
+    font-size: $font_large;
     margin: 0 0 15px;
+  }
+
+  .v-text-field__details {
+    padding: 0!important;
   }
 
   .form-row {
     width: 100%;
-  }
+    margin-bottom: $space_big;
 
-  .upload-photo-wp {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    margin-top: -5px;
-    position: relative;
-    padding-bottom: $space_large;
-
-    .upload-photo {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      border: 1px dashed rgba(0, 0, 0, 0.38);
-      position: relative;
-      background-size: cover;
-      background-position: center;
-
-      span {
-        font-size: $font_small;
-        line-height: 20px;
-        letter-spacing: 0.25px;
-        margin-top: 3px;
-      }
-
-      .v-input {
-        display: block;
-        width: 100%;
-        padding: 0;
-        margin: 0;
-        flex: none;
-
-        .v-input__prepend-outer {
-          display: flex;
-          width: 100%;
-        }
-
-        .v-input__slot {
-          display: none;
-        }
-
-        .v-input__control {
-          position: absolute;
-          bottom: -15px;
-          left: 0;
-
-          .v-messages__message {
-            text-align: center;
-          }
-        }
-
-        .v-icon {
-          color: $color_black;
-        }
-      }
-
-      button {
-        border-radius: 50%;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-
-        &:before {
-          padding-bottom: 15px;
-        }
-      }
+    .editor-toolbar, .CodeMirror {
+      border-color: $color_border;
     }
 
-    .delete-image {
-      position: absolute;
-      right: calc(50% - 70px);
-      top: 0;
-      bottom: 20px;
-      color: #666666;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      i:hover {
-        cursor: pointer;
-        opacity: 0.6;
-      }
+    .CodeMirror-placeholder {
+      font-size: 16px;
+      color: rgba(0, 0, 0, 0.6);
+      opacity: 1;
     }
 
-    &.loaded {
-      .upload-photo {
-        border: none;
+    .v-text-field--outlined fieldset {
+      border-color: $color_border;
+    }
 
-        .v-file-input {
-          display: none;
-        }
-
-        &:hover {
-          .v-file-input {
-            display: block;
-
-            button {
-              background: $button_hover;
-              &:before {
-                padding-bottom: 0;
-                color: $color_white;
-              }
-            }
-
-            .v-text-field__details {
-              display: none;
-            }
-          }
-        }
-      }
+    .v-text-field--outlined.v-input--is-focused fieldset, .v-text-field--outlined.v-input--has-state fieldset {
+      border-width: 1px;
+      border-color: $color_font_normal;
     }
   }
 
@@ -231,7 +122,7 @@
     }
 
     .v-input__slot {
-      margin-bottom: 25px;
+      margin-bottom: $space_big;
     }
 
     .v-text-field__details {
@@ -247,11 +138,11 @@
     margin-top: 5px;
 
     .button-main-color {
-      color: $color_primary;
+      background-color: $color_primary;
     }
 
     .button-third-color {
-      color: $color_white
+      background-color: $color_white
     }
 
     button {
@@ -278,85 +169,167 @@
 }
 </style>
 
-<script>
-import { validationMixin } from 'vuelidate'
-import { required, maxLength } from 'vuelidate/lib/validators'
+<script lang="ts">
+import { Component, Prop } from 'vue-property-decorator'
+import { extend, ValidationObserver, ValidationProvider } from 'vee-validate'
+import { required } from 'vee-validate/dist/rules'
+import { SubmittableResult } from '@polkadot/api'
+import { IpfsContent, OptionId, OptionText } from '@subsocial/types/substrate/classes'
+import { IpfsCid } from '@subsocial/types'
 import { environment } from '~/environments/environment'
+import { SpaceListItemData } from '~/models/space/space-list-item.model'
+import TransactionButton from '~/components/abstract/TransactionButton.vue'
+import { PALLETS, METHODS } from '~/constants/query'
+import TransactionService from '~/services/transaction.service'
+import { ProfileItemModel } from '~/models/profile/profile-item.model'
+import { getNewIdFromEvent } from '~/utils/utils'
 
-export default {
-  name: 'SpaceEdit',
-  mixins: [validationMixin],
+extend('required', required)
+extend('required', {
+  ...required,
+  message: 'This field is required'
+})
 
-  props: {
-    isEdit: {
-      type: Boolean,
-      default: false
-    },
-    spaceItem: {
-      type: Object
-    }
-  },
-  validations: {
-    spaceName: { required, maxLength: maxLength(50) }
-  },
+const transactionService = new TransactionService()
 
-  data: () => ({
-    valid: false,
-    spaceName: '',
-    description: '',
-    avatarRules: [
-      value => !value || value.size < 2000000 || 'Image should be less than 2 MB!'
-    ],
-    avatar: [],
-    selectTags: [],
-    search: '',
-    previewImage: null,
-    url: environment.ipfsUrl
-  }),
+@Component({
+  components: { ValidationProvider, ValidationObserver }
+})
+export default class SpaceEdit extends TransactionButton {
+  $refs!: {
+    form: InstanceType<typeof ValidationObserver>;
+  };
 
-  computed: {
-    spaceNameErrors () {
-      const errors = []
-      if (!this.$v.spaceName.$dirty) { return errors }
-      !this.$v.spaceName.maxLength && errors.push('Name must be at most 50 characters long')
-      !this.$v.spaceName.required && errors.push('Name is required.')
-      return errors
-    }
-  },
+  @Prop({
+    type: Boolean,
+    default: false
+  }) isEdit!: boolean
+
+  @Prop({
+    type: Boolean,
+    default: false
+  }) isProfile!: boolean
+
+  @Prop({
+    type: Object
+  }) spaceItem!: SpaceListItemData
+
+  @Prop({
+    type: Object
+  }) profileItem!: ProfileItemModel
+
+  space: SpaceListItemData | null = null
+  profile: ProfileItemModel | null = null
+  name: string = ''
+  description: string = ''
+  avatar: string = ''
+  selectTags: string[] = []
+  search: string = ''
+  url: string = environment.ipfsUrl
+
   created () {
-    if (this.isEdit) {
-      this.spaceName = this.spaceItem.content.name
-      this.description = this.spaceItem.content.summary
-      this.selectTags = this.spaceItem.content.tags
-      this.previewImage = this.url + this.spaceItem.content.image
+    if (this.spaceItem || this.profileItem) {
+      this.insertDataInForm()
     }
-  },
+  }
 
-  methods: {
-    updateTags () {
+  insertDataInForm (): void {
+    this.name = this.isProfile ? this.profileItem?.name || '' : this.spaceItem.content.name
+    this.description = this.isProfile ? this.profileItem?.summary || '' : this.spaceItem.content.summary
+    this.selectTags = this.isProfile ? [] : this.spaceItem.content.tags
+    this.avatar = this.isProfile ? this.profileItem?.avatar || '' : this.spaceItem.content.image ? this.spaceItem.content.image : ''
+  }
+
+  updateImageCID (cid: string): void {
+    this.avatar = cid
+  }
+
+  updateDescription (content: string): void {
+    this.description = content
+  }
+
+  updateTags (): void {
+    this.$nextTick(() => {
+      if (this.search) { this.selectTags.push(...this.search.split(',')) }
       this.$nextTick(() => {
-        if (this.search) { this.selectTags.push(...this.search.split(',')) }
-        this.$nextTick(() => {
-          this.search = ''
-        })
+        this.search = ''
       })
-    },
-    submit () {
-      this.$v.$touch()
-    },
-    clear () {
-      this.$v.$reset()
-      this.spaceName = ''
-      this.description = ''
-      this.selectTags = [],
-      this.previewImage = null
-    },
-    selectImage (image) {
-      const currentImage = image
-      this.previewImage = URL.createObjectURL(currentImage)
-    },
-    clearImage () {
-      this.previewImage = null
+    })
+  }
+
+  submit () {
+    this.$refs.form.validate().then((result) => {
+      if (result) {
+        this.OnCreateOrUpdateSpace()
+      }
+    })
+  }
+
+  clear () {
+    this.$refs.form.reset()
+    this.name = ''
+    this.description = ''
+    this.selectTags = []
+  }
+
+  onFailed (result: SubmittableResult | null): void {
+  }
+
+  onSuccess (result: SubmittableResult): void {
+    const id = this.spaceItem?.struct?.id || getNewIdFromEvent(result)?.toString()
+    if (id) {
+      this.$store.dispatch('space/getSpacesByIds', [id]).then(() => {
+        this.$router.push('/' + id)
+      })
+    }
+  }
+
+  validate (): boolean {
+    return true
+  }
+
+  async OnCreateOrUpdateSpace () {
+    const pallet = this.isProfile ? PALLETS.profiles : PALLETS.spaces
+    const method = this.getMethods()
+
+    const cid: IpfsCid | undefined = await transactionService.saveIpfsContent({
+      about: this.description,
+      image: this.avatar,
+      name: this.name,
+      tags: this.selectTags,
+      links: [],
+      avatar: this.avatar
+    })
+
+    if (!cid) { return }
+
+    const params = this.getParams(cid)
+
+    await this.initExtrinsic({ pallet, params, method })
+
+    await this.sentTransaction()
+  }
+
+  getParams (cid: IpfsCid) {
+    if (this.isProfile) {
+      return this.isEdit ? [{ content: { IPFS: cid } }] : [{ IPFS: cid }]
+    } else {
+      return this.isEdit
+        ? [this.spaceItem?.struct.id, { content: { IPFS: cid } }]
+        : [
+            new OptionId(),
+            new OptionText(''),
+            { IPFS: cid },
+            null
+          ]
+    }
+  }
+
+  getMethods () {
+    if (this.isProfile) {
+      return this.isEdit ? METHODS.updateProfile : METHODS.createProfile
+    } else {
+      return this.isEdit ? METHODS.updateSpace : METHODS.createSpace
     }
   }
 }

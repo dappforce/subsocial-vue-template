@@ -63,7 +63,7 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { ProfileData } from '@subsocial/api/flat-subsocial/dto'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
-import { environment } from '~/environments/environment'
+import { config } from '~/config/config'
 
 @Component
 export default class UserItem extends Vue {
@@ -82,7 +82,7 @@ export default class UserItem extends Vue {
 
   balance: string = ''
   isFollow: boolean = false
-  addressLength: number = environment.addressLengthLong
+  addressLength: number = config.addressLengthLong
 
   @Watch('userInfo')
   userInfoHandler () {

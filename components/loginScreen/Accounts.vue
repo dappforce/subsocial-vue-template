@@ -34,8 +34,8 @@
 
 <style lang="scss">
 .account-present {
-  width: 432px;
-  padding: 18px;
+  width: $modal_width;
+  padding: $space_normal;
 
   .title {
     font-weight: 500;

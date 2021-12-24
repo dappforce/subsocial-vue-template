@@ -3,6 +3,7 @@ import { FlatSubsocialApi } from '@subsocial/api/flat-subsocial'
 import SubsocialApiService from '~/services/subsocial-api.service'
 import { AccountData, AccountRawData, Balance, PolkadotAccount } from '~/types/account.types'
 import { environment } from '~/environments/environment'
+import { config } from '~/config/config'
 
 const subsocialApiService = new SubsocialApiService()
 
@@ -57,9 +58,9 @@ export default class AccountService {
     return this.getFormattedBalance(balance)
   }
 
-  private async getFormattedBalance (balance: Balance | undefined) {
+  async getFormattedBalance (balance: Balance | undefined) {
     const { formatBalance } = await import('@polkadot/util')
-    const { decimals, currency: unit } = environment
+    const { decimals, currency: unit } = config
     formatBalance.setDefaults({ decimals, unit })
     const [prefix, postfix] = balance
       ? formatBalance(balance.freeBalance, {

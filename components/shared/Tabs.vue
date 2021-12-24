@@ -21,11 +21,16 @@
 <style lang="scss">
 .tabs-container {
   height: 100%;
-  min-height: 48px;
+  min-height: 56px;
+  padding-top: $space_normal;
+  background-color: $color_page_bg;
+  margin-bottom: $space_normal;
 
   .v-tabs-bar {
     height: 100%;
-    min-height: 48px;
+    min-height: 56px;
+    box-shadow: $box_shadow_card;
+    width: $general_width;
   }
 
   .slider-color {

@@ -1,7 +1,7 @@
 <template>
   <div style="width: 100%;">
     <div v-if="postList.length" class="post-container">
-      <div v-for="(item, index) in postList" :key="index" style="width: 100%">
+      <div v-for="(item, index) in filterPostList" :key="index" style="width: 100%">
         <PostListItem
           v-if="!item.isSharedPost"
           :post-item-data="item"
@@ -30,12 +30,12 @@
 </style>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { SharedPostStruct } from '@subsocial/api/flat-subsocial/flatteners'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
-import { environment } from '~/environments/environment'
+import { config } from '~/config/config'
 
-const stepNumber = environment.stepForLoading
+const stepNumber = config.stepForLoading
 
 @Component({})
 export default class PostContainer extends Vue {
@@ -58,6 +58,15 @@ export default class PostContainer extends Vue {
   postsIds: string[] = []
   currentUser: ProfileItemModel | undefined | null = null
   allPostsIds: string[] = []
+
+  @Watch('type')
+  typeHandler (newVal: string, oldVal: string) {
+    if (newVal !== oldVal) {
+      if (this.ids.length) {
+        this.load()
+      }
+    }
+  }
 
   created () {
     if (this.ids.length) {
@@ -83,10 +92,10 @@ export default class PostContainer extends Vue {
 
     if (this.isAllPostsInState()) {
       this.selectPostsWithData(this.defaultStart, this.defaultEnd)
-      this.currentUser = this.$store.state.profiles.currentUser
+      this.setCurrentUser()
     } else {
       this.getNewPosts(this.defaultStart, this.defaultEnd).then(() => {
-        this.currentUser = this.$store.state.profiles.currentUser
+        this.setCurrentUser()
         this.selectPostsWithData(this.defaultStart, this.defaultEnd)
       })
     }
@@ -147,6 +156,14 @@ export default class PostContainer extends Vue {
       .filter(post => post !== undefined)
     this.postList.push(...newPosts)
     this.postsIds.push(...newPostsIds)
+  }
+
+  setCurrentUser (): void {
+    this.currentUser = this.$store.state.profiles.currentUser
+  }
+
+  get filterPostList () {
+    return this.postList.filter((post: SharedPostStruct) => this.type === 'all' ? true : !post.hidden)
   }
 }
 </script>

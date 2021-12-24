@@ -11,7 +11,7 @@
               <PostInfoItem
                 :post-item="post"
               />
-              <OptionButton :post-id="post.id" :account-id="post.ownerId" />
+              <OptionButton :post-id="post.id" :account-id="post.ownerId" :post="post" :toggle-type="'post'" />
             </div>
             <Title size="large" :link="post.postLink" :name="post.title" />
 
@@ -29,32 +29,34 @@
       </v-card>
     </div>
 
-    <SpaceListItem v-if="space && currentUser" :space-item-data="space" :avatar-size="40" :current-user="currentUser" />
+    <div class="space-item-container">
+      <SpaceListItem v-if="space && currentUser" :space-item-data="space" :avatar-size="40" :current-user="currentUser" />
+    </div>
 
     <v-card
       elevation="2"
       class="comment-container"
     >
-      <Comment :id="post.id" :avatar-src="post.ownerImageUrl" :handle="post.handle" :count="post.visibleRepliesCount" />
+      <Comment :id="post.id" :avatar-src="post.ownerImageUrl" :handle="post.handle" :count="post.visibleRepliesCount" :show-divider="false" />
     </v-card>
   </div>
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
 .post-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 
+  .space-item-container {
+    width: 100%;
+    margin-bottom: $space_normal;
+  }
+
   .comment-container {
     width: 100%;
     padding: $space_normal;
-    margin-top: $space_normal;
-
-    .divider {
-      display: none;
-    }
   }
 
   .post-item-wp {
@@ -67,7 +69,7 @@
 
     .post-main-wp {
       display: flex;
-      padding-bottom: 22px;
+      padding-bottom: 0;
 
       .post-data {
         width: 100%;
@@ -110,17 +112,19 @@ export default class PostPage extends Vue {
   currentUser?: ProfileStruct
 
   created (): void {
-    this.currentUser = this.$store.state.profiles.currentUser
-    this.post = this.$store.getters['posts/getPostInfo'](getPostIdFromLink(this.$route.params.post))
-    this.$store.dispatch('space/findSpaceById', this.$route.params.space).then((space) => {
-      this.space = space
-    })
+    if (this.$store.state.loading.isLoading) {
+      this.setCurrentUser()
+      this.post = this.$store.getters['posts/getPostInfo'](getPostIdFromLink(this.$route.params.post))
+      this.$store.dispatch('space/findSpaceById', this.$route.params.space).then((space) => {
+        this.space = space
+      })
+    }
 
-    const unsubscribe = this.$store.subscribe((mutation, state) => {
-      if (mutation.type === 'posts/SET_SUGGESTED_POST_IDS' && this.post === undefined) {
+    const unsubscribe = this.$store.subscribe((mutation) => {
+      if (mutation.type === 'posts/SET_SUGGESTED_POST_IDS' && this.post === null) {
         this.$store.dispatch('posts/getPostById', getPostIdFromLink(this.$route.params.post)).then(() => {
           this.post = this.$store.getters['posts/getPostInfo'](getPostIdFromLink(this.$route.params.post))
-          this.currentUser = this.$store.state.profiles.currentUser
+          this.setCurrentUser()
           unsubscribe()
         })
         this.$store.dispatch('space/getSpaceById', this.$route.params.space).then((space) => {
@@ -128,8 +132,10 @@ export default class PostPage extends Vue {
         })
       }
     })
+  }
 
-    this.$nuxt.$emit('isShowTabs', false)
+  setCurrentUser (): void {
+    this.currentUser = this.$store.state.profiles.currentUser
   }
 }
 </script>

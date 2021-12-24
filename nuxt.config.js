@@ -1,5 +1,4 @@
 import colors from 'vuetify/es5/util/colors'
-require('dotenv').config({ path: `.env.${process.env.NODE_ENV}` })
 
 export default {
   target: 'server',
@@ -26,7 +25,8 @@ export default {
     '~/assets/main.scss',
     '~/assets/github-markdown.css',
     '@mdi/font/css/materialdesignicons.min.css',
-    'vuetify/src/components/VGrid/VGrid.sass'
+    'vuetify/src/components/VGrid/VGrid.sass',
+    'easymde/dist/easymde.min.css'
   ],
 
   plugins: [
@@ -35,13 +35,16 @@ export default {
     '@/plugin/day.js',
     '@/plugin/numeral.ts',
     '@/plugin/linkFilters.ts',
+    '@/plugin/addressShortness.ts',
+    { src: '@/plugin/easymde.ts', ssr: false },
     { src: '~/plugin/numeral.ts', ssr: false },
     { src: '~/plugin/infiniteloading.ts', ssr: false }
   ],
 
   components: [
     '~/components',
-    { path: '~/components/shared', extensions: ['vue'] }
+    { path: '~/components/shared', extensions: ['vue'] },
+    { path: '~/components/shared/buttons', extensions: ['vue'] }
   ],
 
   buildModules: [
@@ -56,9 +59,17 @@ export default {
   modules: [
     '@nuxt/http',
     '@nuxt/content',
+    '@nuxtjs/i18n',
     '@nuxtjs/markdownit',
-    '@nuxtjs/dayjs'
+    '@nuxtjs/dayjs',
+    '@nuxtjs/axios'
   ],
+
+  i18n: {
+    defaultLocale: 'en',
+    langDir: 'locales/',
+    locales: [{ code: 'en', file: 'en.js' }]
+  },
 
   markdownit: {
     runtime: true
@@ -105,7 +116,8 @@ export default {
     },
     transpile: [
       'quasar',
-      'vue-numeral-filter'
+      'vue-numeral-filter',
+      'vee-validate/dist/rules'
     ]
 
   }

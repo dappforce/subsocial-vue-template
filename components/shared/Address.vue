@@ -1,6 +1,6 @@
 <template>
   <div class="address-container" @mouseover="mouseover" @mouseleave="mouseleave">
-    <span class="address-text">{{ shortAddress }}</span>
+    <span class="address-text">{{ address | addressShortness(length) }}</span>
     <button v-show="showCopy && showCopyBtn" @click="copyAddress">
       <v-icon :size="size === 'small' ? '16px' : '24px'">
         mdi-content-copy
@@ -87,15 +87,6 @@ export default class Address extends Vue implements AddressInt {
   mouseleave (): void {
     if (!this.showIcon) {
       this.showCopy = false
-    }
-  }
-
-  get shortAddress (): string {
-    if (this.length > this.address.length) {
-      return this.address
-    } else {
-      const index = Math.floor(this.length / 2)
-      return this.address.substring(0, index) + '...' + this.address.slice(-index)
     }
   }
 }

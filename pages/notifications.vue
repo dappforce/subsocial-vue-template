@@ -36,9 +36,5 @@ export default class NotificationsPage extends Vue {
     this.notifications = this.$store.state.notifications.list
     this.users = this.$store.state.profiles.list
   }
-
-  mounted () {
-    this.$nuxt.$emit('isShowTabs', false)
-  }
 }
 </script>

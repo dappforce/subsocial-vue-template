@@ -1,9 +1,10 @@
 <template>
   <div data-app>
     <LoadSpinner v-if="showHideSpinner" />
-    <Header :show-tabs="true" :tab-links="['posts', 'spaces']" />
+    <Header />
     <div class="container">
       <Nuxt />
+      <LeftSideMenu />
       <Snackbar ref="snackbar" />
     </div>
   </div>
@@ -20,7 +21,7 @@
 }
 .container {
   width: $general_width;
-  padding: 0 0 $space_large;
+  padding: 56px 0 $space_large;
 
   .v-window {
     overflow: visible;

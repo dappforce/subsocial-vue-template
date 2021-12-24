@@ -195,12 +195,12 @@ export const getters = {
     const spaceEntity = rootState.space.spaces
     const postListItemDataArray: KeyValuePair<PostListItemData> = {}
     postArray.map((postStruct: SharedPostStruct) => {
-      const profile = profileEntity.find((i: PostStruct) => i.id === postStruct.ownerId)
+      const profile = profileEntity.find((i: PostStruct) => i?.id === postStruct.ownerId)
       if (postStruct.contentId && profile?.contentId && postStruct.spaceId) {
-        const spaceStruct = spaceEntity.find((i: SpaceStruct) => i.id === postStruct.spaceId)
-        const postContent = contentEntities.find((i: Content) => i.id === postStruct.contentId) as PostContent
-        const profileContent = contentEntities.find((i: Content) => i.id === profile.contentId) as ProfileContent
-        const spaceContent = contentEntities.find((i: Content) => i.id === spaceStruct?.contentId) as SpaceContent
+        const spaceStruct = spaceEntity.find((i: SpaceStruct) => i?.id === postStruct.spaceId)
+        const postContent = contentEntities.find((i: Content) => i?.id === postStruct.contentId) as PostContent
+        const profileContent = contentEntities.find((i: Content) => i?.id === profile.contentId) as ProfileContent
+        const spaceContent = contentEntities.find((i: Content) => i?.id === spaceStruct?.contentId) as SpaceContent
 
         if (spaceStruct && postContent && profileContent) {
           const postListItemData: PostListItemData = {
@@ -210,9 +210,7 @@ export const getters = {
             spaceName: spaceContent.name!,
             title: postContent.title,
             summary: postContent.summary,
-            imageUrl: postContent.image
-              ? environment.ipfsUrl + postContent.image
-              : '',
+            imageUrl: postContent.image || '',
             createdAtTime: postStruct.createdAtTime,
             repliesCount: postStruct.repliesCount,
             hiddenRepliesCount: postStruct.hiddenRepliesCount,
@@ -225,9 +223,10 @@ export const getters = {
             isShowMore: postContent.isShowMore,
             ownerName: profileContent?.name || '',
             postLink: getPostLink(
-                spaceStruct.handle!,
+                spaceStruct.handle! || spaceStruct.id,
                 postContent.title,
-                postStruct.id
+                postStruct.id,
+                !!spaceStruct.handle
             ),
             body: postContent.body,
             tags: postContent.tags,
@@ -253,10 +252,10 @@ export const getters = {
     const profileEntity = rootState.profiles.list
     const postListItemDataArray: KeyValuePair<PostListItemData> = {}
     postArray.map((postStruct: PostStruct) => {
-      const profile = profileEntity.find((i: PostStruct) => i.id === postStruct.ownerId)
+      const profile = profileEntity.find((i: PostStruct) => i?.id === postStruct.ownerId)
       if (postStruct.contentId && profile.contentId) {
-        const postContent = contentEntities.find((i: Content) => i.id === postStruct.contentId) as PostContent
-        const profileContent = contentEntities.find((i: Content) => i.id === profile.contentId) as ProfileContent
+        const postContent = contentEntities.find((i: Content) => i?.id === postStruct.contentId) as PostContent
+        const profileContent = contentEntities.find((i: Content) => i?.id === profile.contentId) as ProfileContent
         if (postContent && profileContent) {
           const postListItemData: PostListItemData = {
             id: postStruct.id,

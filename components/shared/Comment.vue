@@ -1,6 +1,7 @@
 <template>
   <div class="comments-wp">
     <v-divider
+      v-if="showDivider"
       class="mx-4 divider"
     />
     <div class="comments-counter">
@@ -14,7 +15,15 @@
 
       <div class="action-wp">
         <div class="text-area-wp">
+          <client-only>
+            <vue-easymde
+              v-if="showEditor"
+              v-model="comment"
+              class="easy-mde"
+            />
+          </client-only>
           <v-textarea
+            v-if="!showEditor"
             v-model="comment"
             auto-grow
             outlined
@@ -39,6 +48,7 @@
       :comment="item"
       :handle="handle"
       :avatar-src="item.ownerImageUrl"
+      :is-post-owner="isPostOwner"
     />
   </div>
 </template>
@@ -101,6 +111,20 @@
       width: 100%;
       margin-left: $space_tiny;
 
+      .easy-mde {
+        .EasyMDEContainer .CodeMirror {
+          min-height: 30px;
+        }
+
+        .CodeMirror-scroll {
+          min-height: 30px !important;
+        }
+
+        .editor-statusbar {
+          display: none;
+        }
+      }
+
       .send-button {
         background-color: $color_primary;
         border-radius: $border_small;
@@ -146,11 +170,22 @@ export default class Comment extends Vue {
     type: Number
   }) count!: number
 
+  @Prop({
+    type: Boolean,
+    default: false
+  }) isPostOwner!: boolean
+
+  @Prop({
+    type: Boolean,
+    default: true
+  }) showDivider!: boolean
+
   comment: string = ''
   showBtn: boolean = false
   commentIds: [] = []
   commentsList: PostListItemData[] = []
   showSpinner: boolean = true
+  showEditor: boolean = false
 
   created () {
     this.$store.dispatch('comment/getPostReplyId', this.id).then(() => {
@@ -169,19 +204,21 @@ export default class Comment extends Vue {
   }
 
   showButton (): void {
+    this.showEditor = !this.showEditor
+    this.showBtn = true
     if (!this.comment.length) {
-      this.showBtn = true
+
     }
   }
 
   hideButton (): void {
-    if (!this.comment.length) {
-      this.showBtn = false
-    }
+    // if (!this.comment.length) {
+    //   this.showBtn = false
+    // }
   }
 
   async getNewPosts (ids: []) {
-    return await this.$store.dispatch('posts/getPostsByIds', { ids, type: 'public' })
+    return await this.$store.dispatch('posts/getPostsByIds', { ids, type: this.isPostOwner ? 'all' : 'public' })
   }
 
   addUniquePostToPostArray (postsDictionary: [], ids: []) {

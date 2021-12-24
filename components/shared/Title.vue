@@ -4,7 +4,7 @@
   </NuxtLink>
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
 .title {
   font-weight: 500;
   font-size: $font_normal;

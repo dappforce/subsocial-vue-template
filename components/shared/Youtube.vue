@@ -1,13 +1,20 @@
 <template>
-  <iframe
-    width="100%"
-    height="315"
-    :src="'https://www.youtube.com/embed/' + extractVideoID(link)"
-  />
+  <div class="youtube-container">
+    <iframe
+      width="100%"
+      height="315"
+      :src="'https://www.youtube.com/embed/' + extractVideoID(link)"
+    />
+  </div>
 </template>
 
-<script lang="ts">
+<style lang="scss">
+.youtube-container {
+  margin-top: $space_small;
+}
+</style>
 
+<script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
 @Component
