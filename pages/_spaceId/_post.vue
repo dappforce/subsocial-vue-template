@@ -29,15 +29,18 @@
 
             <Youtube v-if="post.link" :link="post.link" />
 
-            <p class="markdown-body" v-html="$md.render(post.body)" />
+            <p class="markdown-body" v-html="$md.render(post.body, {html: true})" />
 
             <PostListItem
-              v-if="sharedPost"
+              v-if="isShowHiddenPost()"
               :post-item-data="sharedPost"
               :current-user-id="currentUser.id"
               :is-shared-post="true"
               class="shared-post"
             />
+            <div v-if="sharedPost && !isShowHiddenPost() || sharedPost === undefined " class="hidden-post-text">
+              Post not found
+            </div>
 
             <div class="post-tags">
               <Tag v-for="(item, index) in post.tags" :key="index" :tag-name="item" size="medium" />
@@ -122,6 +125,17 @@
       align-items: flex-start;
       margin-bottom: $space_normal;
     }
+
+    .hidden-post-text {
+      text-align: center;
+      background: $color_white;
+      border: 1px solid $color_light_border;
+      box-sizing: border-box;
+      border-radius: $border_small;
+      padding: $space_large;
+      color: $color_dark_gray;
+      font-size: $font_normal;
+    }
   }
 
   .description {
@@ -143,6 +157,7 @@ export default class PostPage extends Vue {
   currentUser?: ProfileStruct
   sharedPost: PostListItemData | null = null
   isPostOwner: boolean = false
+  isSharedPostOwner: boolean = false
 
   created (): void {
     if (this.$store.state.loading.isLoading) {
@@ -181,12 +196,21 @@ export default class PostPage extends Vue {
     if (sharedPostId) {
       this.$store.dispatch('posts/getPostById', this.post?.sharedPostId).then(() => {
         this.sharedPost = this.$store.getters['posts/getPostInfo'](this.post?.sharedPostId)
+        this.isSharedPostOwner = this.currentUser && this.sharedPost ? getIsPostOwner(this.sharedPost?.ownerId, this.currentUser.id) : false
       })
     }
   }
 
   isMobileScreen (): boolean {
     return isMobile()
+  }
+
+  isShowHiddenPost (): boolean {
+    if (this.isSharedPostOwner) {
+      return !!this.sharedPost
+    } else {
+      return !!this.sharedPost && !this.sharedPost.hidden
+    }
   }
 }
 </script>

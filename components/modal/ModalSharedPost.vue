@@ -140,6 +140,7 @@ import { ProfileStruct } from '@subsocial/api/flat-subsocial/flatteners'
 import { CommonContent, IpfsCid } from '@subsocial/types'
 import { SubmittableResult } from '@polkadot/api'
 import { createPostSlug } from '@subsocial/utils'
+import sanitizeHtml from 'sanitize-html'
 import { PostListItemData } from '~/models/post/post-list-item.model'
 import TransactionButton from '~/components/abstract/TransactionButton.vue'
 import { METHODS, PALLETS } from '~/constants/query'
@@ -235,7 +236,7 @@ export default class ModalAdblock extends TransactionButton {
     const method = METHODS.createPost
 
     this.cid = await transactionService.saveIpfsContent({
-      body: this.$options?.filters?.sanitize(this.comment)
+      body: sanitizeHtml(this.comment)
     } as CommonContent)
 
     if (!this.cid) { return }

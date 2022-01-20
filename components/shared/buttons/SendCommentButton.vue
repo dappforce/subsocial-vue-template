@@ -38,6 +38,7 @@
 import { Component, Prop } from 'vue-property-decorator'
 import { SubmittableResult } from '@polkadot/api'
 import { CommonContent, IpfsCid } from '@subsocial/types'
+import sanitizeHtml from 'sanitize-html'
 import TransactionButton from '~/components/abstract/TransactionButton.vue'
 import { METHODS, PALLETS } from '~/constants/query'
 import TransactionService from '~/services/transaction.service'
@@ -104,7 +105,7 @@ export default class SendCommentButton extends TransactionButton {
     const method = this.isEdit ? METHODS.updatePost : METHODS.createPost
 
     this.cid = await transactionService.saveIpfsContent({
-      body: this.$options?.filters?.sanitize(this.comment)
+      body: sanitizeHtml(this.comment)
     } as CommonContent)
 
     if (!this.cid) { return }

@@ -39,13 +39,13 @@
       />
 
       <PostListItem
-        v-if="sharedPost"
+        v-if="isShowHiddenPost()"
         :post-item-data="sharedPost"
         :current-user-id="currentUserId"
         :is-shared-post="true"
         class="shared-post"
       />
-      <div v-if="sharedPost === undefined" class="hidden-post-text">
+      <div v-if="!isShowHiddenPost() || sharedPost === undefined " class="hidden-post-text">
         Post not found
       </div>
 
@@ -170,12 +170,14 @@ export default class PostListItemShared extends Vue {
   sharedPost: PostListItemData | null = null
   post: PostListItemData = this.postItemData
   isPostOwner : boolean = getIsPostOwner(this.postItemData.ownerId, this.currentUserId)
+  isSharedPostOwner: boolean = false
 
   created () {
     const sharedPostId = this.postItemData.sharedPostId
     if (sharedPostId) {
       this.$store.dispatch('posts/getPostById', this.postItemData.sharedPostId).then(() => {
         this.sharedPost = this.$store.getters['posts/getPostInfo'](this.postItemData.sharedPostId)
+        this.isSharedPostOwner = this.sharedPost ? getIsPostOwner(this.sharedPost?.ownerId, this.currentUserId) : false
       })
     }
 
@@ -186,6 +188,14 @@ export default class PostListItemShared extends Vue {
         }
       }
     })
+  }
+
+  isShowHiddenPost (): boolean {
+    if (this.isSharedPostOwner) {
+      return !!this.sharedPost
+    } else {
+      return !!this.sharedPost && !this.sharedPost.hidden
+    }
   }
 }
 </script>

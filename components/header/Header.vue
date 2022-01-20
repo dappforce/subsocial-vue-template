@@ -137,7 +137,7 @@ header {
     .project-name {
       font-style: normal;
       font-weight: 500;
-      font-size: $font_huge;
+      font-size: $font_large;
       line-height:$main_line_height;
       letter-spacing: 0.15px;
       color: $color_font_normal;

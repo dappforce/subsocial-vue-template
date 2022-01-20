@@ -253,6 +253,7 @@ import { required, min } from 'vee-validate/dist/rules'
 import { SubmittableResult } from '@polkadot/api'
 import { CommonContent, IpfsCid } from '@subsocial/types'
 import { createPostSlug } from '@subsocial/utils'
+import sanitizeHtml from 'sanitize-html'
 import { PostListItemData } from '~/models/post/post-list-item.model'
 import TransactionButton from '~/components/abstract/TransactionButton.vue'
 import { METHODS, PALLETS } from '~/constants/query'
@@ -260,6 +261,7 @@ import TransactionService from '~/services/transaction.service'
 import { getNewIdFromEvent } from '~/utils/utils'
 import { SpaceListItemData } from '~/models/space/space-list-item.model'
 import StorageService from '~/services/storage.service'
+
 extend('required', required)
 extend('min', min)
 extend('required', {
@@ -410,7 +412,7 @@ export default class PostEdit extends TransactionButton {
       title: this.postName,
       image: this.isArticleTab ? this.image : '',
       tags: this.selectTags,
-      body: this.$options?.filters?.sanitize(this.description),
+      body: sanitizeHtml(this.description),
       link: this.videoUrl || undefined
     } as CommonContent)
 

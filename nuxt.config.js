@@ -35,7 +35,6 @@ export default {
     '@/plugin/day.js',
     '@/plugin/numeral.ts',
     '@/plugin/linkFilters.ts',
-    '@/plugin/sanitize.ts',
     '@/plugin/addressShortness.ts',
     { src: '@/plugin/easymde.ts', ssr: false },
     { src: '~/plugin/numeral.ts', ssr: false },
@@ -78,7 +77,10 @@ export default {
   },
 
   markdownit: {
-    runtime: true
+    runtime: true,
+    html: true,
+    linkify: true,
+    typographer: true
   },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
