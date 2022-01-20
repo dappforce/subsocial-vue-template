@@ -176,6 +176,7 @@ import { required } from 'vee-validate/dist/rules'
 import { SubmittableResult } from '@polkadot/api'
 import { OptionId, OptionText } from '@subsocial/types/substrate/classes'
 import { IpfsCid } from '@subsocial/types'
+import sanitizeHtml from 'sanitize-html'
 import { environment } from '~/environments/environment'
 import { SpaceListItemData } from '~/models/space/space-list-item.model'
 import TransactionButton from '~/components/abstract/TransactionButton.vue'
@@ -312,7 +313,7 @@ export default class SpaceEdit extends TransactionButton {
     const method = this.getMethods()
 
     this.cid = await transactionService.saveIpfsContent({
-      about: this.$options?.filters?.sanitize(this.description),
+      about: sanitizeHtml(this.description),
       image: this.avatar,
       name: this.name,
       tags: this.selectTags,
