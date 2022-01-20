@@ -17,6 +17,10 @@
   .editor-statusbar {
     display: none;
   }
+
+  .editor-preview {
+    padding: 0;
+  }
 }
 </style>
 
@@ -25,7 +29,9 @@ import { Component, Prop, Ref, Vue, Watch } from 'vue-property-decorator'
 
 export interface Config {
   minHeight: string,
-  placeholder: string
+  placeholder: string,
+  autofocus: boolean,
+  spellChecker: boolean
 }
 
 @Component
@@ -55,6 +61,9 @@ export default class MdeEditor extends Vue {
   @Watch('text')
   textHandler (newVal: string, oldVal: string) {
     if (newVal !== oldVal) {
+      if (!newVal.length) {
+        this.easyMde.codemirror.setValue('')
+      }
       this.content = newVal
     }
   }
@@ -68,14 +77,16 @@ export default class MdeEditor extends Vue {
 
   created () {
     this.content = this.text
-
     this.config = {
       minHeight: this.height,
-      placeholder: this.placeholder
+      placeholder: this.placeholder,
+      autofocus: true,
+      spellChecker: false
     }
   }
 
   updated () {
+    this.easyMde.codemirror.focus()
     this.easyMde.codemirror.on('update', () => {
       this.$emit('contentUpdate', this.content)
     })

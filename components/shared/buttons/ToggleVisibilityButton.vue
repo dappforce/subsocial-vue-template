@@ -1,13 +1,9 @@
 <template>
-  <span @click="onClick">
-    {{ hidden ? 'Make visible' : 'Hide' }} {{ hidden ? '' : type }}
-  </span>
+  <span @click="onClick">{{ hidden ? $t('buttons.makeVisible') : $t('buttons.hide') }} {{ hidden ? '' : type }}</span>
 </template>
 
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator'
-import { OptionBool, OptionId, OptionIpfsContent, OptionOptionText, PostUpdate, SpaceUpdate } from '@subsocial/types/substrate/classes'
-import { SubmittableResult } from '@polkadot/api'
 import TransactionButton from '~/components/abstract/TransactionButton.vue'
 import { PostListItemData } from '~/models/post/post-list-item.model'
 import { PALLETS, METHODS } from '~/constants/query'
@@ -35,7 +31,7 @@ export default class ToggleVisibilityButton extends TransactionButton {
   }) toggleType!: string
 
   hidden: boolean | undefined = false
-  type: string = this.post ? this.postType(this.post) : 'space'
+  type: string = this.post ? this.postType(this.post) : this.$t('general.space') as string
 
   created () {
     this.hidden = this.toggleType === 'post' ? this.post.hidden : this.space.struct.hidden
@@ -47,11 +43,13 @@ export default class ToggleVisibilityButton extends TransactionButton {
     return new Option(registry, 'Option<SpacePermissions>')
   }
 
-  onFailed (result: SubmittableResult | null): void {
+  onFailed (): void {
   }
 
-  onSuccess (result: SubmittableResult): void {
-    this.$router.go(0)
+  onSuccess (): void {
+    this.type === 'space'
+      ? this.$store.dispatch('space/updateHiddenState', { id: this.space.struct.id, state: this.space.struct.hidden })
+      : this.$store.dispatch('posts/updateHiddenState', { id: this.post.id, state: this.post.hidden })
   }
 
   validate (): boolean {
@@ -91,45 +89,15 @@ export default class ToggleVisibilityButton extends TransactionButton {
     return [this.post.id, update]
   }
 
-  // newTxParamsPost (): [string | undefined, PostUpdate] {
-  //   const update = new PostUpdate({
-  //     space_id: new OptionId(),
-  //     content: new OptionIpfsContent(),
-  //     hidden: new OptionBool(!this.hidden)
-  //   })
-  //   return [this.post.id, update]
-  // }
-
   newTxParamsSpace (): [string | undefined, {}] {
     const update = {
       hidden: !this.hidden
     }
-
-    //   new SpaceUpdate({
-    //   handle: new OptionOptionText(),
-    //   content: new OptionIpfsContent(),
-    //   hidden: new OptionBool(!this.hidden),
-    //   permissions: null
-    // })
     return [this.space.struct.id, update]
   }
 
-  // newTxParamsSpace (): [string | undefined, SpaceUpdate] {
-  //   const update = {
-  //     hidden: !this.hidden
-  //   }
-  //
-  //   //   new SpaceUpdate({
-  //   //   handle: new OptionOptionText(),
-  //   //   content: new OptionIpfsContent(),
-  //   //   hidden: new OptionBool(!this.hidden),
-  //   //   permissions: null
-  //   // })
-  //   return [this.space.struct.id, update]
-  // }
-
-  private postType (post: PostListItemData) {
-    return post.isComment ? 'comment' : 'post'
+  private postType (post: PostListItemData): string {
+    return post.isComment ? this.$t('general.comment') as string : this.$t('general.post') as string
   }
 }
 </script>

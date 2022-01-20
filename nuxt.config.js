@@ -6,7 +6,7 @@ export default {
 
   head: {
     titleTemplate: '%s - subsocial',
-    title: 'subsocial',
+    title: 'Subsocial',
     htmlAttrs: {
       lang: 'en'
     },
@@ -35,6 +35,7 @@ export default {
     '@/plugin/day.js',
     '@/plugin/numeral.ts',
     '@/plugin/linkFilters.ts',
+    '@/plugin/sanitize.ts',
     '@/plugin/addressShortness.ts',
     { src: '@/plugin/easymde.ts', ssr: false },
     { src: '~/plugin/numeral.ts', ssr: false },
@@ -44,7 +45,8 @@ export default {
   components: [
     '~/components',
     { path: '~/components/shared', extensions: ['vue'] },
-    { path: '~/components/shared/buttons', extensions: ['vue'] }
+    { path: '~/components/shared/buttons', extensions: ['vue'] },
+    { path: '~/components/shared/form-inputs', extensions: ['vue'] }
   ],
 
   buildModules: [
@@ -68,7 +70,11 @@ export default {
   i18n: {
     defaultLocale: 'en',
     langDir: 'locales/',
-    locales: [{ code: 'en', file: 'en.js' }]
+    differentDomains: false,
+    locales: [
+      { code: 'en', file: 'en.js' },
+      { code: 'ru', file: 'ru.js' }
+    ]
   },
 
   markdownit: {

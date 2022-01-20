@@ -5,7 +5,10 @@ export const config = {
   currency: 'SUB',
   addressLengthShort: 13,
   addressLengthLong: 17,
-  recommendedSpaceIds: ['1001', '1002', '1003', '1004', '1005', '1006']
+  imageSizeBytes: 2000000,
+  subRate: 100000000000,
+  feedType: 'offChain',
+  recommendedSpaceIds: ['1001', '1002', '1003', '1004', '1005', '1006', '1007', '1008', '1009', '1010', '1011', '1012', '1013', '1014', '1015', '1016', '1017']
   // recommendedSpaceIds: [
   //   '1',
   //   '1354',

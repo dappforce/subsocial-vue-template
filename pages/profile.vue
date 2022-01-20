@@ -31,19 +31,13 @@ export default class ProfilePage extends Vue {
           this.$store.dispatch('profiles/getProfile', { id: this.userId }).then(() => {
             this.getAccount().then((data) => {
               this.profile = data
-              this.profile?.name ? this.isEdit = true : this.isEdit = false
+              this.profile?.contentId ? this.isEdit = true : this.isEdit = false
               this.isUserCanEdit()
               unsubscribe()
             })
           })
         }
       })
-    }
-
-    if (this.$route.query.id) {
-      this.isEdit = true
-    } else {
-      this.havePermission = !this.havePermission
     }
   }
 

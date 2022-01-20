@@ -7,7 +7,7 @@ import PostService from '~/services/post.service'
 import SubsocialApiService from '~/services/subsocial-api.service'
 import { KeyValuePair } from '~/models/key-value-pair.model'
 import { Content } from '~/types/content'
-import { getPostLink } from '~/utils/utils'
+import { getPostLink, selectPostStructByIds } from '~/utils/utils'
 
 const UPDATE_POSTS = 'UPDATE_POSTS'
 const SET_LOADING_POSTS = 'SET_LOADING_POSTS'
@@ -16,11 +16,13 @@ const SET_LOADING_POST_IDS = 'SET_LOADING_POST_IDS'
 const SET_SELECTED_POSTS = 'SET_SELECTED_POSTS'
 const CLEAR_SELECTED_POSTS = 'CLEAR_SELECTED_POSTS'
 const SET_SELECTED_SPACE_POSTS = 'SET_SELECTED_SPACE_POSTS'
-const CLEAR_SELECTED_SPACE_POSTS = 'CLEAR_SELECTED_SPACE_POSTS'
+const SET_LOADING_POST_ID = 'SET_LOADING_POST_ID'
 const SET_ACCOUNT_POSTS_IDS = 'SET_ACCOUNT_POSTS_IDS'
 const SET_POSTS_COMMENT = 'SET_POSTS_COMMENT'
 const NEW_POSTS_ABSENT = 'NEW_POSTS_ABSENT'
 const UPDATE_POST_REACTION_COUNT = 'UPDATE_POST_REACTION_COUNT'
+const UPDATE_POST_HIDDEN_STATE = 'UPDATE_POST_HIDDEN_STATE'
+
 const postService = new PostService()
 const subsocialApiService = new SubsocialApiService()
 
@@ -35,6 +37,7 @@ export interface PostModel {
   list: SharedPostStruct[],
   postsIds: string[],
   isLoadingPosts: boolean,
+  loadingPostId: string,
   isLoadingPostsIds: boolean,
   selectedPost: [],
   spacePostsIds: string[],
@@ -47,6 +50,7 @@ export const state = (): PostModel => ({
   list: [],
   isLoadingPosts: false,
   isLoadingPostsIds: false,
+  loadingPostId: '',
   postsIds: [],
   selectedPost: [],
   spacePostsIds: [],
@@ -60,11 +64,17 @@ export const mutations = {
     state.list = [...new Map(state.list.concat(posts).map((item: SharedPostStruct) =>
       [item.id, item])).values()]
   },
+  [UPDATE_POST_HIDDEN_STATE] (state: PostModel, payload: {id: string, state: boolean}) {
+    state.list.find(i => i.id === payload.id)!.hidden = !payload.state
+  },
   [SET_LOADING_POST_IDS] (state: PostModel, loading: boolean) {
     state.isLoadingPostsIds = loading
   },
   [SET_LOADING_POSTS] (state: PostModel, loading: boolean) {
     state.isLoadingPosts = loading
+  },
+  [SET_LOADING_POST_ID] (state: PostModel, loading: string) {
+    state.loadingPostId = loading
   },
   [SET_SUGGESTED_POST_IDS] (state: PostModel, ids: string[]) {
     state.postsIds = ids
@@ -96,14 +106,10 @@ export const mutations = {
         } else {
           i.downvotesCount = payload.type === 'downvote' && payload.isActive
             ? ++i.downvotesCount
-            : payload.type === 'downvote' && !payload.isActive
-              ? --i.downvotesCount
-              : i.downvotesCount
+            : payload.type === 'downvote' && !payload.isActive ? --i.downvotesCount : i.downvotesCount
           i.upvotesCount = payload.type === 'upvote' && payload.isActive
             ? ++i.upvotesCount
-            : payload.type === 'upvote' && !payload.isActive
-              ? --i.upvotesCount
-              : i.upvotesCount
+            : payload.type === 'upvote' && !payload.isActive ? --i.upvotesCount : i.upvotesCount
         }
         return i
       }
@@ -118,7 +124,6 @@ export const actions = {
       postService.getSuggestedPostsIds().then((ids: string[]) => {
         commit(SET_SUGGESTED_POST_IDS, ids)
         commit(SET_LOADING_POST_IDS, false)
-        // dispatch('getPostsByIds', ids.slice(0, 20))
       })
     })
   },
@@ -151,6 +156,7 @@ export const actions = {
       commit('profiles/UPDATE_PROFILES', postData.profiles, { root: true })
       commit('space/UPDATE_SPACE', postData.spaces, { root: true })
       commit(SET_LOADING_POSTS, false)
+      commit(SET_LOADING_POST_ID, postData?.posts.length ? postData.posts[0].id : null)
     })
   },
 
@@ -184,6 +190,10 @@ export const actions = {
 
   updatePostReaction ({ commit }: {commit: Commit}, payload: {type: string, isActive: boolean, postId: string, isNew: boolean}) {
     commit(UPDATE_POST_REACTION_COUNT, payload)
+  },
+
+  updateHiddenState ({ commit } : {commit: Commit}, payload : {id: string, state: boolean}) {
+    commit(UPDATE_POST_HIDDEN_STATE, payload)
   }
 }
 
@@ -192,21 +202,20 @@ export const getters = {
     const postArray = selectPostStructByIds(ids, state.list)
     const contentEntities = rootState.content.contents
     const profileEntity = rootState.profiles.list
-    const spaceEntity = rootState.space.spaces
+    const spaceEntity = [...rootState.space.spaces, rootState.space.currentSpace]
     const postListItemDataArray: KeyValuePair<PostListItemData> = {}
     postArray.map((postStruct: SharedPostStruct) => {
       const profile = profileEntity.find((i: PostStruct) => i?.id === postStruct.ownerId)
-      if (postStruct.contentId && profile?.contentId && postStruct.spaceId) {
+      if (postStruct.contentId && postStruct.spaceId) {
         const spaceStruct = spaceEntity.find((i: SpaceStruct) => i?.id === postStruct.spaceId)
         const postContent = contentEntities.find((i: Content) => i?.id === postStruct.contentId) as PostContent
         const profileContent = contentEntities.find((i: Content) => i?.id === profile.contentId) as ProfileContent
         const spaceContent = contentEntities.find((i: Content) => i?.id === spaceStruct?.contentId) as SpaceContent
-
-        if (spaceStruct && postContent && profileContent) {
+        if (spaceStruct && postContent) {
           const postListItemData: PostListItemData = {
             id: postStruct.id,
             ownerId: postStruct.ownerId,
-            ownerImageUrl: profileContent.avatar || '',
+            ownerImageUrl: profileContent?.avatar || '',
             spaceName: spaceContent.name!,
             title: postContent.title,
             summary: postContent.summary,
@@ -224,7 +233,7 @@ export const getters = {
             ownerName: profileContent?.name || '',
             postLink: getPostLink(
                 spaceStruct.handle! || spaceStruct.id,
-                postContent.title,
+                postContent.title || postContent.summary.slice(0, 50) || spaceContent.name,
                 postStruct.id,
                 !!spaceStruct.handle
             ),
@@ -234,7 +243,9 @@ export const getters = {
             handle: spaceStruct.handle,
             link: postContent.link,
             sharedPostId: postStruct.sharedPostId,
-            hidden: postStruct.hidden
+            hidden: postStruct.hidden,
+            hiddenSpace: spaceStruct.hidden,
+            contentId: postStruct.contentId
           }
           postListItemDataArray[postStruct.id] = postListItemData
         }
@@ -242,10 +253,12 @@ export const getters = {
     })
     return postListItemDataArray
   },
+
   getPostInfo: (state: PostModel, getters: any) => (id: string) => {
     const postData = getters.selectPostsWithAllDetailsByIds([id])
     return postData[id]
   },
+
   selectComments: (state: PostModel, getters: any, rootState: any) => (ids: string[], isComment: boolean = false) => {
     const postArray = selectPostStructByIds(ids.flat(1), state.list)
     const contentEntities = rootState.content.contents
@@ -256,6 +269,7 @@ export const getters = {
       if (postStruct.contentId && profile.contentId) {
         const postContent = contentEntities.find((i: Content) => i?.id === postStruct.contentId) as PostContent
         const profileContent = contentEntities.find((i: Content) => i?.id === profile.contentId) as ProfileContent
+
         if (postContent && profileContent) {
           const postListItemData: PostListItemData = {
             id: postStruct.id,
@@ -280,7 +294,8 @@ export const getters = {
             body: postContent.body,
             tags: postContent.tags,
             link: postContent.link,
-            hidden: postStruct.hidden
+            hidden: postStruct.hidden,
+            contentId: postStruct.contentId
           }
           postListItemDataArray[postStruct.id] = postListItemData
         }
@@ -288,15 +303,10 @@ export const getters = {
     })
 
     return postListItemDataArray
-  }
-}
+  },
 
-const selectPostStructByIds = (ids: string[], state: SharedPostStruct[]) => {
-  const structs: SharedPostStruct[] = []
-  ids.forEach((id) => {
-    const struct = state.find(i => i.id === id)
-    // eslint-disable-next-line no-unused-expressions
-    struct ? structs.push(struct) : null
-  })
-  return structs
+  getCommentInfo: (state: PostModel, getters: any) => (id: string) => {
+    const postData = getters.selectComments([id])
+    return postData[id]
+  }
 }

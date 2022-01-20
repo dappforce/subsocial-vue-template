@@ -4,7 +4,7 @@
       <ValidationObserver ref="form" v-slot="{ handleSubmit, handleReset }">
         <form @submit.prevent="handleSubmit(submit)" @reset.prevent="handleReset(clear)">
           <h2 class="edit-post-title">
-            {{ isEdit ? 'Edit' : 'New' }} post
+            {{ isEdit ? $t('general.edit') : $t('general.new') }} {{ $t('general.post') }}
           </h2>
 
           <v-tabs
@@ -23,6 +23,8 @@
               {{ item }}
             </v-tab>
           </v-tabs>
+
+          <SpacesDropdown :is-edit="isEdit" :space-id="getSpaceId" @selectedSpace="updateSpaceID" />
 
           <v-tabs-items v-model="tab">
             <v-tab-item
@@ -67,8 +69,8 @@
                   :v-validate="description"
                   :show-editor="true"
                   :text="description"
-                  name="Description"
-                  :placeholder="(isArticleTab ? '*' : '') + ' Post body'"
+                  :name="$t('forms.fieldName.description')"
+                  :placeholder="(isArticleTab ? '* ' : '') + $t('forms.placeholder.postBody')"
                   :height="'200px'"
                   @contentUpdate="updateDescription"
                 />
@@ -85,13 +87,13 @@
                 hide-details="auto"
                 multiple
                 outlined
-                label="Tags"
+                :label="$t('forms.fieldName.tags')"
                 append-icon
                 chips
                 deletable-chips
                 class="tag-input"
                 :search-input.sync="search"
-                placeholder="Press 'Enter' or 'Tab' key to add tags"
+                :placeholder="$t('forms.placeholder.tags')"
                 @keyup.tab="updateTags"
                 @paste="updateTags"
               />
@@ -99,10 +101,10 @@
           </div>
           <div class="button-wp">
             <v-btn class="button-third-color" @click="clear">
-              {{ isEdit ? 'Cancel' : 'Reset form' }}
+              {{ isEdit ? $t('buttons.cancel') : $t('buttons.resetForm') }}
             </v-btn>
             <v-btn class="button-main-color" @click="submit">
-              {{ isEdit ? 'Save' : 'Create post' }}
+              {{ isEdit ? $t('buttons.save') : $t('buttons.createPost') }}
             </v-btn>
           </div>
         </form>
@@ -153,7 +155,7 @@
     }
 
     &.description-row {
-      margin-bottom: 10px;
+      position: relative;
     }
 
     .editor-toolbar, .CodeMirror {
@@ -168,10 +170,22 @@
       border-width: 1px;
       border-color: $color_font_normal;
     }
+
+    .v-text-field__details {
+      position: absolute;
+      bottom: -20px;
+      left: 0;
+      padding: 0;
+
+      .v-messages__message {
+        font-size: $font_extra_small;
+        color: $color_red;
+      }
+    }
   }
 
   .youtube-container {
-    margin-top: $space_normal;
+    margin-top: 0;
   }
 
   .v-chip {
@@ -206,8 +220,7 @@
     button {
       min-width: 110px !important;
       font-size: $font_normal;
-      border: 1px solid #E0E0E0;
-      border-color: #E0E0E0 !important;
+      border: 1px solid #E0E0E0!important;
       border-radius: $border_small;
       box-shadow: none;
       text-transform: capitalize;
@@ -244,8 +257,9 @@ import { PostListItemData } from '~/models/post/post-list-item.model'
 import TransactionButton from '~/components/abstract/TransactionButton.vue'
 import { METHODS, PALLETS } from '~/constants/query'
 import TransactionService from '~/services/transaction.service'
-import { getNewIdFromEvent, getPostIdFromLink } from '~/utils/utils'
+import { getNewIdFromEvent } from '~/utils/utils'
 import { SpaceListItemData } from '~/models/space/space-list-item.model'
+import StorageService from '~/services/storage.service'
 extend('required', required)
 extend('min', min)
 extend('required', {
@@ -253,6 +267,7 @@ extend('required', {
   message: 'This field is required'
 })
 
+const storageService = new StorageService()
 const transactionService = new TransactionService()
 
 @Component({
@@ -261,7 +276,7 @@ const transactionService = new TransactionService()
 export default class PostEdit extends TransactionButton {
   $refs!: {
     form: InstanceType<typeof ValidationObserver>;
-  };
+  }
 
   @Prop({
     type: Boolean,
@@ -282,6 +297,7 @@ export default class PostEdit extends TransactionButton {
   search: string = ''
   videoUrl: string = ''
   spaceId: string = ''
+  cid: IpfsCid | undefined
 
   @Watch('postItem')
   postItemHandler (newVal: any, OldVal: any) {
@@ -295,7 +311,6 @@ export default class PostEdit extends TransactionButton {
     if (this.isEdit) {
       this.insertDataInForm()
     }
-    this.spaceId = this.$route.query.spaceId as string
   }
 
   insertDataInForm () {
@@ -325,14 +340,25 @@ export default class PostEdit extends TransactionButton {
 
   clear () {
     this.$refs.form.reset()
-    this.postName = ''
-    this.description = ''
-    this.videoUrl = ''
-    this.selectTags = []
+    if (this.isEdit) {
+      this.insertDataInForm()
+    } else {
+      this.postName = ''
+      this.description = ''
+      this.videoUrl = ''
+      this.selectTags = []
+    }
   }
 
-  get isArticleTab () {
+  get isArticleTab (): boolean {
     return this.tab === this.items[0]
+  }
+
+  get getSpaceId (): string | undefined {
+    if (typeof window !== 'undefined') {
+      const spaceId = !this.isEdit ? storageService.getCurrentSpaceId() : ''
+      return this.postItem ? this.postItem.spaceId : spaceId
+    }
   }
 
   updateDescription (content: string): void {
@@ -343,10 +369,20 @@ export default class PostEdit extends TransactionButton {
     this.image = cid
   }
 
-  onFailed (result: SubmittableResult | null): void {
+  updateSpaceID (id: string): void {
+    this.spaceId = id
+  }
+
+  onFailed (): void {
+    if (this.cid) {
+      transactionService.removeIpfsContent(this.cid).catch(err => new Error(err))
+    }
   }
 
   onSuccess (result: SubmittableResult): void {
+    if (this.isEdit) {
+      transactionService.removeIpfsContent(this.post?.contentId || '').catch(err => new Error(err))
+    }
     const id = this.postItem?.id || getNewIdFromEvent(result)?.toString()
     if (id) {
       this.goToPostPage(id)
@@ -362,7 +398,7 @@ export default class PostEdit extends TransactionButton {
     const slug = createPostSlug(id, { title: this.postName, body: this.description })
 
     await this.$store.dispatch('posts/getPostById', id).then(() => {
-      this.$router.push('/' + (space.struct?.handle || space.struct.id) + '/' + slug)
+      this.$router.push(this.$nuxt.localePath('/' + (space.struct?.handle || space.struct.id) + '/' + slug))
     })
   }
 
@@ -370,19 +406,19 @@ export default class PostEdit extends TransactionButton {
     const pallet = PALLETS.posts
     const method = this.isEdit ? METHODS.updatePost : METHODS.createPost
 
-    const cid: IpfsCid | undefined = await transactionService.saveIpfsContent({
+    this.cid = await transactionService.saveIpfsContent({
       title: this.postName,
       image: this.isArticleTab ? this.image : '',
       tags: this.selectTags,
-      body: this.description,
+      body: this.$options?.filters?.sanitize(this.description),
       link: this.videoUrl || undefined
     } as CommonContent)
 
-    if (!cid) { return }
+    if (!this.cid) { return }
 
     const params = this.isEdit
-      ? [this.postItem?.id, { spaceId: null, content: { IPFS: cid }, hidden: null }]
-      : [this.spaceId, { RegularPost: null }, { IPFS: cid }]
+      ? [this.postItem?.id, { spaceId: null, content: { IPFS: this.cid }, hidden: null }]
+      : [this.spaceId, { RegularPost: null }, { IPFS: this.cid }]
 
     await this.initExtrinsic({ pallet, params, method })
 

@@ -1,6 +1,6 @@
 <template>
   <div class="account-container">
-    <ProfileItem v-if="!showSpinner" :profile-data="accountData" :tabs-event="'accountPage'" />
+    <ProfileItem v-if="!showSpinner" :profile-data="accountData" :tabs-event="'accountPage'" :is-owner="isOwner" :is-account-view="true" />
 
     <v-tabs-items v-model="currentTab">
       <v-tab-item
@@ -45,7 +45,6 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { ProfileStruct } from '@subsocial/api/flat-subsocial/flatteners'
-import { routerParamsLength } from '~/utils/utils'
 
 @Component
 export default class Account extends Vue {

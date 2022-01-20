@@ -2,7 +2,7 @@
   <div class="youtube-container">
     <iframe
       width="100%"
-      height="315"
+      height="390"
       :src="'https://www.youtube.com/embed/' + extractVideoID(link)"
     />
   </div>

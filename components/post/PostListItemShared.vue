@@ -1,10 +1,11 @@
 <template>
-  <div v-if="postItemData" class="post-item-wp shared">
+  <div class="post-item-wp shared">
     <v-card
+      v-if="post"
       elevation="2"
       class="post-item"
     >
-      <div v-if="postItemData.hidden && isPostOwner" class="hidden-post">
+      <div v-if="post.hidden && isPostOwner" class="hidden-post">
         <div class="alert-text">
           <v-icon color="#EFB041">
             mdi-alert-circle
@@ -12,7 +13,7 @@
         </div>
         <div class="unhidden-btn">
           <span class="make-visible">
-            Make visible
+            <ToggleVisibilityButton :post="post" :toggle-type="'post'" />
           </span>
         </div>
       </div>
@@ -20,21 +21,22 @@
         <div class="post-data">
           <div class="post-item-header">
             <PostInfoItem
-              :avatar-size="postItemData.avatarSize"
-              :avatar-src="postItemData.ownerImageUrl"
-              :created-at-time="postItemData.createdAtTime"
-              :space-name="postItemData.spaceName"
-              :handle="postItemData.handle"
-              :user-name="postItemData.ownerName"
-              :profile-link="postItemData.ownerId"
+              :post-item="post"
             />
             <div class="button-wp">
-              <EditButton v-if="isPostOwner" :link="'post-edit/?post=' + postItemData.id" />
-              <OptionButton :post-id="postItemData.id" :account-id="postItemData.ownerId" :post="postItemData" :can-edit="isPostOwner" :toggle-type="'post'" />
+              <OptionButton :post-id="post.id" :account-id="post.ownerId" :post="post" :can-edit="isPostOwner" :toggle-type="'post'" />
             </div>
           </div>
         </div>
       </div>
+
+      <Paragraph
+        v-if="post.summary.length"
+        :text="post.summary"
+        :is-show-more="post.isShowMore"
+        :link="post.postLink"
+        :margin-bottom="'10'"
+      />
 
       <PostListItem
         v-if="sharedPost"
@@ -43,11 +45,12 @@
         :is-shared-post="true"
         class="shared-post"
       />
-      <v-divider
-        class="mx-4"
-      />
+      <div v-if="sharedPost === undefined" class="hidden-post-text">
+        Post not found
+      </div>
+
       <div class="action-panel-wp">
-        <ActionPanel :id="postItemData.id" :is-show-label="false" :handle="postItemData.profileId" :post="postItemData" />
+        <ActionPanel :id="post.id" :is-show-label="false" :handle="post.ownerId" :post="post" />
       </div>
     </v-card>
   </div>
@@ -62,7 +65,13 @@
     padding: $space_normal;
 
     .shared-post {
-        margin-top: 0;
+      margin-top: 0;
+      border: 1px solid $color_light_border;
+      border-radius: $border_small;
+
+      & .post-item {
+        box-shadow: none !important;
+      }
     }
   }
 
@@ -76,6 +85,7 @@
     padding: 0 $space_normal;
     color: $color_font_normal;
     font-size: $font_small;
+    border-bottom: 1px solid $color_warning_border;
 
     .v-icon {
       margin-right: 10px;
@@ -100,7 +110,7 @@
 
   .post-main-wp {
     display: flex;
-    padding-bottom: 15px;
+    padding-bottom: 0;
 
     .post-data {
       width: 100%;
@@ -118,6 +128,17 @@
       align-items: center;
       height: $buttons_height;
     }
+  }
+
+  .hidden-post-text {
+    text-align: center;
+    background: $color_white;
+    border: 1px solid $color_light_border;
+    box-sizing: border-box;
+    border-radius: $border_small;
+    padding: $space_large;
+    color: $color_dark_gray;
+    font-size: $font_normal;
   }
 }
 
@@ -147,6 +168,7 @@ export default class PostListItemShared extends Vue {
   }) currentUserId!: string
 
   sharedPost: PostListItemData | null = null
+  post: PostListItemData = this.postItemData
   isPostOwner : boolean = getIsPostOwner(this.postItemData.ownerId, this.currentUserId)
 
   created () {
@@ -156,6 +178,14 @@ export default class PostListItemShared extends Vue {
         this.sharedPost = this.$store.getters['posts/getPostInfo'](this.postItemData.sharedPostId)
       })
     }
+
+    this.$store.subscribeAction({
+      after: (action) => {
+        if (action.type === 'posts/updateHiddenState' && action.payload.id === this.postItemData.id) {
+          this.post = this.$store.getters['posts/getPostInfo'](this.postItemData.id)
+        }
+      }
+    })
   }
 }
 </script>

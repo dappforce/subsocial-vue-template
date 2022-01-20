@@ -2,7 +2,7 @@
   <div class="action-container">
     <div class="action-panel-wp">
       <VoteButton
-        type="upvote"
+        :type="$t('buttons.upvote')"
         :post-id="post.id"
         :reaction="myReaction"
         :reaction-id="myReaction ? myReaction.id : null"
@@ -11,7 +11,7 @@
         :count="post.upvotesCount"
       />
       <VoteButton
-        type="downvote"
+        :type="$t('buttons.downvote')"
         :post-id="post.id"
         :reaction="myReaction"
         :reaction-id="myReaction ? myReaction.id : null"
@@ -21,10 +21,17 @@
       />
       <CommentButton v-if="isShowCommentBtn" :id="id" :count="isPostOwner ? post.repliesCount : post.visibleRepliesCount" />
       <ReplyButton v-if="isShowReplyBtn" :id="id" :is-show-label="isShowLabel" />
-      <SharedButton v-if="isShowSharedBtn" :is-show-label="isShowLabel" :count="post.sharesCount" />
+      <SharedButton v-if="isShowSharedBtn" :is-show-label="isShowLabel" :count="post.sharesCount" :post="post" />
     </div>
     <div v-if="showCommentBlock" class="comment-container">
-      <Comment :id="id" :avatar-src="isAvatar(currentUser)" :handle="handle" :count="isPostOwner ? post.repliesCount : post.visibleRepliesCount" :is-post-owner="isPostOwner" />
+      <Comment
+        :id="id"
+        :avatar-src="isAvatar(currentUser)"
+        :user-id="isUserId(currentUser)"
+        :handle="handle"
+        :count="isPostOwner ? post.repliesCount : post.visibleRepliesCount"
+        :is-post-owner="isPostOwner"
+      />
     </div>
   </div>
 </template>
@@ -124,6 +131,14 @@ export default class ActionPanel extends Vue implements ActionPanelInt {
   isAvatar (user: ProfileItemModel): string | null {
     if (user) {
       return typeof user.avatar === 'undefined' ? null : user.avatar
+    } else {
+      return null
+    }
+  }
+
+  isUserId (user: ProfileItemModel): string | null {
+    if (user) {
+      return typeof user.id === 'undefined' ? null : user.id
     } else {
       return null
     }

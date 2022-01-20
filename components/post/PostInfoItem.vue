@@ -2,11 +2,11 @@
   <div v-if="postItem" class="post-info-wp">
     <Avatar :id="postItem.ownerId" :src="postItem.ownerImageUrl" :name="postItem.ownerName" />
     <div class="info-container">
-      <Title :link="'/accounts/'+ postItem.ownerId" :name="postItem.ownerName" />
+      <Title :id="postItem.ownerId" :link="'/accounts/'+ postItem.ownerId" :name="postItem.ownerName" />
       <div class="post-additional-info">
-        <span class="owner-name"><NuxtLink :to="postItem.handle ? '/@'+postItem.handle : '/'+postItem.spaceId">{{ postItem.spaceName }}</NuxtLink></span>
+        <span class="owner-name"><NuxtLink :to="localePath(postItem.handle ? '/@'+postItem.handle : '/'+postItem.spaceId)">{{ postItem.spaceName }}</NuxtLink></span>
         <span>·</span>
-        <span v-if="postItem.postLink"><NuxtLink :to="postItem.postLink">{{ toDate }}</NuxtLink></span>
+        <span v-if="postItem.postLink"><NuxtLink :to="localePath(postItem.postLink)">{{ toDate }}</NuxtLink></span>
       </div>
     </div>
   </div>

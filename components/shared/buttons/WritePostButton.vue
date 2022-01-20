@@ -1,6 +1,6 @@
 <template>
-  <v-btn depressed class="tips-btn">
-    Write post
+  <v-btn depressed class="tips-btn" @click="onClick">
+    {{ $t('buttons.writePost') }}
   </v-btn>
 </template>
 
@@ -31,9 +31,20 @@
 </style>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
+import StorageService from '~/services/storage.service'
+
+const storageService = new StorageService()
 
 @Component
 export default class WritePostButton extends Vue {
+  @Prop({
+    type: String
+  }) spaceId!: string
+
+  onClick () {
+    storageService.setCurrentSpaceId(this.spaceId)
+    this.$router.push(this.$nuxt.localePath('/post?new'))
+  }
 }
 </script>

@@ -6,7 +6,7 @@
   >
     <v-card v-if="reactions" class="v-modal-container">
       <v-card-title>
-        {{ reactions.length }} Reactions
+        {{ reactions.length }} {{ reactions.length | pluralize('en', [$tc('modals.likes.reaction'), $tc('modals.likes.reactions')]) }}
 
         <v-icon medium class="close-icon" @click="onClick">
           mdi-close
@@ -21,23 +21,23 @@
         >
           <v-tabs-slider class="slider-color" />
           <v-tab
-            v-for="i in tabs"
+            v-for="(i, index) in tabs"
             :key="i"
             :href="`#tab-${i}`"
           >
-            {{ i }} <span class="votes-count">{{ i === 'upvotes' ? upvote.length : downvote.length }}</span>
+            {{ i }} <span class="votes-count">{{ index === 0 ? upvote.length : downvote.length }}</span>
           </v-tab>
         </v-tabs>
 
         <v-tabs-items v-model="activeTab">
           <v-tab-item
-            v-for="i in tabs"
+            v-for="(i, index) in tabs"
             :key="i"
             :value="`tab-${i}`"
           >
             <v-card flat>
               <v-card-text>
-                <ModalInfinityScrollContainer :user-ids="i === 'upvotes' ? upvote : downvote" />
+                <ModalInfinityScrollContainer :user-ids="index === 0 ? upvote : downvote" />
               </v-card-text>
             </v-card>
           </v-tab-item>
@@ -92,7 +92,7 @@
       }
 
       &::-webkit-scrollbar-thumb {
-        background-color: rgba(0, 0, 0, 0.12);
+        background-color: $color_gray;
         width: 6px;
       }
     }
@@ -121,7 +121,7 @@ export default class ModalLikes extends Vue {
 
   openModal: boolean = false
   users: undefined
-  tabs: string[] = ['upvotes', 'downvotes']
+  tabs: string[] = [this.$t('tabs.upvotes') as string, this.$t('tabs.downvotes') as string]
   activeTab: string = ''
   currentUser: undefined
   reactions: any = null

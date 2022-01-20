@@ -2,8 +2,9 @@
   <div class="ma-12 pa-12">
     <v-card>
       <v-navigation-drawer
-        permanent
-        expand-on-hover
+        v-model="drawer"
+        :expand-on-hover="!isMobile()"
+        absolute
         width="230"
       >
         <v-list class="px-5">
@@ -166,9 +167,23 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { MenuLinks } from '~/constants/menu-links'
+import { isMobile } from '~/utils/utils'
 
 @Component
 export default class LeftSideMenu extends Vue {
   links: {} = MenuLinks
+  drawer: boolean = false
+
+  created () {
+    this.drawer = !isMobile()
+
+    this.$nuxt.$on('openDrawer', (isOpen: boolean) => {
+      this.drawer = isOpen
+    })
+  }
+
+  isMobile () {
+    return isMobile()
+  }
 }
 </script>

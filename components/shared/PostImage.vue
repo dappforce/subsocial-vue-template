@@ -1,5 +1,5 @@
 <template>
-  <NuxtLink v-if="imageSrc && imageSrc.length" :to="link">
+  <NuxtLink v-if="imageSrc && imageSrc.length" :to="localePath(link)">
     <div class="post-image" :style="{ backgroundImage: 'url(' + url + imageSrc +')'}" />
   </NuxtLink>
 </template>

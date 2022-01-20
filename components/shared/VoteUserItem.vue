@@ -1,7 +1,7 @@
 <template>
   <div class="vote-item-wp">
     <div>
-      <Avatar :id="userInfo.id" :src="userInfo.avatar" :size="40" :name="userInfo.name" />
+      <Avatar :id="userInfo.id" :src="userInfo.avatar" :size="40" />
 
       <div class="user-info-wp">
         <span class="user-name">{{ userInfo.name }}</span>
@@ -23,7 +23,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: $space_tiny 0;
+  padding: $space_tiny 5px;
 
   &>div {
     display: flex;

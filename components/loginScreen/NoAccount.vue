@@ -1,14 +1,13 @@
 <template>
   <div class="no-account">
     <div class="title">
+      {{ $t('modals.login.title') }}
       Sign In
     </div>
-    <div class="message">
-      No accounts found. Please open your <b>Polkadot extension</b> and create a new account or import existing. Then reload this page.
-    </div>
+    <div class="message" v-html="$t('modals.login.noAccountScreen.message')" />
     <div class="privacy">
-      <a href="">Privacy Policy</a>
-      <a href="">Terms of Use</a>
+      <a href="">{{ $t('buttons.privacyPolicy') }}</a>
+      <a href="">{{ $t('buttons.termsOfUse') }}</a>
     </div>
   </div>
 </template>

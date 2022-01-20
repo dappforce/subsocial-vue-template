@@ -18,6 +18,7 @@
           </div>
         </div>
         <div class="button-wp">
+          <EditButton v-if="isOwner && isAccountView" :link="'/profile?id=' + profileData.id" />
           <!--          <OptionButton />-->
         </div>
       </div>
@@ -41,7 +42,8 @@
       </div>
 
       <div class="action-row">
-        <SendTipsButton />
+        <SendTipsButton v-if="!isOwner" :user-id="profileData.id" />
+        <CreateSpaceButton v-if="isOwner" />
         <FollowButton :follow="isFollowing" type="profile" :entity-id="profileData.id" />
       </div>
 
@@ -164,7 +166,7 @@
     margin-bottom: $space_big;
     margin-top: $space_big;
 
-    & button {
+    & button, & a {
       width: calc(50% - 8px);
     }
   }
@@ -204,6 +206,15 @@ export default class ProfileItem extends Vue {
     type: String,
     default: 'accountPage'
   }) tabsEvent!: string
+
+  @Prop({
+    type: Boolean
+  }) isOwner!: string
+
+  @Prop({
+    type: Boolean,
+    default: false
+  }) isAccountView!: string
 
   isOpenModal: boolean = false
   isFollowing: boolean = false

@@ -1,6 +1,7 @@
 <template>
-  <v-btn depressed :disabled="true" class="tips-btn">
-    Send tips
+  <v-btn depressed :disabled="!isAuth" class="tips-btn" @click="isOpen = !isOpen">
+    {{ $t('buttons.sendTips') }}
+    <ModalSendTips v-if="isAuth" :is-modal="isOpen" :user-info="userInfo" />
   </v-btn>
 </template>
 
@@ -31,9 +32,27 @@
 </style>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
+import { ProfileData } from '@subsocial/api/flat-subsocial/dto'
 
 @Component
 export default class SendTipsButton extends Vue {
+  @Prop({
+    type: String
+  }) userId!: string
+
+  isOpen: boolean = false
+  userInfo: ProfileData | null = null
+  isAuth: boolean = !!this.$store.state.profiles.currentUser
+
+  mounted () {
+    this.getAccount().then((data) => {
+      this.userInfo = data
+    })
+  }
+
+  async getAccount () {
+    return await this.$store.getters['profiles/selectProfileData'](this.userId)
+  }
 }
 </script>
