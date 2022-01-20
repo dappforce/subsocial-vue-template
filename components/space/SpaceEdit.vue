@@ -45,10 +45,10 @@
 
       <div class="button-wp">
         <v-btn class="button-third-color" @click="clear">
-          {{ isEdit ? 'Cancel' : 'Reset' }}
+          {{ isEdit ? $t('buttons.cancel') : 'Reset' }}
         </v-btn>
         <v-btn class="button-main-color" @click="submit">
-          {{ isEdit ? 'Save' : 'Create' }}
+          {{ isEdit ? $t('buttons.save') : 'Create' }}
         </v-btn>
       </div>
     </v-card>
@@ -174,7 +174,7 @@ import { Component, Prop } from 'vue-property-decorator'
 import { extend, ValidationObserver, ValidationProvider } from 'vee-validate'
 import { required } from 'vee-validate/dist/rules'
 import { SubmittableResult } from '@polkadot/api'
-import { IpfsContent, OptionId, OptionText } from '@subsocial/types/substrate/classes'
+import { OptionId, OptionText } from '@subsocial/types/substrate/classes'
 import { IpfsCid } from '@subsocial/types'
 import { environment } from '~/environments/environment'
 import { SpaceListItemData } from '~/models/space/space-list-item.model'
@@ -226,6 +226,7 @@ export default class SpaceEdit extends TransactionButton {
   selectTags: string[] = []
   search: string = ''
   url: string = environment.ipfsUrl
+  cid: IpfsCid | undefined
 
   created () {
     if (this.spaceItem || this.profileItem) {
@@ -235,7 +236,7 @@ export default class SpaceEdit extends TransactionButton {
 
   insertDataInForm (): void {
     this.name = this.isProfile ? this.profileItem?.name || '' : this.spaceItem.content.name
-    this.description = this.isProfile ? this.profileItem?.summary || '' : this.spaceItem.content.summary
+    this.description = this.isProfile ? this.profileItem?.summary || '' : this.spaceItem.content.about
     this.selectTags = this.isProfile ? [] : this.spaceItem.content.tags
     this.avatar = this.isProfile ? this.profileItem?.avatar || '' : this.spaceItem.content.image ? this.spaceItem.content.image : ''
   }
@@ -267,20 +268,38 @@ export default class SpaceEdit extends TransactionButton {
 
   clear () {
     this.$refs.form.reset()
+    if (this.spaceItem || this.profileItem) {
+      this.insertDataInForm()
+    }
     this.name = ''
     this.description = ''
     this.selectTags = []
   }
 
-  onFailed (result: SubmittableResult | null): void {
+  onFailed (): void {
+    if (this.cid) {
+      transactionService.removeIpfsContent(this.cid).catch(err => new Error(err))
+    }
   }
 
   onSuccess (result: SubmittableResult): void {
-    const id = this.spaceItem?.struct?.id || getNewIdFromEvent(result)?.toString()
-    if (id) {
-      this.$store.dispatch('space/getSpacesByIds', [id]).then(() => {
-        this.$router.push('/' + id)
-      })
+    if (this.isEdit) {
+      transactionService.removeIpfsContent(this.spaceItem?.struct.contentId || this.profileItem?.contentId || '').catch(err => new Error(err))
+    }
+
+    if (this.isProfile) {
+      const id = this.profileItem?.id || getNewIdFromEvent(result)?.toString()
+
+      if (id) {
+        this.$router.push(this.$nuxt.localePath('/accounts/' + id))
+      }
+    } else {
+      const id = this.spaceItem?.struct?.id || getNewIdFromEvent(result)?.toString()
+      if (id) {
+        this.$store.dispatch('space/getSpacesByIds', [id]).then(() => {
+          this.$router.push(this.$nuxt.localePath('/' + id))
+        })
+      }
     }
   }
 
@@ -292,8 +311,8 @@ export default class SpaceEdit extends TransactionButton {
     const pallet = this.isProfile ? PALLETS.profiles : PALLETS.spaces
     const method = this.getMethods()
 
-    const cid: IpfsCid | undefined = await transactionService.saveIpfsContent({
-      about: this.description,
+    this.cid = await transactionService.saveIpfsContent({
+      about: this.$options?.filters?.sanitize(this.description),
       image: this.avatar,
       name: this.name,
       tags: this.selectTags,
@@ -301,9 +320,8 @@ export default class SpaceEdit extends TransactionButton {
       avatar: this.avatar
     })
 
-    if (!cid) { return }
-
-    const params = this.getParams(cid)
+    if (!this.cid) { return }
+    const params = this.getParams(this.cid)
 
     await this.initExtrinsic({ pallet, params, method })
 

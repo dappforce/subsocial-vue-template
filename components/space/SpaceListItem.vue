@@ -1,10 +1,10 @@
 <template>
-  <div v-if="spaceItemData" class="space-item-wp">
+  <div v-if="space" class="space-item-wp">
     <v-card
       elevation="2"
       class="space-item"
     >
-      <div v-if="spaceItemData.struct.hidden && isMyOwnSpace" class="hidden-space">
+      <div v-if="space.struct.hidden && isMyOwnSpace" class="hidden-space">
         <div class="alert-text">
           <v-icon color="#EFB041">
             mdi-alert-circle
@@ -12,39 +12,39 @@
         </div>
         <div class="unhidden-btn">
           <span class="make-visible">
-            <ToggleVisibilityButton :space="spaceItemData" :toggle-type="'space'" />
+            <ToggleVisibilityButton :space="space" :toggle-type="'space'" />
           </span>
         </div>
       </div>
       <div class="space-item-header">
         <SpaceInfoItem
-          :space-item="spaceItemData"
+          :space-item="space"
           :avatar-size="avatarSize"
         />
         <div class="button-wp">
-          <EditButton v-if="isMyOwnSpace && isSpaceView" :link="'space-edit/?space=' + spaceItemData.struct.id" />
+          <EditButton v-if="isMyOwnSpace && isSpaceView && !isMobileScreen()" :link="'/space?space=' + spaceItemData.struct.id" />
           <FollowButton v-if="!isSpaceView" :follow="isFollowing" class="follow-btn" type="space" :entity-id="spaceItemData.struct.id" />
-          <OptionButton :no-reactions="true" :space="spaceItemData" :can-edit="isMyOwnSpace" :toggle-type="'space'" />
+          <OptionButton :no-reactions="true" :space="spaceItemData" :can-edit="isMyOwnSpace" :toggle-type="'space'" :is-space-view="isSpaceView" />
         </div>
       </div>
-      <div v-if="spaceItemData.content.summary.length" class="description">
+      <div v-if="space.content.summary.length" class="description">
         <Paragraph
-          :text="spaceItemData.content.summary"
-          :long-text="spaceItemData.content.about"
-          :link="link(spaceItemData)"
-          :is-show-more="spaceItemData.content.isShowMore"
+          :text="space.content.summary"
+          :long-text="space.content.about"
+          :link="link(space)"
+          :is-show-more="space.content.isShowMore"
           :redirect="isSpaceView ? false : true"
           margin-top="10"
         />
       </div>
-      <LinkIcons v-if="isSpaceView && spaceItemData.content.links.length" :links="spaceItemData.content.links" class="links-container" />
-      <div v-if="spaceItemData.content.tags.length" class="tags-container">
-        <Tag v-for="tag in spaceItemData.content.tags" :key="tag" :tag-name="tag" size="medium" />
+      <LinkIcons v-if="isSpaceView && space.content.links && space.content.links.length" :links="space.content.links" class="links-container" />
+      <div v-if="space.content.tags.length" class="tags-container">
+        <Tag v-for="tag in space.content.tags" :key="tag" :tag-name="tag" size="medium" />
       </div>
       <div v-if="isSpaceView" class="action-row">
-        <SendTipsButton v-if="!isMyOwnSpace" />
-        <WritePostButton v-if="isMyOwnSpace" />
-        <FollowButton :follow="isFollowing" type="space" :entity-id="spaceItemData.struct.id" />
+        <SendTipsButton v-if="!isMyOwnSpace" :user-id="space.struct.ownerId" />
+        <WritePostButton v-if="isMyOwnSpace" :space-id="space.struct.id" />
+        <FollowButton :follow="isFollowing" type="space" :entity-id="space.struct.id" />
       </div>
     </v-card>
   </div>
@@ -68,6 +68,7 @@
       padding: 0 $space_normal;
       color: $color_font_normal;
       font-size: $font_small;
+      border-bottom: 1px solid $color_warning_border;
 
       .v-icon {
         margin-right: 10px;
@@ -128,7 +129,7 @@
       justify-content: space-between;
       margin-top: 22px;
 
-      & button {
+      & button, & a {
         width: calc(50% - 8px);
       }
     }
@@ -140,6 +141,7 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { SpaceListItemData } from '~/models/space/space-list-item.model'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
+import { isMobile } from '~/utils/utils'
 
 @Component
 export default class SpaceListItem extends Vue {
@@ -168,6 +170,7 @@ export default class SpaceListItem extends Vue {
 
   isFollowing: boolean = false
   user: ProfileItemModel | null = null
+  space: SpaceListItemData = this.spaceItemData
 
   @Watch('currentUser')
   currentUserHandler () {
@@ -184,6 +187,14 @@ export default class SpaceListItem extends Vue {
       if (mutation.type === 'profiles/SET_CURRENT_USER') {
         this.setCurrentUser()
         this.getIsFollowing()
+      }
+    })
+
+    this.$store.subscribeAction({
+      after: (action) => {
+        if (action.type === 'space/updateHiddenState' && action.payload.id === this.space.struct.id) {
+          this.space = this.$store.getters['space/getSpaceWithContent'](this.space.struct.id)
+        }
       }
     })
   }
@@ -211,6 +222,10 @@ export default class SpaceListItem extends Vue {
     } else {
       this.user = null
     }
+  }
+
+  isMobileScreen (): boolean {
+    return isMobile()
   }
 }
 </script>

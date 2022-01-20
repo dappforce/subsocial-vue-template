@@ -3,7 +3,7 @@
     <v-icon medium class="shared-icon">
       mdi-reply
     </v-icon>
-    <span v-if="isShowLabel" class="vote-label">Reply</span>
+    <span v-if="isShowLabel" class="vote-label">{{ $t('buttons.reply') }}</span>
   </v-btn>
 </template>
 

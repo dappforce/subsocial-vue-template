@@ -10,4 +10,6 @@ export interface ProfileItemModel {
   id: string;
   balance?: string;
   isFollowing?: boolean;
+  about? : string;
+  contentId?: string;
 }

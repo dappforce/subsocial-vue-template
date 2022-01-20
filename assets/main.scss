@@ -14,12 +14,34 @@ theme--light.v-btn:hover::before {
   opacity: 0 !important;
 }
 
+.v-btn {
+  &__content {
+    text-transform: none!important;
+    letter-spacing: normal;
+  }
+}
+
 .v-btn:before {
   display: none !important;
 }
 
 .container .theme--light.v-btn.v-btn--disabled.v-btn--has-bg {
-  background-color: $color_disabled !important;;
+  background-color: $color_disabled !important;
+}
+
+body {
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    box-shadow: none;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $color_gray;
+    width: 6px;
+  }
 }
 
 .action-panel-wp {

@@ -8,6 +8,7 @@ import slug from 'slugify'
 import BN from 'bn.js'
 
 import { SubmittableResult } from '@polkadot/api'
+import { SharedPostStruct } from '@subsocial/api/flat-subsocial/flatteners'
 import { TransformDataArray } from '~/types/transform-dto'
 import { Content } from '~/types/content'
 
@@ -88,7 +89,6 @@ export function routerParamsLength (value: object) {
 
 export function getNewIdsFromEvent (txResult: SubmittableResult): BN[] {
   const newIds: BN[] = []
-
   txResult.events.find((event) => {
     const { event: { data, method } } = event
     if (method.includes('Created')) {
@@ -111,4 +111,25 @@ export function getIsPostOwner (ownerId: string, currentUseId: string | undefine
     return ownerId === currentUseId
   }
   return false
+}
+
+export function selectPostStructByIds (ids: string[], state: SharedPostStruct[]): SharedPostStruct[] {
+  const structs: SharedPostStruct[] = []
+  ids.forEach((id) => {
+    const struct = state.find(i => i.id === id)
+    if (struct) {
+      structs.push(struct)
+    }
+  })
+  return structs
+}
+
+export function isMobile () {
+  if (process.browser) {
+    if (window.innerWidth <= 760) {
+      return true
+    } else {
+      return false
+    }
+  } else { return false }
 }

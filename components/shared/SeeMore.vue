@@ -1,5 +1,5 @@
 <template>
-  <NuxtLink :to="link" class="see-more-button">
+  <NuxtLink :to="localePath(link)" class="see-more-button">
     See more
   </NuxtLink>
 </template>

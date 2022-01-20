@@ -1,8 +1,6 @@
 import { FlatSubsocialApi } from '@subsocial/api/flat-subsocial'
-import { CommonContent } from '@subsocial/types'
-import axios from 'axios'
+import { CommonContent, IpfsCid } from '@subsocial/types'
 import SubsocialApiService from '~/services/subsocial-api.service'
-import { environment } from '~/environments/environment'
 import { ExtrinsicProps } from '~/components/abstract/TransactionButton.vue'
 
 const subsocialApiService = new SubsocialApiService()
@@ -38,9 +36,11 @@ export default class TransactionService {
   }
 
   async saveFile (file: File) {
-    const { addFileUrl } = environment
-    const formData = new FormData()
-    formData.append('file', file)
-    return await axios.post(addFileUrl, formData)
+    const cid = await (await this.getApi()).subsocial.ipfs.saveFile(file)
+    return cid
+  }
+
+  async removeIpfsContent (cid: IpfsCid) {
+    await (await this.getApi()).subsocial.ipfs.removeContent(cid)
   }
 }

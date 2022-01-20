@@ -3,27 +3,30 @@
     <div class="header-container">
       <div class="header-line">
         <div class="left-bar">
+          <div v-if="isMobileView()" class="hamburger" @click="openLeftDrawer">
+            <v-icon>mdi-menu</v-icon>
+          </div>
           <div class="project-name" @click="returnHome">
-            <NuxtLink to="/">
+            <NuxtLink :to="localePath('/')">
               {{ $t('general.title') }}
             </NuxtLink>
           </div>
         </div>
 
         <div class="user-block">
-          <CreateSpaceButton v-if="user && !hasSpace" />
+          <CreateSpaceButton v-if="user && !hasSpace" :is-header-btn="true" />
           <CreatePostButton v-if="user && hasSpace" />
           <SignInButton v-if="!user" />
           <div v-if="user" class="user-info-block">
-            <NuxtLink to="notifications" class="notification-icon">
+            <NuxtLink :to="localePath('/notifications')" class="notification-icon">
               <v-icon>
                 mdi-bell-outline
               </v-icon>
             </NuxtLink>
             <div class="user-container" @click.stop="openDrawer">
               <v-list-item>
-                <v-list-item-avatar size="30">
-                  <Avatar :id=" user.id" :src=" user.avatar" :size="30" />
+                <v-list-item-avatar size="36">
+                  <Avatar :id="user.id" :src="user.avatar" :size="36" />
                 </v-list-item-avatar>
                 <v-list-item-content>
                   <v-list-item-title>{{ user.name }}</v-list-item-title>
@@ -62,7 +65,7 @@ header {
       align-items: center;
 
       .notification-icon {
-        margin-right: $space_normal;
+        margin-right: $space_large;
       }
 
       .user-info-block {
@@ -84,7 +87,7 @@ header {
 
             &__title {
               color: $color_font_normal;
-              margin-left: 10px;
+              margin-left: $space_tiny;
               font-size: $font_small;
               align-self: flex-start;
               line-height: 17px;
@@ -119,11 +122,11 @@ header {
       display: flex;
       align-items: center;
 
-      .menu-button {
+      .hamburger {
         width: 30px;
         height: 30px;
         line-height: 30px;
-        margin: 13px 30px 13px 15px;
+        margin-left: $space_large;
 
         .v-icon {
           color: $color_font_normal;
@@ -162,6 +165,7 @@ header {
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
 import { config } from '~/config/config'
+import { isMobile } from '~/utils/utils'
 
 @Component
 export default class Header extends Vue {
@@ -176,6 +180,7 @@ export default class Header extends Vue {
   isOpenModal: boolean = false
   tabLinks: string[] = ['posts', 'spaces']
   hasSpace: boolean = false
+  addressLength: number = config.addressLengthShort
 
   created () {
     this.$store.subscribe((mutation) => {
@@ -190,7 +195,6 @@ export default class Header extends Vue {
               this.hasSpace = res
             })
           }
-
           this.balance = this.$store.state.profiles.myBalance
         } else {
           this.user = null
@@ -202,14 +206,22 @@ export default class Header extends Vue {
         this.balance = this.$store.state.profiles.myBalance
       }
     })
+
+    this.$store.subscribeAction({
+      after: (action) => {
+        if (action.type === 'profiles/updateUserInfo') {
+          this.user = this.$store.getters['profiles/selectProfileData'](this.$store.state.profiles.currentUser.id)
+        }
+      }
+    })
   }
 
-  openDrawer () {
+  openDrawer (): void {
     this.isOpenDrawer = !this.isOpenDrawer
   }
 
-  returnHome () {
-    this.$nuxt.$emit('setTab', this.tabLinks[0])
+  returnHome (): void {
+    this.$nuxt.$emit('setTab')
   }
 
   mounted () {
@@ -224,6 +236,14 @@ export default class Header extends Vue {
         this.isOpenModal = detected
       }
     })
+  }
+
+  openLeftDrawer (): void {
+    this.$nuxt.$emit('openDrawer', true)
+  }
+
+  isMobileView (): boolean {
+    return isMobile()
   }
 }
 </script>

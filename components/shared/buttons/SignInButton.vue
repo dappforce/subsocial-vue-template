@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-btn class="signin-button" @click="openModal">
-      Sign In
+      {{ $t('buttons.signIn') }}
     </v-btn>
 
     <ModalLogin :is-modal="isOpenModal" />

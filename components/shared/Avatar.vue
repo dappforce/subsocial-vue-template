@@ -2,7 +2,7 @@
   <v-avatar
     :size="size"
   >
-    <img v-if="!showJdentity" :src="link" alt="" @error="onImgError">
+    <img v-if="!showJdentity && src" :src="link" alt="" @error="onImgError">
     <client-only>
       <svg v-if="showJdentity" id="identicon" :width="size" :height="size" :data-jdenticon-value="userId" />
     </client-only>
@@ -40,12 +40,13 @@ export default class Avatar extends Vue {
 
   @Watch('src')
   srcHandle () {
-    this.showJdentity = false
+    this.showJdentity = !this.src
     this.link = this.url + this.src
   }
 
   created (): void {
     this.link = this.url + this.src
+    this.showJdentity = !this.src
     this.userId = this.id
   }
 

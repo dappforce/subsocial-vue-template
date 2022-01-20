@@ -1,6 +1,6 @@
 <template>
   <div class="no-posts">
-    No posts yet
+    {{ message }}
   </div>
 </template>
 
@@ -21,11 +21,14 @@
 }
 </style>
 
-<script>
-import { Component, Vue } from 'vue-property-decorator'
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
 @Component
 export default class NoPosts extends Vue {
-
+  @Prop({
+    type: String,
+    default: 'No posts yet'
+  }) message!: string
 }
 </script>

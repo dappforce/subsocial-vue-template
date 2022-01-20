@@ -1,20 +1,21 @@
 <template>
-  <v-btn class="shared-button">
+  <v-btn class="shared-button" @click="onClick">
     <v-icon medium class="vote-icon">
       mdi-repeat
     </v-icon>
-    <span v-if="isShowLabel" class="share-label">Share</span>
-    <span class="count-label">{{ count ? count : '' }}</span>
+    <span v-if="isShowLabel" class="share-label">{{ $t('buttons.share') }}</span>
+    <span class="count-label">{{ count ? isShowLabel ? '(' + count + ')' : count : '' }}</span>
+    <ModalSharedPost :is-modal="isOpen" :post-id="getPostId" :root-post-id="post.id" />
   </v-btn>
 </template>
 
 <style lang="scss">
-.share-button {
+.shared-button {
   display: flex;
   align-items: center;
 
   .share-label {
-    margin-left: 9px;
+    margin-left: 6px;
     font-weight: 500;
     font-size: $font_small;
     line-height: $main_line_height;
@@ -22,7 +23,7 @@
   }
 
   .count-label {
-    margin-left: 9px;
+    margin-left: 4px;
     font-weight: 500;
     font-size: $font_small;
     line-height: $main_line_height;
@@ -34,6 +35,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import { PostListItemData } from '~/models/post/post-list-item.model'
 
 @Component
 export default class SharedButton extends Vue {
@@ -45,5 +47,26 @@ export default class SharedButton extends Vue {
   @Prop({
     type: Number
   }) count!: number
+
+  @Prop({
+    type: Object,
+    default: undefined
+  }) post!: PostListItemData
+
+  isOpen: boolean = false
+
+  created (): void {
+    this.$nuxt.$on('isSharedPost-' + this.post.id, () => {
+      this.isOpen = false
+    })
+  }
+
+  onClick (): void {
+    this.isOpen = true
+  }
+
+  get getPostId (): string | undefined {
+    return this.post.isSharedPost ? this.post.sharedPostId : this.post.id
+  }
 }
 </script>

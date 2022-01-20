@@ -34,6 +34,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { SharedPostStruct } from '@subsocial/api/flat-subsocial/flatteners'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
 import { config } from '~/config/config'
+import { PostListItemData } from '~/models/post/post-list-item.model'
 
 const stepNumber = config.stepForLoading
 
@@ -48,13 +49,22 @@ export default class PostContainer extends Vue {
     type: Array
   }) ids!: []
 
+  @Prop({
+    type: Boolean,
+    default: false
+  }) isFeed!: boolean
+
+  @Prop({
+    type: String
+  }) feedCount!: string
+
   defaultStart: number = 0
   defaultEnd: number = stepNumber
   startIndex: number = stepNumber
   endIndex: number = stepNumber * 2
   step: number = stepNumber
   max: number = 0
-  postList: SharedPostStruct[] = []
+  postList: PostListItemData[] = []
   postsIds: string[] = []
   currentUser: ProfileItemModel | undefined | null = null
   allPostsIds: string[] = []
@@ -68,17 +78,40 @@ export default class PostContainer extends Vue {
     }
   }
 
+  @Watch('ids')
+  idsHandler (newVal: string, oldVal: string) {
+    if (newVal !== oldVal) {
+      if (this.ids.length) {
+        this.clearData()
+        this.load()
+      }
+    }
+  }
+
   created () {
     if (this.ids.length) {
       this.load()
     }
+
+    this.$store.subscribeAction({
+      after: (action) => {
+        if (action.type === 'space/updateHiddenState') {
+          this.clearData()
+          this.load()
+        }
+      }
+    })
   }
 
   mounted () {
-    this.max = this.ids.length
+    this.max = this.isFeed ? +this.feedCount : this.ids.length
   }
 
   beforeDestroy () {
+    this.clearData()
+  }
+
+  clearData () {
     this.startIndex = stepNumber
     this.endIndex = stepNumber * 2
     this.postList = []
@@ -89,6 +122,7 @@ export default class PostContainer extends Vue {
 
   load () {
     this.allPostsIds = this.ids
+    this.max = this.isFeed ? +this.feedCount : this.ids.length
 
     if (this.isAllPostsInState()) {
       this.selectPostsWithData(this.defaultStart, this.defaultEnd)
@@ -116,6 +150,7 @@ export default class PostContainer extends Vue {
       await this.getNewPosts(this.startIndex, this.endIndex).then(() => {
         this.selectPostsWithData(this.startIndex, this.endIndex)
         $state.loaded()
+
         if (this.max <= this.postList.length) {
           $state.complete()
         }
@@ -124,8 +159,8 @@ export default class PostContainer extends Vue {
           $state.complete()
         }
 
-        const unsubscribe = this.$store.subscribe((mutation, state) => {
-          if (mutation.type === 'posts/NEW_POSTS_ABSENT' && state === true) {
+        const unsubscribe = this.$store.subscribe((mutation) => {
+          if (mutation.type === 'posts/NEW_POSTS_ABSENT' && mutation.payload === true) {
             $state.complete()
             this.$store.commit('posts/NEW_POSTS_ABSENT', false)
             unsubscribe()
@@ -139,10 +174,15 @@ export default class PostContainer extends Vue {
   }
 
   async getNewPosts (start: number, end: number) {
+    let ids: string[] = []
+    if (this.isFeed) {
+      ids = await this.$store.dispatch('feeds/getFeedIds', { id: this.currentUser?.id, offset: start })
+    }
+    this.allPostsIds = [...this.allPostsIds, ...ids]
     return await this.$store.dispatch('posts/getPostsByIds', { ids: this.allPostsIds.slice(start, end), type: this.type })
   }
 
-  addUniquePostToPostArray (postsDictionary: SharedPostStruct[]) {
+  addUniquePostToPostArray (postsDictionary: PostListItemData[]) {
     const newPostsIds = []
     for (const id in postsDictionary) {
       // eslint-disable-next-line no-prototype-builtins
@@ -163,7 +203,7 @@ export default class PostContainer extends Vue {
   }
 
   get filterPostList () {
-    return this.postList.filter((post: SharedPostStruct) => this.type === 'all' ? true : !post.hidden)
+    return this.postList.filter((post: PostListItemData) => this.type === 'all' ? true : !(post.hidden || post.hiddenSpace))
   }
 }
 </script>

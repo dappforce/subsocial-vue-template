@@ -16,7 +16,7 @@
         </span>
       </div>
       <div class="image-subtitle">
-        {{ $tc('imageShouldBeLessThanTwoMB') }}
+        {{ $t('imageShouldBeLessThanTwoMB') }}
       </div>
     </div>
     <div v-if="type === 'square'" class="square">
@@ -181,7 +181,6 @@
   .square {
     .upload-photo-wp {
       padding-bottom: $space_big;
-      margin-top: $space_normal;
 
       .upload-photo {
         width: 100%;
@@ -272,8 +271,10 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import { IpfsCid } from '@subsocial/types'
 import { environment } from '~/environments/environment'
 import TransactionService from '~/services/transaction.service'
+import { config } from '~/config/config'
 
 const transactionService = new TransactionService()
 
@@ -290,6 +291,7 @@ export default class ImageLoader extends Vue {
 
   previewImage: string | null = null
   image?: {} = {}
+  cid: IpfsCid | undefined
 
   created () {
     this.setPreviewImage(this.avatar)
@@ -299,6 +301,11 @@ export default class ImageLoader extends Vue {
     if (!event || !event.type.includes('image')) {
       return
     }
+
+    if (event.size > config.imageSizeBytes) {
+      this.$nuxt.$emit('isShowSnackbar', { show: true, text: this.$t('imageShouldBeLessThanTwoMB') })
+      return
+    }
     const file = event
     const mimeType = file.type
 
@@ -306,15 +313,19 @@ export default class ImageLoader extends Vue {
       return
     }
 
-    const cid = (await transactionService.saveFile(file).then()) as {data: string}
+    if (this.cid || this.avatar) {
+      transactionService.removeIpfsContent(this.cid || this.avatar).catch(err => new Error(err))
+    }
 
-    if (cid) {
-      this.setPreviewImage(cid.data)
-      this.$emit('avatar', cid.data)
+    this.cid = (await transactionService.saveFile(file).then())
+
+    if (this.cid) {
+      this.setPreviewImage(this.cid)
+      this.$emit('avatar', this.cid)
     }
   }
 
-  setPreviewImage (id: string) {
+  setPreviewImage (id: IpfsCid) {
     this.previewImage = id ? environment.ipfsUrl + id : null
   }
 

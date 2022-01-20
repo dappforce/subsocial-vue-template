@@ -1,6 +1,6 @@
 <template>
   <div class="edit-btn">
-    <NuxtLink :to="link">
+    <NuxtLink :to="localePath(link)">
       <v-icon size="15" class="btn-color">
         mdi-pencil-outline
       </v-icon>

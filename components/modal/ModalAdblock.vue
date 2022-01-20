@@ -11,15 +11,15 @@
         <img src="../../assets/image/subsocial-logo.svg" alt="Subsocial logo">
       </div>
       <div class="title">
-        Uh oh, it looks like you are using an ad blocker.
+        {{ $t('modals.adblock.title') }}
       </div>
       <div class="subtitle">
-        This may affect the display of content on our site. We recommend turning it off to use the entire functionality of the site.
+        {{ $t('modals.adblock.subtitle') }}
       </div>
       <div class="btn-container">
         <div class="disable-btn">
           <v-btn @click="reloadPage">
-            Done! Reload page
+            {{ $t('modals.adblock.button') }}
           </v-btn>
         </div>
       </div>

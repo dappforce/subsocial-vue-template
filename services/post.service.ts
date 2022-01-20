@@ -24,7 +24,7 @@ export default class PostService {
     const postData = await subsocialApiService.api?.findPostsWithAllDetails({
       ids: convertToBNArray(ids)
     })
-    return this.splitPostWithAllDataByEntity(postData)
+    return this.splitPostWithAllDataByEntity(postData, true)
   }
 
   async getPost (id: AnyId): Promise<TransformPostWithAllDetails> {
@@ -58,7 +58,8 @@ export default class PostService {
   }
 
   splitPostWithAllDataByEntity (
-    postsAllData: PostWithAllDetails[]
+    postsAllData: PostWithAllDetails[],
+    hidden: boolean = false
   ): TransformPostWithAllDetails {
     const posts: PostStruct[] = []
     const spaces: SpaceStruct[] = []
@@ -66,16 +67,20 @@ export default class PostService {
     const contents: Content[] = []
     postsAllData.forEach((postAllData: PostWithAllDetails) => {
       const { post, space, owner } = postAllData
-      if (post?.content && space?.content) {
+      if (post?.content && (space?.content || hidden)) {
         posts.push(post.struct)
-        spaces.push(space.struct)
+        if (!hidden) {
+          spaces.push(space.struct)
+        }
         profiles.push(owner ? owner.struct : { id: post.struct.ownerId, contentId: post.struct.ownerId } as ProfileStruct)
 
         const postContent = post.content as Content
         postContent.id = post.struct.contentId!
 
-        const spaceContent = space.content as Content
-        spaceContent.id = space.struct.contentId!
+        const spaceContent = space?.content as Content || {} as Content
+        if (!hidden) {
+          spaceContent.id = space.struct.contentId!
+        }
 
         const profileContent = owner
           ? owner.content as Content

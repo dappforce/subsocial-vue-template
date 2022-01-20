@@ -2,12 +2,12 @@
   <div class="spaces-container">
     <div v-if="spaceList.length">
       <SpaceListItem
-        v-for="(item, index) in spaceList"
+        v-for="(item, index) in filterSpaceList"
         :key="index"
         :space-item-data="item"
         :avatar-size="40"
         :current-user="currentUser"
-        :is-my-own-space="item.struct.ownerId === currentUser.id"
+        :is-my-own-space="isMyOwnSpace(item.struct.ownerId)"
       />
       <infinite-loading
         spinner="spiral"
@@ -25,15 +25,21 @@
 </style>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
 import { SpaceListItemData } from '~/models/space/space-list-item.model'
 import { config } from '~/config/config'
+import { PostListItemData } from '~/models/post/post-list-item.model'
 
 const stepNumber = config.stepForLoading
 
 @Component
 export default class SpaceContainer extends Vue {
+  @Prop({
+    type: String,
+    default: 'public'
+  }) type!: string
+
   defaultStart: number = 0
   defaultEnd: number = stepNumber
   startIndex: number = stepNumber
@@ -75,9 +81,21 @@ export default class SpaceContainer extends Vue {
         this.spaceList.push(...this.$store.getters['space/getSpacesWithContent'](this.startIndex, this.endIndex))
 
         $state.loaded()
-        if (this.spaceList.length >= config.recommendedSpaceIds.length) {
+        if (this.spaceList.length >= this.max) {
           $state.complete()
         }
+
+        if (this.max <= this.step) {
+          $state.complete()
+        }
+
+        const unsubscribe = this.$store.subscribe((mutation, state) => {
+          if (mutation.type === 'space/NEW_SPACES_ABSENT' && mutation.payload === true) {
+            $state.complete()
+            this.$store.commit('space/NEW_SPACES_ABSENT', false)
+            unsubscribe()
+          }
+        })
 
         this.startIndex += this.step
         this.endIndex += this.step
@@ -93,6 +111,14 @@ export default class SpaceContainer extends Vue {
     if (this.$store.state.profiles.currentUser) {
       this.currentUser = this.$store.state.profiles.currentUser
     }
+  }
+
+  isMyOwnSpace (ownerId: string): boolean {
+    return ownerId === this.currentUser?.id
+  }
+
+  get filterSpaceList () {
+    return this.spaceList.filter((space: SpaceListItemData) => this.type === 'all' ? true : !(space.struct.hidden))
   }
 }
 </script>

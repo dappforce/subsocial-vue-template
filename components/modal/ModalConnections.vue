@@ -5,7 +5,7 @@
   >
     <v-card class="v-modal-container">
       <v-card-title>
-        Connections
+        {{ $t('modals.connections.connections') }}
 
         <v-icon medium class="close-icon" @click="onClick">
           mdi-close
@@ -20,23 +20,23 @@
         >
           <v-tabs-slider class="slider-color" />
           <v-tab
-            v-for="i in tabs"
+            v-for="(i, index) in tabs"
             :key="i"
             :href="`#tab-${i}`"
           >
-            {{ i }} <span class="votes-count">{{ i === 'FOLLOWING' ? followingUserIds.length : followersUserIds.length }}</span>
+            {{ i }} <span class="votes-count">{{ index === 0 ? followingUserIds.length : followersUserIds.length }}</span>
           </v-tab>
         </v-tabs>
 
-        <v-tabs-items v-model="activeTab">
+        <v-tabs-items v-if="openModal" v-model="activeTab">
           <v-tab-item
-            v-for="i in tabs"
+            v-for="(i, index) in tabs"
             :key="i"
             :value="`tab-${i}`"
           >
             <v-card flat>
               <v-card-text>
-                <ModalInfinityScrollContainer :user-ids="i === 'FOLLOWING' ? followingUserIds : followersUserIds" />
+                <ModalInfinityScrollContainer :user-ids="index === 0 ? followingUserIds : followersUserIds" :type="'connections'" />
               </v-card-text>
             </v-card>
           </v-tab-item>
@@ -91,7 +91,7 @@
       }
 
       &::-webkit-scrollbar-thumb {
-        background-color: rgba(0, 0, 0, 0.12);
+        background-color: $color_gray;
         width: 6px;
       }
     }
@@ -117,28 +117,40 @@ export default class ModalConnections extends Vue {
   openModal: boolean = false
   followersUserIds: string[] = []
   followingUserIds: string[] = []
-  tabs: string[] = ['FOLLOWING', 'FOLLOWERS']
+  tabs: string[] = [this.$t('tabs.following') as string, this.$t('tabs.followers') as string]
   activeTab: string = ''
+  userId: string = this.accountId
 
   @Watch('isModal')
   isModalHandler () {
     this.onClick()
   }
 
+  @Watch('accountId')
+  accountIdHandler (newVal: string, oldVal: string) {
+    if (newVal !== oldVal) {
+      this.userId = newVal
+      this.getUserIds()
+    }
+  }
+
   created (): void {
     this.activeTab = this.tabs[0]
-
-    this.$store.dispatch('accountFollower/getAccountFollowers', this.accountId).then((ids) => {
-      this.followersUserIds = ids || []
-    })
-
-    this.$store.dispatch('accountFollower/getAccountFollowing', this.accountId).then((ids) => {
-      this.followingUserIds = ids || []
-    })
+    this.getUserIds()
   }
 
   onClick (): void {
     this.openModal = !this.openModal
+  }
+
+  getUserIds () {
+    this.$store.dispatch('accountFollower/getAccountFollowers', this.userId).then((ids) => {
+      this.followersUserIds = ids || []
+    })
+
+    this.$store.dispatch('accountFollower/getAccountFollowing', this.userId).then((ids) => {
+      this.followingUserIds = ids || []
+    })
   }
 }
 </script>

@@ -5,6 +5,7 @@ import { SpaceContentExtend, SpaceListItemData } from '~/models/space/space-list
 import SpaceService from '~/services/space.service'
 import { Content } from '~/types/content'
 import { config } from '~/config/config'
+import { PostModel } from '~/store/posts'
 
 const spaceServices = new SpaceService()
 
@@ -16,6 +17,8 @@ const SET_CURRENT_SPACE = 'SET_CURRENT_SPACE'
 const SET_ACCOUNT_SPACE_IDS = 'SET_ACCOUNT_SPACE_IDS'
 const SET_MY_ACCOUNT_SPACE_IDS = 'SET_MY_ACCOUNT_SPACE_IDS'
 const SET_IS_ACCOUNT_HAS_SPACES = 'SET_IS_ACCOUNT_HAS_SPACES'
+const NEW_SPACES_ABSENT = 'NEW_SPACES_ABSENT'
+const UPDATE_SPACE_HIDDEN_STATE = 'UPDATE_SPACE_HIDDEN_STATE'
 
 export interface SpaceModel {
   spaces: SpaceStruct[],
@@ -24,6 +27,7 @@ export interface SpaceModel {
   myAccountSpaceIds: [],
   accountUnlistedSpaceIds: [],
   isAccountHasSpaces: boolean,
+  newSpacedAbsent: boolean,
   isLoading: boolean
 }
 
@@ -31,6 +35,7 @@ export const state = (): SpaceModel => ({
   spaces: [],
   isLoading: false,
   isAccountHasSpaces: false,
+  newSpacedAbsent: false,
   currentSpace: undefined,
   accountSpaceIds: [],
   myAccountSpaceIds: [],
@@ -38,40 +43,51 @@ export const state = (): SpaceModel => ({
 })
 
 export const mutations = {
-  [UPDATE_SPACE] (state: any, spaces: SpaceStruct[]) {
+  [UPDATE_SPACE] (state: SpaceModel, spaces: SpaceStruct[]) {
     state.spaces = [...new Map(state.spaces.concat(spaces).map((item: SpaceStruct) =>
       [item.id, item])).values()]
   },
-  [SET_LOADING_SPACE] (state: any, loading: boolean) {
+  [UPDATE_SPACE_HIDDEN_STATE] (state: SpaceModel, payload: {id: string, state: boolean}) {
+    state.spaces.find(i => i.id === payload.id)!.hidden = !payload.state
+  },
+  [SET_LOADING_SPACE] (state: SpaceModel, loading: boolean) {
     state.isLoading = loading
   },
-  [SET_LOADING_ACCOUNT_SPACES] (state: any, loading: boolean) {
+  [SET_LOADING_ACCOUNT_SPACES] (state: SpaceModel, loading: boolean) {
     state.isLoading = loading
   },
-  [SET_IS_ACCOUNT_HAS_SPACES] (state: any, data: boolean) {
+  [SET_IS_ACCOUNT_HAS_SPACES] (state: SpaceModel, data: boolean) {
     state.isAccountHasSpaces = data
   },
-  [SET_CURRENT_SPACE] (state: any, space: SpaceStruct) {
+  [NEW_SPACES_ABSENT] (state: SpaceModel, data: boolean) {
+    state.newSpacedAbsent = data
+  },
+  [SET_CURRENT_SPACE] (state: SpaceModel, space: SpaceStruct) {
     state.currentSpace = space
   },
-  [SET_ACCOUNT_SPACE_IDS] (state: any, ids: []) {
+  [SET_ACCOUNT_SPACE_IDS] (state: SpaceModel, ids: []) {
     state.accountSpaceIds = ids
   },
-  [SET_MY_ACCOUNT_SPACE_IDS] (state: any, ids: []) {
+  [SET_MY_ACCOUNT_SPACE_IDS] (state: SpaceModel, ids: []) {
     state.myAccountSpaceIds = ids
   },
-  [CLEAR_SPACES] (state: any, space: SpaceStruct) {
+  [CLEAR_SPACES] (state: SpaceModel, space: SpaceStruct[]) {
     state.spaces = space
   }
+
 }
 
 export const actions = {
   async getSpacesByIds ({ commit }: {commit: Commit }, payload: AnyId[]) {
     commit(SET_LOADING_SPACE, true)
-    const data = await spaceServices.getSpaces(payload)
-    commit('content/SET_CONTENT', data.contents, { root: true })
-    commit(UPDATE_SPACE, data.structs)
-    commit(SET_LOADING_SPACE, false)
+    await spaceServices.getSpaces(payload).then((data) => {
+      if (data.contents.length === 0) {
+        commit(NEW_SPACES_ABSENT, true)
+      }
+      commit('content/SET_CONTENT', data.contents, { root: true })
+      commit(UPDATE_SPACE, data.structs)
+      commit(SET_LOADING_SPACE, false)
+    })
   },
 
   async getUnlistedSpacesByIds ({ commit }: {commit: Commit }, payload: AnyId[]) {
@@ -85,9 +101,15 @@ export const actions = {
       const space = await spaceServices.getSpaceIdByHandle(payload).then(async (id: any) => {
         return await spaceServices.getSpace(id)
       })
+      commit(SET_CURRENT_SPACE, space?.struct)
+      commit(UPDATE_SPACE, [space?.struct])
+      commit('content/SET_CONTENT', space?.content, { root: true })
       return space
     } else {
       const space = await spaceServices.getSpace(payload)
+      commit(SET_CURRENT_SPACE, space?.struct)
+      commit(UPDATE_SPACE, [space?.struct])
+      commit('content/SET_CONTENT', space?.content, { root: true })
       return space
     }
   },
@@ -131,6 +153,10 @@ export const actions = {
       return content ? ({ struct, content } as unknown as SpaceListItemData) : undefined
     }
     return undefined
+  },
+
+  updateHiddenState ({ commit } : {commit: Commit}, payload : {id: string, state: boolean}) {
+    commit(UPDATE_SPACE_HIDDEN_STATE, payload)
   }
 }
 

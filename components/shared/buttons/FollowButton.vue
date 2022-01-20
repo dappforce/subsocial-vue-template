@@ -1,13 +1,13 @@
 <template>
   <v-btn
     depressed
-    :class="{follow : isFollow, following: !isFollow}"
+    :class="{follow : !isFollow, following: isFollow}"
     :disabled="loading"
     class="follow-btn"
     @click="onClick"
   >
     <ButtonSpinner v-if="loading" />
-    {{ isFollow ? 'Follow' : 'Following' }}
+    {{ isFollow ? $t('buttons.following') : $t('buttons.follow') }}
   </v-btn>
 </template>
 
@@ -16,7 +16,7 @@
     background-color: $color_primary !important;
   }
   .following {
-    background-color: $color_white !important;
+    background-color: $color_white  !important;
   }
   .follow-btn {
     width: 99px;
@@ -32,6 +32,7 @@
     .v-btn__content {
       color: $color_primary;
       font-size: $font_small;
+      flex: initial;
     }
     &.follow {
       border: none;
@@ -70,7 +71,7 @@ export default class FollowButton extends TransactionButton {
 
   @Prop({
     type: String
-  }) entityId!: FollowButtonType
+  }) entityId!: string
 
   isFollow: boolean = this.follow
   loading: boolean = false
@@ -81,13 +82,14 @@ export default class FollowButton extends TransactionButton {
     this.isFollow = this.follow
   }
 
-  onFailed (result: SubmittableResult | null): void {
+  onFailed (): void {
     this.loading = !this.loading
   }
 
   onSuccess (result: SubmittableResult): void {
     this.isFollow = !this.isFollow
     this.loading = !this.loading
+    this.$store.dispatch('profiles/updateUserInfo', { id: this.$store.state.profiles.currentUser.id, data: 1, type: this.isFollow })
   }
 
   validate (): boolean {
@@ -116,7 +118,6 @@ export default class FollowButton extends TransactionButton {
             : METHODS.unfollowAccount
         break
     }
-
     await this.initExtrinsic({
       pallet,
       method,

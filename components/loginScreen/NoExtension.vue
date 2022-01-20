@@ -1,32 +1,29 @@
 <template>
   <div class="no-extension">
     <div class="title">
-      Sign In
+      {{ $t('modals.login.title') }}
     </div>
 
-    <div class="sub-title">
-      <span>Polkadot Extension</span> was not found or disabled.
-      Install the extension with the button below.
-    </div>
+    <div class="sub-title" v-html="$t('modals.login.noExtension.message')" />
 
     <div class="btn-container">
       <v-btn class="signin-button">
         <a href="https://chrome.google.com/webstore/detail/polkadot%7Bjs%7D-extension/mopnmbcafieddcagagdcbnhejhlodfdd">
           <img src="../../assets/image/chrome-icon.svg" alt="Chrome logo">
-          Install for Chrome
+          {{ $t('modals.login.noExtension.installForChrome') }}
         </a>
       </v-btn>
 
       <v-btn class="signin-button">
         <a href="https://addons.mozilla.org/en-US/firefox/addon/polkadot-js-extension/">
           <img src="../../assets/image/firefox-icon.svg" alt="Firefox logo">
-          Install for Firefox
+          {{ $t('modals.login.noExtension.installForFirefox') }}
         </a>
       </v-btn>
     </div>
 
     <div class="need-help">
-      Need help? Read our <a href="">Sign In Guide</a>
+      {{ $t('modals.login.noExtension.needHelp') }} <a href="">{{ $t('modals.login.noExtension.signInGuide') }}</a>
     </div>
   </div>
 </template>
@@ -65,7 +62,7 @@
     margin-bottom: $space_large;
 
     .signin-button {
-      width: 230px;
+      width: 200px;
       display: flex;
       justify-content: flex-start;
       border: 1px solid #D9D9D9;

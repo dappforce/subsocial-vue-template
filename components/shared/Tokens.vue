@@ -9,7 +9,7 @@
 <style lang="scss">
 .tokens-wp {
   line-height: $main_line_height;
-  color: $color_font_normal;
+  color: $color_font_secondary;
   display: flex;
   align-items: center;
   font-weight: 500;

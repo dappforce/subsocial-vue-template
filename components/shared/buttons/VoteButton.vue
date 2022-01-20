@@ -3,18 +3,18 @@
     class="vote-button"
     @click="onClick"
   >
-    <template v-if="type === 'upvote'">
+    <template v-if="type.toLowerCase() === 'upvote'">
       <v-icon medium class="vote-icon" :color="isActive ? '#3BB356' : ''">
         {{ isActive ? 'mdi-thumb-up' : 'mdi-thumb-up-outline' }}
       </v-icon>
     </template>
-    <template v-if="type === 'downvote'">
+    <template v-if="type.toLowerCase() === 'downvote'">
       <v-icon medium class="vote-icon" :color="isActive ? '#EA3323' : ''">
         {{ isActive ? 'mdi-thumb-down' : 'mdi-thumb-down-outline' }}
       </v-icon>
     </template>
-    <span v-if="isShowLabel" class="vote-label" :class="[isActive && type === 'downvote' ? 'dislike' : isActive ? 'like' : '']">{{ type }} <span v-if="voteCount > 0" :class="[type === 'downvote' ? 'dislike' : 'like']">({{ voteCount }})</span></span>
-    <span v-if="!isShowLabel && voteCount > 0" class="vote-label" :class="[isActive && type === 'downvote' ? 'dislike' : isActive && type === 'upvote' ? 'like' : '']">{{ voteCount }}</span>
+    <span v-if="isShowLabel" class="vote-label" :class="[isActive && type.toLowerCase() === 'downvote' ? 'dislike' : isActive ? 'like' : '']">{{ type }} <span v-if="voteCount > 0" :class="[type.toLowerCase() === 'downvote' ? 'dislike' : 'like']">({{ voteCount }})</span></span>
+    <span v-if="!isShowLabel && voteCount > 0" class="vote-label" :class="[isActive && type.toLowerCase() === 'downvote' ? 'dislike' : isActive && type.toLowerCase() === 'upvote' ? 'like' : '']">{{ voteCount }}</span>
   </v-btn>
 </template>
 
@@ -97,6 +97,8 @@ export default class VoteButton extends TransactionButton {
   voteCount: number = this.count
   oldKind: string | undefined
   newKind: string | undefined
+  id: string | null = null
+  eventType: string | null = null
 
   @Watch('active')
   activeHandler (newVal: boolean) {
@@ -107,9 +109,17 @@ export default class VoteButton extends TransactionButton {
   reactionHandler (newVal: any, oldVal: any) {
     if (newVal !== oldVal) {
       if (this.reaction && !this.reactionId) {
-        this.reactionId = this.reaction.id
-        this.getOldKind()
+        this.id = this.reaction.id
       }
+      this.id = this.reactionId
+      this.getOldKind()
+    }
+  }
+
+  @Watch('reactionId')
+  reactionIdHandler (newVal: any, oldVal: any) {
+    if (newVal !== oldVal) {
+      this.id = this.reactionId
     }
   }
 
@@ -123,17 +133,26 @@ export default class VoteButton extends TransactionButton {
       this.voteCount++
     }
 
+    this.eventUpdates()
+
     this.isActive = !this.isActive
     this.oldKind = this.newKind
-    this.reactionId = this.reactionId || getNewIdsFromEvent(result)[1]?.toString()
-
+    this.id = this.id || getNewIdsFromEvent(result)[1]?.toString()
     this.updatePost()
 
-    if (this.type === 'upvote') {
-      this.$nuxt.$emit('upvote', false)
-    } else if (this.type === 'downvote') {
-      this.$nuxt.$emit('downvote', false)
+    if (this.type.toLowerCase() === 'upvote') {
+      this.$nuxt.$emit('upvote', { active: false, id: this.id })
+    } else if (this.type.toLowerCase() === 'downvote') {
+      this.$nuxt.$emit('downvote', { active: false, id: this.id })
     }
+  }
+
+  eventUpdates () {
+    if (this.eventType === 'delete') {
+      this.id = null
+      this.newKind = undefined
+    }
+    this.eventType = null
   }
 
   validate (): boolean {
@@ -142,20 +161,22 @@ export default class VoteButton extends TransactionButton {
 
   created () {
     this.getOldKind()
-    if (this.reaction) {
-      this.getOldKind()
-    }
+    this.id = this.reactionId
 
-    this.$nuxt.$on('upvote', (data: boolean) => {
-      if (this.isActive === true && this.type === 'downvote') {
-        this.isActive = data
+    this.$nuxt.$on('upvote', (data: {active: boolean, id: string}) => {
+      if (this.isActive === true && this.type.toLowerCase() === 'downvote') {
+        this.oldKind = ReactionEnum.Upvote
+        this.id = data.id
+        this.isActive = data.active
         this.voteCount--
       }
     })
 
-    this.$nuxt.$on('downvote', (data: boolean) => {
-      if (this.isActive === true && this.type === 'upvote') {
-        this.isActive = data
+    this.$nuxt.$on('downvote', (data: {active: boolean, id: string}) => {
+      if (this.isActive === true && this.type.toLowerCase() === 'upvote') {
+        this.oldKind = ReactionEnum.Downvote
+        this.id = data.id
+        this.isActive = data.active
         this.voteCount--
       }
     })
@@ -163,11 +184,12 @@ export default class VoteButton extends TransactionButton {
 
   async onClick () {
     this.getNewKind()
+
     const params = this.buildTxParams()
     const pallet = PALLETS.reactions
     let method = ''
 
-    if (!this.reaction?.id) {
+    if (!this.id) {
       method = METHODS.createPostReaction
     } else {
       method = this.isActive
@@ -185,25 +207,26 @@ export default class VoteButton extends TransactionButton {
   }
 
   buildTxParams (): any[] {
-    if (!this.reactionId) {
+    if (!this.id) {
       return [this.postId, new ReactionKind(this.newKind)]
     } else if (this.oldKind !== this.newKind) {
-      return [this.postId, this.reactionId, new ReactionKind(this.newKind)]
+      return [this.postId, this.id, new ReactionKind(this.newKind)]
     } else {
-      return [this.postId, this.reactionId]
+      this.eventType = 'delete'
+      return [this.postId, this.id]
     }
   }
 
   getOldKind () {
-    this.oldKind = this.reaction.isUpvote
+    this.oldKind = this.reaction?.isUpvote
       ? ReactionEnum.Upvote
-      : this.reaction.isDownvote
+      : this.reaction?.isDownvote
         ? ReactionEnum.Downvote
         : undefined
   }
 
   getNewKind () {
-    this.newKind = this.type === 'upvote' ? ReactionEnum.Upvote : ReactionEnum.Downvote
+    this.newKind = this.type.toLowerCase() === 'upvote' ? ReactionEnum.Upvote : ReactionEnum.Downvote
   }
 
   updatePost () {
@@ -214,7 +237,7 @@ export default class VoteButton extends TransactionButton {
       isNew: false
     }
 
-    if (!this.reactionId) {
+    if (!this.id) {
       payload.isNew = true
     }
 

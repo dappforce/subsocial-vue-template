@@ -8,8 +8,8 @@
         @infinite="infiniteScroll"
       />
     </div>
-    <div v-if="!userIds.length" class="no-reactions">
-      No reactions yet
+    <div v-if="!userIds.length " class="no-reactions">
+      {{ type === 'likes' ? $t('modals.infinityScroll.noReactionsYet') : $t('modals.infinityScroll.noDataYet') }}
     </div>
     <BounceSpinner v-if="userIds.length && !list.length" />
   </div>
@@ -35,6 +35,11 @@ export default class ModalInfinityScrollContainer extends Vue {
   @Prop({
     type: Array
   }) userIds!: string[]
+
+  @Prop({
+    type: String,
+    default: 'likes'
+  }) type!: string
 
   defaultStart: number = 0
   defaultEnd: number = stepNumber
