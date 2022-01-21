@@ -8,8 +8,8 @@
         @infinite="infiniteScroll"
       />
     </div>
-    <div v-if="!userIds.length" class="no-reactions">
-      No reactions yet
+    <div v-if="!userIds.length " class="no-reactions">
+      {{ type === 'likes' ? $t('modals.infinityScroll.noReactionsYet') : $t('modals.infinityScroll.noDataYet') }}
     </div>
     <BounceSpinner v-if="userIds.length && !list.length" />
   </div>
@@ -26,15 +26,20 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { ProfileStruct } from '@subsocial/api/flat-subsocial/flatteners'
-import { environment } from '~/environments/environment'
+import { config } from '~/config/config'
 
-const stepNumber = environment.stepForLoading
+const stepNumber = config.stepForLoading
 
 @Component
 export default class ModalInfinityScrollContainer extends Vue {
   @Prop({
     type: Array
   }) userIds!: string[]
+
+  @Prop({
+    type: String,
+    default: 'likes'
+  }) type!: string
 
   defaultStart: number = 0
   defaultEnd: number = stepNumber

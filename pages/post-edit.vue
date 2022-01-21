@@ -1,5 +1,11 @@
 <template>
-  <PostEdit :is-edit="isEdit" :post-item="post" />
+  <div>
+    <PostEdit v-if="havePermission" :is-edit="isEdit" :post-item="post" />
+    <div v-if="!havePermission && post" class="error">
+      You do not have permission to edit this post
+    </div>
+    <BounceSpinner v-if="!havePermission && !post" />
+  </div>
 </template>
 
 <script lang="ts">
@@ -9,12 +15,39 @@ import { PostListItemData } from '~/models/post/post-list-item.model'
 @Component
 export default class PostEditPage extends Vue {
   isEdit: boolean = false
-  post: PostListItemData = {} as PostListItemData
+  post: PostListItemData | null = null
+  havePermission: boolean = false
+  postId: string | null = null
 
   created (): void {
-    this.post = this.$store.state.posts.list.find((i: PostListItemData) => i.id === this.$route.query.post)
-    this.isEdit = !!this.post
-    this.$nuxt.$emit('isShowTabs', false)
+    this.postId = this.$route.query.post as string
+
+    if (this.$store.state.loading.isLoading) {
+      this.post = this.postId ? this.$store.getters['posts/getPostInfo'](this.postId) : null
+      this.isUserCanEdit()
+    } else {
+      const unsubscribe = this.$store.subscribe((mutation) => {
+        if (mutation.type === 'profiles/SET_CURRENT_USER' && this.post === null && this.postId) {
+          this.$store.dispatch('posts/getPostById', this.postId).then(() => {
+            this.post = this.$store.getters['posts/getPostInfo'](this.postId)
+            unsubscribe()
+          })
+        }
+      })
+    }
+
+    if (this.postId) {
+      this.isEdit = !this.isEdit
+    } else {
+      this.havePermission = !this.havePermission
+    }
+  }
+
+  isUserCanEdit () {
+    const user = this.$store.state.profiles.currentUser
+    if (user.id === this.post?.ownerId) {
+      this.havePermission = !this.havePermission
+    }
   }
 }
 </script>

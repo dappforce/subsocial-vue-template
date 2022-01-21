@@ -1,10 +1,10 @@
 <template>
   <div class="account-present">
     <div class="title">
-      Sign In
+      {{ $t('modals.login.title') }}
     </div>
     <div class="message">
-      Click on your account to sign in:
+      {{ $t('modals.login.accountScreen.message') }}
     </div>
     <div class="accounts-container">
       <div
@@ -26,16 +26,16 @@
       </div>
     </div>
     <div class="privacy">
-      <a href="">Privacy Policy</a>
-      <a href="">Terms of Use</a>
+      <a href="">{{ $t('buttons.privacyPolicy') }}</a>
+      <a href="">{{ $t('buttons.termsOfUse') }}</a>
     </div>
   </div>
 </template>
 
 <style lang="scss">
 .account-present {
-  width: 432px;
-  padding: 18px;
+  width: $modal_width;
+  padding: $space_normal;
 
   .title {
     font-weight: 500;
@@ -59,6 +59,7 @@
   .accounts-container {
     max-height: 264px;
     margin-bottom: 22px;
+    overflow: auto;
 
     .account {
       display: flex;
@@ -90,7 +91,21 @@
 
       .address {
         margin: 0 0 0 auto;
+        padding-right: 10px;
       }
+    }
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      box-shadow: none;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: $color_gray;
+      width: 6px;
     }
   }
 

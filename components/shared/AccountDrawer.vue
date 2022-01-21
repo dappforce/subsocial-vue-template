@@ -15,7 +15,7 @@
         <Avatar :id="user.id" :src="user.avatar" :size="40" :name="user.name" />
         <div class="info-container">
           <div class="profile-name-wp">
-            <Title size="large" :name="user.name" :link="'/accounts/' + user.id" />
+            <Title :id="user.id" size="large" :name="user.name" :link="'/accounts/' + user.id" />
           </div>
           <div class="profile-stats-wp">
             <span @click="openModal"><b>{{ user.followingCount | numeral('0,0a') }}</b> {{ user.followingCount | pluralize('en', ['Following', 'Following']) }}</span>
@@ -42,7 +42,7 @@
     <v-divider />
 
     <v-list class="account-btn" dense>
-      <v-list-item link>
+      <v-list-item link :to="localePath('/accounts/' + user.id)">
         <v-list-item-icon>
           <v-icon class="account-icon">
             mdi-account-outline
@@ -51,33 +51,23 @@
 
         <v-list-item-content>
           <v-list-item-title>
-            <NuxtLink :to="'/accounts/' + user.id">
-              My profile
-            </NuxtLink>
+            My profile
           </v-list-item-title>
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item link>
+      <v-list-item link :to="localePath('/profile/?id=' + user.id)">
         <v-list-item-icon>
           <v-icon class="account-icon">
             mdi-pencil-outline
           </v-icon>
         </v-list-item-icon>
 
-        <v-tooltip top>
-          <template #activator="{ on, attrs }">
-            <v-list-item-content>
-              <v-list-item-title
-                v-bind="attrs"
-                v-on="on"
-              >
-                Edit my profile
-              </v-list-item-title>
-            </v-list-item-content>
-          </template>
-          <span>Coming soon</span>
-        </v-tooltip>
+        <v-list-item-content>
+          <v-list-item-title>
+            Edit my profile
+          </v-list-item-title>
+        </v-list-item-content>
       </v-list-item>
 
       <v-list-item link>
@@ -135,7 +125,7 @@
 <style lang="scss">
 .drawer-container {
   width: 420px !important;
-  padding: $space_normal $space_normal;
+  padding: $space_normal $space_normal $space_normal 11px;
   z-index: 10;
 
   .account-icon {
@@ -150,13 +140,14 @@
     cursor: pointer;
   }
 
-  .user-info {
+  & .user-info {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
     min-height: 0;
     padding-bottom: $space_normal;
+    padding-left: 5px;
 
     .profile-info-wp {
       display: flex;
@@ -244,7 +235,9 @@
     }
   }
 
-  .account-btn {
+  & .account-btn {
+    padding-left: 5px;
+
     .v-list-item {
       color: $color_black;
       padding: 0;
@@ -284,7 +277,7 @@
     }
 
     &::-webkit-scrollbar-thumb {
-      background-color: rgba(0, 0, 0, 0.12);;
+      background-color: $color_gray;
       width: 6px;
     }
 
@@ -296,7 +289,6 @@
         &:hover {
           background-color: rgba(238, 236, 236, 0.7);
           cursor: pointer;
-          padding: $space_tiny 5px;
         }
       }
     }
@@ -314,6 +306,7 @@
   }
 
   .sign-out {
+    padding-left: 5px;
     &__btn {
       border: 1px solid $color_primary;
       box-sizing: border-box;
@@ -340,7 +333,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import StorageService from '../../services/storage.service'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
 import { AccountData } from '~/types/account.types'
-import { environment } from '~/environments/environment'
+import { config } from '~/config/config'
 const storageService = new StorageService()
 
 @Component
@@ -360,7 +353,7 @@ export default class AccountDrawer extends Vue {
   drawer: boolean = false
   isOpenModal: boolean = false
   accounts: AccountData[] = []
-  addressLength: number = environment.addressLengthShort
+  addressLength: number = config.addressLengthShort
 
   created () {
     const currentAcc = this.$store.state.profiles.currentUser

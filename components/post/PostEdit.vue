@@ -1,154 +1,114 @@
 <template>
   <section class="edit-post-container">
     <v-card>
-      <h2>{{ isEdit ? 'Edit' : 'New' }} post</h2>
+      <ValidationObserver ref="form" v-slot="{ handleSubmit, handleReset }">
+        <form @submit.prevent="handleSubmit(submit)" @reset.prevent="handleReset(clear)">
+          <h2 class="edit-post-title">
+            {{ isEdit ? $t('general.edit') : $t('general.new') }} {{ $t('general.post') }}
+          </h2>
 
-      <v-tabs
-        v-model="tab"
-        background-color="transparent"
-        color="basil"
-        grow
-      >
-        <v-tabs-slider class="slider-color" />
+          <v-tabs
+            v-model="tab"
+            background-color="transparent"
+            color="basil"
+            grow
+          >
+            <v-tabs-slider class="slider-color" />
 
-        <v-tab
-          v-for="item in items"
-          :key="item"
-          :href="'#' + item"
-        >
-          {{ item }}
-        </v-tab>
-      </v-tabs>
+            <v-tab
+              v-for="item in items"
+              :key="item"
+              :href="'#' + item"
+            >
+              {{ item }}
+            </v-tab>
+          </v-tabs>
 
-      <v-tabs-items v-model="tab">
-        <v-tab-item
-          :key="items[0]"
-          :value="items[0]"
-        >
-          <div class="upload-photo-wp" :class="{ loaded: !!previewImage }">
-            <div class="upload-photo" :style="{ backgroundImage: 'url(' + previewImage + ')' }">
-              <v-file-input
-                v-model="avatar"
-                prepend-icon="mdi-camera-outline"
-                color="#000"
-                :rules="avatarRules"
-                @change="selectImage"
-              />
-              <span v-if="!previewImage" class="upload-title">Upload cover image</span>
-              <span v-if="!previewImage" class="image-recommendations">Image should be less than 2 MB</span>
-            </div>
-          </div>
+          <SpacesDropdown :is-edit="isEdit" :space-id="getSpaceId" @selectedSpace="updateSpaceID" />
 
-          <v-form v-model="valid">
+          <v-tabs-items v-model="tab">
+            <v-tab-item
+              :key="items[0]"
+              :value="items[0]"
+            >
+              <ImageLoader :avatar="image" :type="'square'" @avatar="updateImageCID" />
+            </v-tab-item>
+
+            <v-tab-item
+              :key="items[1]"
+              :value="items[1]"
+            >
+              <div class="form-row youtube-container">
+                <ValidationProvider v-slot="{ errors }" name="Video URL" :rules="!isArticleTab ? 'required' : ''">
+                  <v-text-field
+                    v-model="videoUrl"
+                    :hide-details="!isArticleTab ? 'auto' : true"
+                    :messages="errors[0]"
+                    outlined
+                    :label="(!isArticleTab ? '*' : '') + ' Video URL'"
+                  />
+                </ValidationProvider>
+                <client-only>
+                  <Youtube v-if="videoUrl" :link="videoUrl" />
+                </client-only>
+              </div>
+            </v-tab-item>
+          </v-tabs-items>
+          <div class="form-container">
             <div class="form-row">
               <v-text-field
                 v-model="postName"
-                :counter="50"
-                outlined
-                label="      Post title"
-              />
-            </div>
-            <div class="form-row">
-              <v-textarea
-                v-model="description"
-                :error-messages="descriptionErrors"
-                :counter="2500"
-                required
-                outlined
-                auto-grow
-                name="input-7-4"
-                label="* Post body"
-                @input="$v.description.$touch()"
-                @blur="$v.description.$touch()"
-              />
-            </div>
-            <div class="form-row">
-              <v-combobox
-                v-model="selectTags"
-                multiple
-                outlined
-                label="Tags"
-                append-icon
-                chips
-                deletable-chips
-                class="tag-input"
-                :search-input.sync="search"
-                placeholder="Press 'Enter' or 'Tab' key to add tags"
-                @keyup.tab="updateTags"
-                @paste="updateTags"
-              />
-            </div>
-          </v-form>
-        </v-tab-item>
-
-        <v-tab-item
-          :key="items[1]"
-          :value="items[1]"
-        >
-          <v-form v-model="valid">
-            <div class="form-row youtube-container">
-              <v-text-field
-                v-model="videoUrl"
-                :error-messages="videoUrlErrors"
-                outlined
-                label="* Video URL"
-                required
-                @input="$v.videoUrl.$touch()"
-                @blur="$v.videoUrl.$touch()"
-              />
-              <client-only>
-                <Youtube v-if="videoUrl" :link="videoUrl" />
-              </client-only>
-            </div>
-            <div class="form-row">
-              <v-text-field
-                v-model="postName"
-                :counter="50"
+                hide-details="auto"
                 outlined
                 label="Post title"
-                @input="$v.postName.$touch()"
-                @blur="$v.postName.$touch()"
               />
             </div>
-            <div class="form-row">
-              <v-textarea
-                v-model="description"
-                :counter="2500"
-                outlined
-                auto-grow
-                name="input-7-4"
-                label="Post body"
-                @input="$v.description.$touch()"
-                @blur="$v.description.$touch()"
-              />
+            <div class="form-row description-row">
+              <ValidationProvider v-slot="{ errors }" name="Description" :rules="isArticleTab ? 'required|min:3' : ''">
+                <mde-editor
+                  :v-validate="description"
+                  :show-editor="true"
+                  :text="description"
+                  :name="$t('forms.fieldName.description')"
+                  :placeholder="(isArticleTab ? '* ' : '') + $t('forms.placeholder.postBody')"
+                  :height="'200px'"
+                  @contentUpdate="updateDescription"
+                />
+                <v-textarea
+                  v-model="description"
+                  class="hidden-textarea"
+                  :messages="errors[0]"
+                />
+              </ValidationProvider>
             </div>
             <div class="form-row">
               <v-combobox
                 v-model="selectTags"
+                hide-details="auto"
                 multiple
                 outlined
-                label="Tags"
+                :label="$t('forms.fieldName.tags')"
                 append-icon
                 chips
                 deletable-chips
                 class="tag-input"
                 :search-input.sync="search"
-                placeholder="Press 'Enter' or 'Tab' key to add tags"
+                :placeholder="$t('forms.placeholder.tags')"
                 @keyup.tab="updateTags"
                 @paste="updateTags"
               />
             </div>
-          </v-form>
-        </v-tab-item>
-      </v-tabs-items>
-      <div class="button-wp">
-        <v-btn color="#fff" @click="clear">
-          {{ isEdit ? 'Cancel' : 'Reset form' }}
-        </v-btn>
-        <v-btn class="btn-main-color" @click="submit">
-          {{ isEdit ? 'Save' : 'Create post' }}
-        </v-btn>
-      </div>
+          </div>
+          <div class="button-wp">
+            <v-btn class="button-third-color" @click="clear">
+              {{ isEdit ? $t('buttons.cancel') : $t('buttons.resetForm') }}
+            </v-btn>
+            <v-btn class="button-main-color" @click="submit">
+              {{ isEdit ? $t('buttons.save') : $t('buttons.createPost') }}
+            </v-btn>
+          </div>
+        </form>
+      </ValidationObserver>
     </v-card>
   </section>
 </template>
@@ -160,8 +120,12 @@
   min-height: 60vh;
   padding-bottom: $space_normal;
 
+  .edit-post-title {
+    font-size: $font_large;
+  }
+
   .v-card {
-    padding: 35px 23px 21px;
+    padding: $space_huge $space_big $space_big;
 
     .v-tabs {
       border-bottom: 1px solid #E0E0E0;
@@ -182,128 +146,59 @@
 
   .form-row {
     width: 100%;
+    margin-bottom: $space_big;
+
+    .CodeMirror-placeholder {
+      font-size: 16px;
+      color: rgba(0, 0, 0, 0.6);
+      opacity: 1;
+    }
+
+    &.description-row {
+      position: relative;
+    }
+
+    .editor-toolbar, .CodeMirror {
+      border-color: $color_border;
+    }
+
+    .v-text-field--outlined fieldset {
+      border-color: $color_border;
+    }
+
+    .v-text-field--outlined.v-input--is-focused fieldset, .v-text-field--outlined.v-input--has-state fieldset {
+      border-width: 1px;
+      border-color: $color_font_normal;
+    }
+
+    .v-text-field__details {
+      position: absolute;
+      bottom: -20px;
+      left: 0;
+      padding: 0;
+
+      .v-messages__message {
+        font-size: $font_extra_small;
+        color: $color_red;
+      }
+    }
   }
 
   .youtube-container {
-    margin-top: 15px;
-  }
-
-  .upload-photo-wp {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    position: relative;
-    padding-bottom: $space_large;
-    margin-top: $space_normal;
-
-    .upload-photo {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      width: 100%;
-      height: 98px;
-      border-radius: $border_small;
-      border: 1px solid rgba(0, 0, 0, 0.38);
-
-      span {
-        font-size: $font_small;
-        line-height: 20px;
-        letter-spacing: 0.25px;
-        margin-top: 3px;
-        position: absolute;
-        bottom: 55px;
-        font-weight: 400;
-      }
-
-      .image-recommendations {
-        font-size: $font_small;
-        line-height: $normal_line_height;
-        letter-spacing: 0.4px;
-        color: rgba(0, 0, 0, 0.38);
-        bottom: 35px;
-      }
-
-      .v-input {
-        display: block;
-        width: 100%;
-        height: 100%;
-        padding: 0;
-        margin: 0;
-        flex: none;
-
-        .v-input__prepend-outer {
-          display: flex;
-          width: 100%;
-          height: 100%;
-          margin: 0;
-
-          .v-input__icon{
-            height: 100%;
-
-            button {
-              width: 100%;
-              height: 100%;
-
-              &::after {
-                display: none;
-              }
-
-              &::before {
-                margin-bottom: 45px;
-              }
-            }
-          }
-        }
-
-        .v-input__slot {
-          display: none;
-        }
-
-        .v-input__control {
-          position: absolute;
-          bottom: 0;
-        }
-
-        .v-icon {
-          color: $color_black;
-        }
-      }
-    }
-
-    &.loaded {
-      .upload-photo {
-        height: 25vh;
-
-        .v-file-input {
-          display: none;
-        }
-
-        &:hover {
-          .v-file-input {
-            display: block;
-
-            button {
-              background: $button_hover;
-              &:before {
-                padding-bottom: 0;
-                color: $color_white;
-              }
-            }
-
-            .v-text-field__details {
-              display: none;
-            }
-          }
-        }
-
-      }
-    }
+    margin-top: 0;
   }
 
   .v-chip {
     &__content {
       color: $main_text_color;
+    }
+  }
+
+  .hidden-textarea {
+    padding: 0 !important;
+    textarea, .v-input__slot {
+      display: none!important;
+      visibility: hidden;
     }
   }
 
@@ -314,15 +209,18 @@
     gap: $space_normal;
     margin-top: 5px;
 
-    .btn-main-color {
-      color: $color_primary;
+    .button-main-color {
+      background-color: $color_primary;
+    }
+
+    .button-third-color {
+      background-color: $color_white
     }
 
     button {
       min-width: 110px !important;
       font-size: $font_normal;
-      border: 1px solid #E0E0E0;
-      border-color: #E0E0E0 !important;
+      border: 1px solid #E0E0E0!important;
       border-radius: $border_small;
       box-shadow: none;
       text-transform: capitalize;
@@ -348,109 +246,186 @@
 }
 </style>
 
-<script>
-import { validationMixin } from 'vuelidate'
-import { required, maxLength } from 'vuelidate/lib/validators'
+<script lang="ts">
+import { Component, Prop, Watch } from 'vue-property-decorator'
+import { extend, ValidationObserver, ValidationProvider } from 'vee-validate'
+import { required, min } from 'vee-validate/dist/rules'
+import { SubmittableResult } from '@polkadot/api'
+import { CommonContent, IpfsCid } from '@subsocial/types'
+import { createPostSlug } from '@subsocial/utils'
+import sanitizeHtml from 'sanitize-html'
+import { PostListItemData } from '~/models/post/post-list-item.model'
+import TransactionButton from '~/components/abstract/TransactionButton.vue'
+import { METHODS, PALLETS } from '~/constants/query'
+import TransactionService from '~/services/transaction.service'
+import { getNewIdFromEvent } from '~/utils/utils'
+import { SpaceListItemData } from '~/models/space/space-list-item.model'
+import StorageService from '~/services/storage.service'
 
-export default {
-  name: 'PostEdit',
-  mixins: [validationMixin],
+extend('required', required)
+extend('min', min)
+extend('required', {
+  ...required,
+  message: 'This field is required'
+})
 
-  props: {
-    isEdit: {
-      type: Boolean,
-      default: false
-    },
-    postItem: {
-      type: Object
+const storageService = new StorageService()
+const transactionService = new TransactionService()
+
+@Component({
+  components: { ValidationProvider, ValidationObserver }
+})
+export default class PostEdit extends TransactionButton {
+  $refs!: {
+    form: InstanceType<typeof ValidationObserver>;
+  }
+
+  @Prop({
+    type: Boolean,
+    default: false
+  }) isEdit!: boolean
+
+  @Prop({
+    type: Object
+  }) postItem!: PostListItemData
+
+  post: PostListItemData | null = null
+  tab: string | null = null
+  items: string[] = ['article', 'video']
+  postName: string = ''
+  description: string = ''
+  image: string = ''
+  selectTags: string[] = []
+  search: string = ''
+  videoUrl: string = ''
+  spaceId: string = ''
+  cid: IpfsCid | undefined
+
+  @Watch('postItem')
+  postItemHandler (newVal: any, OldVal: any) {
+    if (newVal !== OldVal) {
+      this.post = newVal
+      this.insertDataInForm()
     }
-  },
-  validations: {
-    postName: { maxLength: maxLength(50) },
-    description: { required, maxLength: maxLength(2500) },
-    videoUrl: { required }
-  },
-
-  data () {
-    return {
-      tab: null,
-      items: ['article', 'video'],
-      valid: false,
-      postName: '',
-      description: '',
-      avatarRules: [
-        value => !value || value.size < 2000000 || 'Avatar size should be less than 2 MB!'
-      ],
-      avatar: [],
-      selectTags: [],
-      search: '',
-      videoUrl: '',
-      previewImage: ''
-    }
-  },
-
-  computed: {
-    postNameErrors () {
-      const errors = []
-      if (!this.$v.postName.$dirty) { return errors }
-      !this.$v.postName.maxLength && errors.push('Title must be at most 50 characters long')
-      !this.$v.postName.required && errors.push('Title is required.')
-      return errors
-    },
-    descriptionErrors () {
-      const errors = []
-      if (!this.$v.description.$dirty) { return errors }
-      !this.$v.description.maxLength && errors.push('Name must be at most 2500 characters long')
-      !this.$v.description.required && errors.push('Post body is required.')
-      return errors
-    },
-    videoUrlErrors () {
-      const errors = []
-      if (!this.$v.videoUrl.$dirty) { return errors }
-      !this.$v.videoUrl.required && errors.push('Post body is required.')
-      return errors
-    }
-  },
-
-  watch: {
-    tab (newVal, oldVal) {
-      if (newVal !== oldVal) {
-        // this.clear()
-      }
-    }
-  },
+  }
 
   created () {
     if (this.isEdit) {
-      this.postName = this.postItem.title
-      this.description = this.postItem.body
-      this.selectTags = this.postItem.tags
+      this.insertDataInForm()
     }
-  },
+  }
 
-  methods: {
-    updateTags () {
+  insertDataInForm () {
+    this.postName = this.postItem.title
+    this.description = this.postItem.body
+    this.selectTags = this.postItem.tags
+    this.image = this.postItem.imageUrl
+    this.videoUrl = this.postItem.link || ''
+  }
+
+  updateTags () {
+    this.$nextTick(() => {
+      if (this.search) { this.selectTags.push(...this.search.split(',')) }
       this.$nextTick(() => {
-        if (this.search) { this.selectTags.push(...this.search.split(',')) }
-        this.$nextTick(() => {
-          this.search = ''
-        })
+        this.search = ''
       })
-    },
-    submit () {
-      this.$v.$touch()
-    },
-    clear () {
-      this.$v.$reset()
+    })
+  }
+
+  submit () {
+    this.$refs.form.validate().then((result) => {
+      if (result) {
+        this.OnCreateOrUpdatePost()
+      }
+    })
+  }
+
+  clear () {
+    this.$refs.form.reset()
+    if (this.isEdit) {
+      this.insertDataInForm()
+    } else {
       this.postName = ''
       this.description = ''
       this.videoUrl = ''
       this.selectTags = []
-    },
-    selectImage (image) {
-      const currentImage = image
-      this.previewImage = URL.createObjectURL(currentImage)
     }
   }
+
+  get isArticleTab (): boolean {
+    return this.tab === this.items[0]
+  }
+
+  get getSpaceId (): string | undefined {
+    if (typeof window !== 'undefined') {
+      const spaceId = !this.isEdit ? storageService.getCurrentSpaceId() : ''
+      return this.postItem ? this.postItem.spaceId : spaceId
+    }
+  }
+
+  updateDescription (content: string): void {
+    this.description = content
+  }
+
+  updateImageCID (cid: string): void {
+    this.image = cid
+  }
+
+  updateSpaceID (id: string): void {
+    this.spaceId = id
+  }
+
+  onFailed (): void {
+    if (this.cid) {
+      transactionService.removeIpfsContent(this.cid).catch(err => new Error(err))
+    }
+  }
+
+  onSuccess (result: SubmittableResult): void {
+    if (this.isEdit) {
+      transactionService.removeIpfsContent(this.post?.contentId || '').catch(err => new Error(err))
+    }
+    const id = this.postItem?.id || getNewIdFromEvent(result)?.toString()
+    if (id) {
+      this.goToPostPage(id)
+    }
+  }
+
+  validate (): boolean {
+    return true
+  }
+
+  async goToPostPage (id: string) {
+    const space: SpaceListItemData = await this.$store.getters['space/getSpaceWithContent'](this.spaceId)
+    const slug = createPostSlug(id, { title: this.postName, body: this.description })
+
+    await this.$store.dispatch('posts/getPostById', id).then(() => {
+      this.$router.push(this.$nuxt.localePath('/' + (space.struct?.handle || space.struct.id) + '/' + slug))
+    })
+  }
+
+  async OnCreateOrUpdatePost () {
+    const pallet = PALLETS.posts
+    const method = this.isEdit ? METHODS.updatePost : METHODS.createPost
+
+    this.cid = await transactionService.saveIpfsContent({
+      title: this.postName,
+      image: this.isArticleTab ? this.image : '',
+      tags: this.selectTags,
+      body: sanitizeHtml(this.description),
+      link: this.videoUrl || undefined
+    } as CommonContent)
+
+    if (!this.cid) { return }
+
+    const params = this.isEdit
+      ? [this.postItem?.id, { spaceId: null, content: { IPFS: this.cid }, hidden: null }]
+      : [this.spaceId, { RegularPost: null }, { IPFS: this.cid }]
+
+    await this.initExtrinsic({ pallet, params, method })
+
+    await this.sentTransaction()
+  }
 }
+
 </script>

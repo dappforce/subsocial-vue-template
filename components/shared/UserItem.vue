@@ -4,17 +4,13 @@
       <Avatar :id="userInfo.id" :src="isAvatar(userInfo)" :size="40" :name="isName(userInfo)" />
 
       <div class="user-info-wp">
-        <span class="user-name">{{ isName(userInfo) }}</span>
+        <span class="user-name"><NuxtLink :to="localePath('/accounts/' + userInfo.id)">{{ isName(userInfo) }}</NuxtLink></span>
 
         <Address :address="userInfo.id" :length="addressLength" :show-icon="false" />
       </div>
     </div>
 
-    <FollowButton v-if="type === 'follow'" :follow="isFollow" type="profile" :entity-id="userInfo.id" />
-
-    <div v-if="type === 'account'" class="sub-wb">
-      <Tokens :balance="balance" />
-    </div>
+    <FollowButton v-if="type === 'follow' && isNotCurrentUser" :follow="isFollow" type="profile" :entity-id="userInfo.id" />
   </div>
 </template>
 
@@ -32,7 +28,7 @@
   .user-info-wp {
     margin-left: 13px;
 
-    .user-name {
+    .user-name a {
       font-weight: 500;
       font-size: $font_normal;
       line-height: 22px;
@@ -43,6 +39,7 @@
       overflow: hidden;
       white-space: nowrap;
       display: block;
+      text-decoration: none;
     }
   }
 
@@ -60,17 +57,17 @@
 </style>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 import { ProfileData } from '@subsocial/api/flat-subsocial/dto'
-import { ProfileItemModel } from '~/models/profile/profile-item.model'
-import { environment } from '~/environments/environment'
+import { ProfileStruct } from '@subsocial/api/flat-subsocial/flatteners'
+import { config } from '~/config/config'
 
 @Component
 export default class UserItem extends Vue {
   @Prop({
     type: Object,
     default: undefined
-  }) userInfo!: ProfileItemModel
+  }) userInfo!: ProfileData | ProfileStruct
 
   @Prop({
     type: String
@@ -82,15 +79,9 @@ export default class UserItem extends Vue {
 
   balance: string = ''
   isFollow: boolean = false
-  addressLength: number = environment.addressLengthLong
-
-  @Watch('userInfo')
-  userInfoHandler () {
-    this.getBalance()
-  }
+  addressLength: number = config.addressLengthLong
 
   created (): void {
-    this.getBalance()
     if (this.$store.state.profiles.currentUser) {
       this.$store.dispatch('accountFollower/isAccountFollower', {
         myAddress: this.$store.state.profiles.currentUser.id,
@@ -101,19 +92,16 @@ export default class UserItem extends Vue {
     }
   }
 
-  getBalance (): void {
-    new Promise(resolve => resolve(this.userInfo.balance)
-    ).then((res) => {
-      this.balance = res as string
-    })
+  isAvatar (user: any): string | null {
+    return user.content ? user.content.avatar : user.avatar ? user.avatar : null
   }
 
-  isAvatar (user: ProfileData): string | null {
-    return user.content ? user.content.avatar : null
+  isName (user: any): string {
+    return user.content ? user.content.name : user.name ? user.name : null
   }
 
-  isName (user: ProfileData): string {
-    return user.content ? user.content.name : user.id
+  get isNotCurrentUser (): boolean {
+    return this.userInfo.id !== this.$store.state.profiles.currentUser.id
   }
 }
 </script>

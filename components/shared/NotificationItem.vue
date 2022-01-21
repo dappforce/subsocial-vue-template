@@ -1,15 +1,19 @@
 <template>
-  <div class="notification-container">
-    <Avatar :id="notification.account" :src="notification.avatarSrc" :size="46" :name="notification.userName" />
+  <div v-if="notification.profile" class="notification-container">
+    <Avatar :id="notification.profile.id" :src="notification.profile.avatar" :size="46" />
     <div class="notification-info">
       <div class="notification-text">
-        <span class="name">{{ notification.userName ? notification.userName : notification.account }}</span>
-        <span>{{ getMessage }}</span>
-        <span class="name">{{ getName }}</span>
+        <span class="name">
+          <Title :id="notification.profile.id" :link="'/accounts/'+ notification.profile.id" :name="notification.profile.name" size="medium" />
+        </span>
+        <span>{{ notification.activity.agg_count ? 'and ' + notification.activity.agg_count + ' other ' + aggregateMessage : '' }}{{ getMessage }}</span>
+        <span class="name">
+          <Title :id="notification.followingAccount ? notification.followingAccount.id : ''" :link="getUrl" :name="getName" size="medium" />
+        </span>
       </div>
       <span class="date">{{ toDate }}</span>
     </div>
-    <PostImage v-if="notification.imageUrl && notification.imageUrl.length" :image-src="notification.imageUrl" :link="'/'" />
+    <PostImage v-if="notification.post && notification.post.image && notification.post.image.length" :image-src="notification.post.image" :link="'/'" />
   </div>
 </template>
 
@@ -52,31 +56,53 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { NotificationEntity } from '~/models/enum/notification-entity.enum'
+import { pluralize } from '@subsocial/utils'
 import { OwnerNotificationEntity } from '~/models/enum/owner-notification-entity.enum'
+import { NotificationItemData } from '~/store/notifications'
+import { getPostLink } from '~/utils/utils'
 @Component
 export default class NotificationItem extends Vue {
   @Prop({
     type: Object
-  }) notification!: {}
+  }) notification!: NotificationItemData
 
-  // toDate () {
-  //   const days = 7
-  //   return Math.round(this.$dayjs().diff(this.$dayjs(this.notification.date), 'day', true)) < days
-  //     ? this.$dayjs(this.notification.date).fromNow()
-  //     : this.$dayjs(this.notification.date).format('MMM D, YYYY HH:mm A')
-  // }
-  //
-  // getMessage () {
-  //   return this.notification.isOwnerPost
-  //     ? OwnerNotificationEntity[this.notification.event]
-  //     : this.notification.isOwnerSpace
-  //       ? OwnerNotificationEntity[this.notification.event]
-  //       : NotificationEntity[this.notification.event]
-  // }
-  //
-  // getName () {
-  //   return this.notification.isOwnerPost ? this.notification.postName : this.notification.isOwnerSpace ? this.notification.spaceName : ''
-  // }
+  get toDate () {
+    const days = 7
+    return Math.round(this.$dayjs().diff(this.$dayjs(this.notification.activity.date), 'day', true)) < days
+      ? this.$dayjs(this.notification.activity.date).fromNow()
+      : this.$dayjs(this.notification.activity.date).format('MMM D, YYYY HH:mm A')
+  }
+
+  get getMessage () {
+    return OwnerNotificationEntity[this.notification.activity.event as any]
+  }
+
+  get getName () {
+    return this.notification.post
+      ? (this.notification.post?.title || this.notification.post?.summary || 'Shared post')
+      : this.notification.space
+        ? this.notification.space.name
+        : this.notification.followingAccount
+          ? (this.notification.followingAccount.name || this.notification.followingAccount.id)
+          : ''
+  }
+
+  get getUrl () {
+    return this.notification.post
+      ? getPostLink((this.notification.post?.spaceId || this.notification.post.id),
+        this.notification.post?.title || this.notification.post?.summary?.slice(0, 50) || 'Shared post',
+        this.notification.post?.id, false)
+      : this.notification.space
+        ? '/' + this.notification.space.id
+        : this.notification.followingAccount ? '/accounts/' + this.notification.activity.following_id : ''
+  }
+
+  getAccount () {
+    this.$store.dispatch('pro')
+  }
+
+  get aggregateMessage () {
+    return this.$options?.filters?.pluralize(this.notification.activity.agg_count, 'en', ['person', 'people']) + ' '
+  }
 }
 </script>

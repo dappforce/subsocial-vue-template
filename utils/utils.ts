@@ -8,25 +8,14 @@ import slug from 'slugify'
 import BN from 'bn.js'
 
 import { SubmittableResult } from '@polkadot/api'
+import { SharedPostStruct } from '@subsocial/api/flat-subsocial/flatteners'
 import { TransformDataArray } from '~/types/transform-dto'
 import { Content } from '~/types/content'
 
-// export const getStateEntityFromArray = <T>(
-//   array: Array<AnySubsocialData>,
-//   type: 'struct' | 'content' = 'struct'
-// ): StateEntity<T> => {
-//   const ids: string[] = []
-//   const entities: Entity<any> = {}
-//   array.map((elem) => {
-//     const id: string | undefined =
-//       type === 'struct' ? elem.struct.id.toString() : elem.struct.contentId
-//     if (id) {
-//       ids.push(id)
-//       entities[id] = elem[type]
-//     }
-//   })
-//   return { ids, entities }
-// }
+export function getNewIdFromEvent (txResult: SubmittableResult): BN | undefined {
+  const [newId] = getNewIdsFromEvent(txResult)
+  return newId
+}
 
 export const transformEntityDataArray = (
   array: Array<SpaceData> | Array<PostData>
@@ -64,9 +53,10 @@ export const sliceEntityArray = (
 export const getPostLink = (
   spaceHandle: string,
   title: string,
-  id: string
+  id: string,
+  isHandle: boolean
 ): string => {
-  return title ? `/@${spaceHandle}/${slug(title)}-${id}` : ''
+  return title ? `/${isHandle ? '@' : ''}${spaceHandle}/${slug(title)}-${id}` : ''
 }
 
 export function idToBn (id: AnyId): BN {
@@ -99,7 +89,6 @@ export function routerParamsLength (value: object) {
 
 export function getNewIdsFromEvent (txResult: SubmittableResult): BN[] {
   const newIds: BN[] = []
-
   txResult.events.find((event) => {
     const { event: { data, method } } = event
     if (method.includes('Created')) {
@@ -115,4 +104,32 @@ export function getNewIdsFromEvent (txResult: SubmittableResult): BN[] {
 
 export function getPostIdFromLink (link: string | null) {
   return link ? link.trim().split('-').pop() : ''
+}
+
+export function getIsPostOwner (ownerId: string, currentUseId: string | undefined): boolean {
+  if (currentUseId) {
+    return ownerId === currentUseId
+  }
+  return false
+}
+
+export function selectPostStructByIds (ids: string[], state: SharedPostStruct[]): SharedPostStruct[] {
+  const structs: SharedPostStruct[] = []
+  ids.forEach((id) => {
+    const struct = state.find(i => i.id === id)
+    if (struct) {
+      structs.push(struct)
+    }
+  })
+  return structs
+}
+
+export function isMobile () {
+  if (process.browser) {
+    if (window.innerWidth <= 760) {
+      return true
+    } else {
+      return false
+    }
+  } else { return false }
 }

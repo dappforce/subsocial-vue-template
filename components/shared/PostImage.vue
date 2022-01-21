@@ -1,6 +1,6 @@
 <template>
-  <NuxtLink v-if="imageSrc && imageSrc.length" :to="link">
-    <div class="post-image" :style="{ backgroundImage: 'url(' + imageSrc +')'}" />
+  <NuxtLink v-if="imageSrc && imageSrc.length" :to="localePath(link)">
+    <div class="post-image" :style="{ backgroundImage: 'url(' + url + imageSrc +')'}" />
   </NuxtLink>
 </template>
 
@@ -26,6 +26,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import { environment } from '~/environments/environment'
 
 @Component
 export default class PostImage extends Vue {
@@ -37,5 +38,7 @@ export default class PostImage extends Vue {
   @Prop({
     type: String
   }) imageSrc!: string
+
+  url: string = environment.ipfsUrl
 }
 </script>

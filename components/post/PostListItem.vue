@@ -1,18 +1,31 @@
 <template>
-  <div v-if="postItemData" class="post-item-wp">
+  <div v-if="post" class="post-item-wp">
     <v-card
       elevation="2"
       class="post-item"
     >
-      <div v-if="postItemData.hidden" class="hidden-post">
+      <div v-if="post.hiddenSpace && isPostOwner" class="hidden-post">
         <div class="alert-text">
           <v-icon color="#EFB041">
             mdi-alert-circle
-          </v-icon>This post is unlisted and only you can see it
+          </v-icon>{{ $t('generalMessages.hiddenPostBySpace') }}
         </div>
         <div class="unhidden-btn">
           <span class="make-visible">
-            Make visible
+            <ToggleVisibilityButton :space="{struct: {id: post.spaceId, hidden: post.hiddenSpace}}" :toggle-type="'space'" />
+          </span>
+        </div>
+      </div>
+
+      <div v-if="post.hidden && isPostOwner" class="hidden-post">
+        <div class="alert-text">
+          <v-icon color="#EFB041">
+            mdi-alert-circle
+          </v-icon>{{ $t('generalMessages.hiddenPost') }}
+        </div>
+        <div class="unhidden-btn">
+          <span class="make-visible">
+            <ToggleVisibilityButton :post="post" :toggle-type="'post'" />
           </span>
         </div>
       </div>
@@ -20,31 +33,31 @@
         <div class="post-data">
           <div class="post-item-header">
             <PostInfoItem
-              :post-item="postItemData"
+              :post-item="post"
             />
             <div class="button-wp">
-              <EditButton v-if="isPostOwner" :link="'post-edit/?post=' + postItemData.id" />
-              <OptionButton :post-id="postItemData.id" :account-id="postItemData.ownerId" />
+              <OptionButton :post-id="post.id" :account-id="post.ownerId" :post="post" :can-edit="isPostOwner" :toggle-type="'post'" />
             </div>
           </div>
-          <Title size="large" :link="postItemData.postLink" :name="postItemData.title" />
-          <Youtube v-if="postItemData.link" :link="postItemData.link" />
+          <Title size="large" :link="post.postLink" :name="post.title" />
+          <Youtube v-if="post.link" :link="post.link" />
           <Paragraph
-            :text="postItemData.summary"
-            :is-show-more="postItemData.isShowMore"
-            :link="postItemData.postLink"
+            v-if="post.summary.length"
+            :text="post.summary"
+            :is-show-more="post.isShowMore"
+            :link="post.postLink"
             margin-top="10"
           />
         </div>
 
-        <PostImage :image-src="postItemData.imageUrl" :link="postItemData.postLink" />
+        <PostImage :image-src="post.imageUrl" :link="post.postLink" />
       </div>
       <v-divider
         v-if="!isSharedPost"
         class="mx-4"
       />
       <div v-if="!isSharedPost" class="action-panel-wp">
-        <ActionPanel :id="postItemData.id" :is-show-label="false" :handle="postItemData.ownerId" :post="postItemData" />
+        <ActionPanel :id="post.id" :is-show-label="false" :handle="post.ownerId" :post="post" />
       </div>
     </v-card>
   </div>
@@ -56,7 +69,7 @@
   margin-top: $space_normal;
 
   .hidden-post {
-    margin: -$space_normal -$space_normal $space_normal;
+    margin: (-$space_normal) (-$space_normal) $space_normal;
     height: 40px;
     background: #FEFBE8;
     display: flex;
@@ -65,6 +78,7 @@
     padding: 0 $space_normal;
     color: $color_font_normal;
     font-size: $font_small;
+    border-bottom: 1px solid $color_warning_border;
 
     .v-icon {
       margin-right: 10px;
@@ -126,6 +140,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { PostListItemData } from '~/models/post/post-list-item.model'
+import { getIsPostOwner } from '~/utils/utils'
 
 @Component
 export default class PostListItem extends Vue {
@@ -143,12 +158,23 @@ export default class PostListItem extends Vue {
     type: String
   }) currentUserId!: string
 
-  get isPostOwner () {
-    if (this.currentUserId) {
-      return this.postItemData.ownerId === this.currentUserId
-    } else {
-      return false
-    }
+  isPostOwner: boolean = getIsPostOwner(this.postItemData.ownerId, this.currentUserId)
+  post: PostListItemData = this.postItemData
+
+  created () {
+    this.$store.subscribe((mutation) => {
+      if (mutation.type === 'posts/SET_LOADING_POST_ID' && mutation.payload === this.postItemData.id) {
+        this.post = this.$store.getters['posts/getPostInfo'](this.postItemData.id)
+      }
+    })
+
+    this.$store.subscribeAction({
+      after: (action) => {
+        if (action.type === 'posts/updateHiddenState' && action.payload.id === this.postItemData.id) {
+          this.post = this.$store.getters['posts/getPostInfo'](this.postItemData.id)
+        }
+      }
+    })
   }
 }
 </script>

@@ -1,7 +1,7 @@
 <template>
   <div class="vote-item-wp">
     <div>
-      <Avatar :id="userInfo.id" :src="userInfo.avatar" :size="40" :name="userInfo.name" />
+      <Avatar :id="userInfo.id" :src="userInfo.avatar" :size="40" />
 
       <div class="user-info-wp">
         <span class="user-name">{{ userInfo.name }}</span>
@@ -23,7 +23,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: $space_tiny 0;
+  padding: $space_tiny 5px;
 
   &>div {
     display: flex;
@@ -62,7 +62,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
-import { environment } from '~/environments/environment'
+import { config } from '~/config/config'
 
 @Component
 export default class VoteUserItem extends Vue {
@@ -76,7 +76,7 @@ export default class VoteUserItem extends Vue {
   }) type!: string
 
   balance: string = ''
-  addressLength: number = environment.addressLengthLong
+  addressLength: number = config.addressLengthLong
 
   @Watch('userInfo')
   userInfoHandler () {

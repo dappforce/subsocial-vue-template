@@ -21,11 +21,16 @@
 <style lang="scss">
 .tabs-container {
   height: 100%;
-  min-height: 48px;
+  min-height: 56px;
+  padding-top: $space_normal;
+  background-color: $color_page_bg;
+  margin-bottom: $space_normal;
 
   .v-tabs-bar {
     height: 100%;
-    min-height: 48px;
+    min-height: 56px;
+    box-shadow: $box_shadow_card;
+    width: $general_width;
   }
 
   .slider-color {
@@ -55,7 +60,7 @@
 </style>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
 @Component
 export default class Tabs extends Vue {
@@ -68,21 +73,24 @@ export default class Tabs extends Vue {
     default: 'mainPage'
   }) eventName!: string
 
-  tab: string = this.tabLinks[1]
+  @Watch('tabLinks')
+  tabLinksHandler (newVal: string[], oldVal: string[]) {
+    if (newVal !== oldVal) {
+      this.tab = this.tabLinks[0]
+      this.$nuxt.$emit(this.eventName, this.tab)
+    }
+  }
+
+  tab: string = this.tabLinks[0]
 
   mounted (): void {
-    if (this.$route.params.length) {
-      this.tab = this.tabLinks[0]
-    } else {
-      this.tab = this.$store.state.profiles.currentUser ? this.tabLinks[0] : this.tabLinks[0]
-    }
     this.$nuxt.$emit(this.eventName, this.tab)
   }
 
   created (): void {
-    this.$nuxt.$on('setTab', (data: string) => {
+    this.$nuxt.$on('setTab', () => {
       setTimeout(() => {
-        this.tab = data
+        this.tab = this.tabLinks[0]
       }, 100)
     })
   }

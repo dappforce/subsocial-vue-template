@@ -5,7 +5,7 @@
   >
     <v-card v-if="usersIds" class="v-modal-container">
       <v-card-title>
-        {{ usersIds.length }} Followers
+        {{ usersIds.length }} {{ usersIds.length | pluralize('en', [$tc('general.follower'), $tc('general.followers')]) }}
 
         <v-icon medium class="close-icon" @click="onClick">
           mdi-close
@@ -42,7 +42,7 @@
     }
 
     &::-webkit-scrollbar-thumb {
-      background-color: rgba(0, 0, 0, 0.12);;
+      background-color: $color_gray;
       width: 6px;
     }
 
@@ -70,7 +70,7 @@ export default class ModalFollower extends Vue {
 
   openModal: boolean = false
   usersIds: [] = []
-  tabs: string[] = ['upvotes', 'downvotes']
+  tabs: string[] = [this.$t('tabs.upvotes') as string, this.$t('tabs.downvotes') as string]
   activeTab: string = ''
 
   @Watch('isModal')

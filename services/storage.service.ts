@@ -1,5 +1,6 @@
 export const STORAGE_KEYS = {
-  accountId: 'accountId'
+  accountId: 'accountId',
+  spaceId: 'spaceId'
 }
 
 export default class StorageService {
@@ -13,5 +14,13 @@ export default class StorageService {
 
   removeAccountId () {
     localStorage.removeItem(STORAGE_KEYS.accountId)
+  }
+
+  setCurrentSpaceId (id: string) {
+    localStorage.setItem(STORAGE_KEYS.spaceId, id)
+  }
+
+  getCurrentSpaceId (): string {
+    return localStorage.getItem(STORAGE_KEYS.spaceId) || ''
   }
 }

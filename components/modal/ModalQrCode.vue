@@ -8,19 +8,19 @@
         mdi-close
       </v-icon>
       <div>
-        <span class="title">Account address</span>
+        <span class="title">{{ $t('modals.qrCode.title') }}</span>
         <qrcode-vue :value="address" :size="size" level="M" class="qr" />
         <span class="address">{{ address }}</span>
       </div>
       <div class="btn-container">
         <v-btn class="close-btn" @click="onClick">
-          Close
+          {{ $t('buttons.close') }}
         </v-btn>
         <v-btn class="copy-btn" @click="copyAddress">
           <v-icon :size="16">
             mdi-content-copy
           </v-icon>
-          Copy
+          {{ $t('buttons.copy') }}
         </v-btn>
       </div>
     </v-card>
@@ -126,10 +126,10 @@ export default class ModalQrCode extends Vue {
   async copyAddress () {
     try {
       await navigator.clipboard.writeText(this.address).then(() => {
-        this.$nuxt.$emit('isShowSnackbar', { show: true, text: 'Address copied!' })
+        this.$nuxt.$emit('isShowSnackbar', { show: true, text: this.$t('snackbars.addressCopied') })
       })
     } catch ($e) {
-      console.log('Cannot copy')
+      this.$nuxt.$emit('isShowSnackbar', { show: true, text: this.$t('snackbars.cannotCopy') })
     }
   }
 }

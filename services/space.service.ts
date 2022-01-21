@@ -2,7 +2,6 @@ import { AnyId } from '@subsocial/api/flat-subsocial/dto'
 import { FlatSubsocialApi } from '@subsocial/api/flat-subsocial'
 import BN from 'bn.js'
 import { SpaceId } from '@subsocial/types/substrate/interfaces'
-import { AnySpaceId } from '@subsocial/types'
 import SubsocialApiService from '~/services/subsocial-api.service'
 import { TransformData, TransformDataArray } from '~/types/transform-dto'
 import { Content } from '~/types/content'
@@ -20,6 +19,11 @@ export default class SpaceService {
     return transformEntityDataArray(spaceData)
   }
 
+  async getUnlistedSpaces (ids: AnyId[]): Promise<TransformDataArray> {
+    const spaceData = await (await this.getApi()).findUnlistedSpaces(ids)
+    return transformEntityDataArray(spaceData)
+  }
+
   async getSpace (id: string): Promise<TransformData | undefined> {
     const spaceData = await (await this.getApi()).findSpace({ id: new BN(id) })
     if (spaceData && spaceData.struct.contentId) {
@@ -28,7 +32,6 @@ export default class SpaceService {
         content: spaceData.content as Content
       }
       transformSpaceData.content.id = spaceData.struct.contentId
-
       return transformSpaceData
     }
 

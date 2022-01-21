@@ -25,4 +25,6 @@ export interface PostListItemData {
   link?: string;
   sharedPostId?: string;
   hidden?: boolean;
+  hiddenSpace?: boolean;
+  contentId: string;
 }

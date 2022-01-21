@@ -1,6 +1,7 @@
 <template>
   <div class="comments-wp">
     <v-divider
+      v-if="showDivider"
       class="mx-4 divider"
     />
     <div class="comments-counter">
@@ -9,25 +10,36 @@
 
     <div class="send-message-wp">
       <div class="avatar-wp">
-        <Avatar :id="id" :size="36" :src="avatarSrc" />
+        <Avatar :id="userId" :size="36" :src="avatarSrc" />
       </div>
 
       <div class="action-wp">
         <div class="text-area-wp">
+          <mde-editor
+            v-if="showEditor"
+            :show-editor="true"
+            :text="comment"
+            class="easy-mde"
+            :height="'30px'"
+            @contentUpdate="updateComment"
+          />
           <v-textarea
+            v-if="!showEditor"
             v-model="comment"
             auto-grow
             outlined
             rows="1"
             row-height="15"
             @focus="showButton"
-            @focusout="hideButton"
           />
           <span v-if="!showBtn" class="placeholder">Add a comment...</span>
         </div>
-        <v-btn v-if="showBtn" :disabled="!comment.length" class="send-button">
-          Send
-        </v-btn>
+        <div class="btn-container">
+          <SendCommentButton v-if="showBtn" :comment="comment" :root-post-id="id" @createdComment="addCommentToList" />
+          <v-btn v-if="showBtn" class="cancel-btn" @click="showButton">
+            {{ $t('buttons.cancel') }}
+          </v-btn>
+        </div>
       </div>
     </div>
     <BounceSpinner v-if="showSpinner" />
@@ -36,9 +48,11 @@
       v-for="(item, index) in commentsList"
       :id="id"
       :key="index"
-      :comment="item"
+      :comment-data="item"
       :handle="handle"
       :avatar-src="item.ownerImageUrl"
+      :is-post-owner="isPostOwner"
+      :user-id="userId"
     />
   </div>
 </template>
@@ -101,21 +115,29 @@
       width: 100%;
       margin-left: $space_tiny;
 
-      .send-button {
-        background-color: $color_primary;
-        border-radius: $border_small;
-        width: 78px;
-        height: $buttons_height;
-        color: $color_white;
-        text-align: center;
-        font-weight: normal;
-        margin-top: $space_tiny;
-        margin-bottom: $space_tiny;
-
-        &:disabled {
-          background-color: #F597CA!important;
-          color: $color_white !important;
+      .easy-mde {
+        .EasyMDEContainer .CodeMirror {
+          min-height: 30px;
         }
+
+        .CodeMirror-scroll {
+          min-height: 30px !important;
+        }
+
+        .editor-statusbar {
+          display: none;
+        }
+      }
+
+      .cancel-btn {
+        width: 78px !important;
+        font-size: $font_normal;
+        border: 1px solid #E0E0E0 !important;
+        border-radius: $border_small;
+        box-shadow: none;
+        text-transform: initial;
+        background-color: $color_white;
+        margin-left: $space_small;
       }
     }
   }
@@ -146,11 +168,26 @@ export default class Comment extends Vue {
     type: Number
   }) count!: number
 
+  @Prop({
+    type: Boolean,
+    default: false
+  }) isPostOwner!: boolean
+
+  @Prop({
+    type: Boolean,
+    default: true
+  }) showDivider!: boolean
+
+  @Prop({
+    type: String
+  }) userId!: string
+
   comment: string = ''
   showBtn: boolean = false
   commentIds: [] = []
   commentsList: PostListItemData[] = []
   showSpinner: boolean = true
+  showEditor: boolean = false
 
   created () {
     this.$store.dispatch('comment/getPostReplyId', this.id).then(() => {
@@ -169,19 +206,12 @@ export default class Comment extends Vue {
   }
 
   showButton (): void {
-    if (!this.comment.length) {
-      this.showBtn = true
-    }
-  }
-
-  hideButton (): void {
-    if (!this.comment.length) {
-      this.showBtn = false
-    }
+    this.showEditor = !this.showEditor
+    this.showBtn = !this.showBtn
   }
 
   async getNewPosts (ids: []) {
-    return await this.$store.dispatch('posts/getPostsByIds', { ids, type: 'public' })
+    return await this.$store.dispatch('posts/getPostsByIds', { ids, type: this.isPostOwner ? 'all' : 'public' })
   }
 
   addUniquePostToPostArray (postsDictionary: [], ids: []) {
@@ -190,6 +220,17 @@ export default class Comment extends Vue {
       .filter(post => post !== undefined)
     this.commentsList.push(...newPosts)
     this.showSpinner = false
+  }
+
+  updateComment (content: string): void {
+    this.comment = content
+  }
+
+  addCommentToList (content: PostListItemData): void {
+    this.commentsList.push(content)
+    this.showButton()
+    this.comment = ''
+    this.$store.dispatch('posts/getPostById', this.id)
   }
 }
 </script>

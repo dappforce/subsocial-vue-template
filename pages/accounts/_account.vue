@@ -1,6 +1,6 @@
 <template>
-  <div v-if="!showSpinner" class="account-container">
-    <ProfileItem :profile-data="accountData" :tabs-event="'accountPage'" />
+  <div class="account-container">
+    <ProfileItem v-if="!showSpinner" :profile-data="accountData" :tabs-event="'accountPage'" :is-owner="isOwner" :is-account-view="true" />
 
     <v-tabs-items v-model="currentTab">
       <v-tab-item
@@ -8,10 +8,8 @@
         :value="tabs[0]"
         class="items-list"
       >
-        <PostContainer v-if="currentTab === 'posts' && allPostsIds.length" :ids="allPostsIds" />
-        <div v-if="!allPostsIds.length && !showSpinner" class="no-posts">
-          No posts yet
-        </div>
+        <PostContainer v-if="currentTab === 'posts' && allPostsIds.length" :ids="allPostsIds" :type="isOwner ? 'all' : 'public'" />
+        <NoPosts v-if="!allPostsIds.length && !showSpinner" />
         <BounceSpinner v-if="showSpinner" />
       </v-tab-item>
 
@@ -25,6 +23,7 @@
           :key="index"
           :space-item-data="item"
           :current-user="currentUser"
+          :is-my-own-space="isOwner"
         />
         <div v-if="!spaces.length" class="no-posts">
           No spaces yet
@@ -40,28 +39,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  .no-posts {
-    color: $color_font_normal;
-    line-height: 125%;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    padding: 34px $space_normal;
-    justify-content: center;
-    background-color: $color_white;
-    box-shadow: $box_shadow_card;
-    border-radius: $border_small;
-    margin-top: $space_normal;
-    font-size: $font_normal;
-  }
 }
 </style>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { ProfileStruct } from '@subsocial/api/flat-subsocial/flatteners'
-import { routerParamsLength } from '~/utils/utils'
 
 @Component
 export default class Account extends Vue {
@@ -72,32 +55,20 @@ export default class Account extends Vue {
   allPostsIds: [] = []
   currentUser?: ProfileStruct
   showSpinner: boolean = false
+  isOwner: boolean = false
 
   created (): void {
     this.showSpinner = true
-    this.currentUser = this.$store.state.profiles.currentUser
     if (this.$store.state.loading.isLoading) {
       this.load()
     } else {
-      const unsubscribe = this.$store.subscribe((mutation) => {
-        if (mutation.type === 'profiles/SET_POLKADOT_ACCOUNTS') {
+      this.$store.subscribe((mutation) => {
+        if (mutation.type === 'profiles/SET_CURRENT_USER') {
           this.load().then(() => {
-            unsubscribe()
           })
         }
       })
     }
-
-    const unsubscribeSpaces = this.$store.subscribe((mutation, state) => {
-      if (mutation.type === 'space/SET_LOADING_ACCOUNT_SPACES' && !state.space.isLoading) {
-        this.getSpacesData().then((data) => {
-          this.spaces = data
-          unsubscribeSpaces()
-        })
-      }
-    })
-
-    this.$nuxt.$emit('isShowTabs', !routerParamsLength(this.$route.params))
 
     this.$nuxt.$on('accountPage', (data: string) => {
       this.currentTab = data
@@ -110,10 +81,14 @@ export default class Account extends Vue {
   }
 
   async load () {
+    this.currentUser = this.$store.state.profiles.currentUser
+    this.isOwner = this.$route.params.account === this.currentUser?.id
+
     return await this.$store.dispatch('profiles/getProfile', { id: this.$route.params.account }).then(() => {
       this.getAccount().then((data) => {
         this.accountData = data
         this.getSpaces().then(() => {
+          this.getSpacesData().then(data => this.spaces = data)
           this.$store.dispatch('posts/getAccountPosts', this.$store.state.space.accountSpaceIds).then(() => {
             setTimeout(() => {
               this.allPostsIds = this.$store.state.posts.accountPostsIds
@@ -134,7 +109,7 @@ export default class Account extends Vue {
   }
 
   async getSpaces () {
-    return await this.$store.dispatch('space/getSpacesByAccount', this.$route.params.account)
+    return await this.$store.dispatch('space/getSpacesByAccount', { id: this.$route.params.account, isOwner: this.isOwner })
   }
 }
 </script>

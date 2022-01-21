@@ -5,6 +5,15 @@ export type PolkadotAccount = {
   name: string;
 };
 
+export type Meta = {
+  name: string
+}
+
+export type PolkadotAccountWithMeta = {
+  address: string;
+  meta: Meta;
+};
+
 export type Balance = {
   accountId: any;
   freeBalance: any;
@@ -18,7 +27,7 @@ export type AccountData = {
 };
 
 export type AccountRawData = {
-  accounts: Array<PolkadotAccount>;
+  accounts: Array<PolkadotAccountWithMeta>;
   balances: Array<Balance>;
   profiles: Array<ProfileData>;
 };

@@ -1,10 +1,10 @@
 <template>
-  <NuxtLink :to="link" class="title" :class="size">
-    {{ name }}
+  <NuxtLink :to="localePath(link)" class="title" :class="size">
+    {{ nameOrId }}
   </NuxtLink>
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
 .title {
   font-weight: 500;
   font-size: $font_normal;
@@ -28,6 +28,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import { config } from '~/config/config'
 
 @Component
 export default class Title extends Vue {
@@ -45,5 +46,21 @@ export default class Title extends Vue {
     type: String,
     default: '/'
   }) link!: string
+
+  @Prop({
+    type: String
+  }) id!: string
+
+  addressLength: number = config.addressLengthLong
+
+  get nameOrId () {
+    if (this.name === this.id) {
+      return this.$root.$options.filters?.addressShortness(this.id, this.addressLength)
+    } else if (this.name.length > 0) {
+      return this.name
+    } else if (this.id) {
+      return this.$root.$options.filters?.addressShortness(this.id, this.addressLength)
+    }
+  }
 }
 </script>

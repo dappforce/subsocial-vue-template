@@ -18,4 +18,6 @@ export interface SpaceEntity {
   visiblePostsCount: number;
   followersCount: number;
   score: number;
+  image: string;
+  name: string;
 }
