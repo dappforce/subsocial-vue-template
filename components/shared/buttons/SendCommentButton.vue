@@ -13,11 +13,12 @@
     height: $buttons_height;
     color: $color_white;
     text-align: center;
-    font-weight: normal;
+    font-weight: 500;
     margin-top: $space_tiny;
     margin-bottom: $space_tiny;
     text-transform: capitalize;
     color: $color_white;
+    font-size: $font_normal;
 
     &:disabled {
       background-color: #F597CA !important;

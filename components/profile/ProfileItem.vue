@@ -43,8 +43,9 @@
 
       <div class="action-row">
         <SendTipsButton v-if="!isOwner" :user-id="profileData.id" />
-        <CreateSpaceButton v-if="isOwner" />
-        <FollowButton :follow="isFollowing" type="profile" :entity-id="profileData.id" />
+        <CreateSpaceButton v-if="isOwner" :is-have-space="isHaveSpace" />
+        <WritePostButton v-if="isOwner" :is-have-space="isHaveSpace" />
+        <FollowButton v-if="!isOwner" :follow="isFollowing" type="profile" :entity-id="profileData.id" />
       </div>
 
       <v-divider
@@ -166,8 +167,12 @@
     margin-bottom: $space_big;
     margin-top: $space_big;
 
-    & button, & a {
+    & button, & a, & .btn-tooltip-wrapper {
       width: calc(50% - 8px);
+    }
+
+    & .write-post-btn {
+      width: 100%;
     }
   }
 
@@ -198,8 +203,7 @@ export default class ProfileItem extends Vue {
   }) profileData!: ProfileItemModel
 
   @Prop({
-    type: Array,
-    default: () => ['posts', 'spaces']
+    type: Array
   }) tabLinks!: []
 
   @Prop({
@@ -214,7 +218,12 @@ export default class ProfileItem extends Vue {
   @Prop({
     type: Boolean,
     default: false
-  }) isAccountView!: string
+  }) isAccountView!: boolean
+
+  @Prop({
+    type: Boolean,
+    default: false
+  }) isHaveSpace!: boolean
 
   isOpenModal: boolean = false
   isFollowing: boolean = false
@@ -224,8 +233,9 @@ export default class ProfileItem extends Vue {
 
   created () {
     this.load()
+
     this.$store.subscribe((mutation) => {
-      if (mutation.type === 'profiles/UPDATE_PROFILES') {
+      if (mutation.type === 'profiles/SET_CURRENT_USER') {
         this.load()
       }
     })

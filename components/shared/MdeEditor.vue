@@ -26,12 +26,14 @@
 
 <script lang="ts">
 import { Component, Prop, Ref, Vue, Watch } from 'vue-property-decorator'
+import sanitizeHtml from 'sanitize-html'
 
 export interface Config {
   minHeight: string,
   placeholder: string,
   autofocus: boolean,
-  spellChecker: boolean
+  spellChecker: boolean,
+  previewRender: (text: string) => {}
 }
 
 @Component
@@ -81,7 +83,8 @@ export default class MdeEditor extends Vue {
       minHeight: this.height,
       placeholder: this.placeholder,
       autofocus: true,
-      spellChecker: false
+      spellChecker: false,
+      previewRender: (text: string) => sanitizeHtml(text)
     }
   }
 

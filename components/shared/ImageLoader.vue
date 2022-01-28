@@ -9,7 +9,7 @@
             color="#000"
             @change="loadImage"
           />
-          <span v-if="!previewImage">Upload</span>
+          <span v-if="!previewImage">{{ $t('general.upload') }}</span>
         </div>
         <span v-if="previewImage" class="delete-image">
           <v-icon @click="clearImage()">mdi-delete-outline</v-icon>
@@ -29,8 +29,8 @@
             hide-details="auto"
             @change="loadImage"
           />
-          <span v-if="!previewImage" class="upload-title">Upload cover image</span>
-          <span v-if="!previewImage" class="image-recommendations">Image should be less than 2 MB</span>
+          <span v-if="!previewImage" class="upload-title">{{ $t('generalMessages.uploadCoverImage') }}</span>
+          <span v-if="!previewImage" class="image-recommendations">{{ $t('imageShouldBeLessThanTwoMB') }}</span>
         </div>
       </div>
     </div>

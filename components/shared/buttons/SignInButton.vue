@@ -34,7 +34,7 @@ export default class SignInButton extends Vue {
   isOpenModal: boolean = false
 
   openModal () {
-    this.isOpenModal = !this.isOpenModal
+    this.$nuxt.$emit('isShowLoginModal', { isOpen: true, isLoginClicked: true })
   }
 }
 </script>

@@ -1,5 +1,5 @@
 export const config = {
-  appName: 'Subsocial Vue',
+  appName: 'vSocial',
   stepForLoading: 20,
   decimals: 11,
   currency: 'SUB',
@@ -7,7 +7,7 @@ export const config = {
   addressLengthLong: 17,
   imageSizeBytes: 2000000,
   subRate: 100000000000,
-  feedType: 'offChain',
+  isOffChainFeed: true,
   recommendedSpaceIds: ['1001', '1002', '1003', '1004', '1005', '1006', '1007', '1008', '1009', '1010', '1011', '1012', '1013', '1014', '1015', '1016', '1017']
   // recommendedSpaceIds: [
   //   '1',

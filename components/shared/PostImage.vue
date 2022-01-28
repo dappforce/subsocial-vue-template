@@ -1,6 +1,7 @@
 <template>
   <NuxtLink v-if="imageSrc && imageSrc.length" :to="localePath(link)">
-    <div class="post-image" :style="{ backgroundImage: 'url(' + url + imageSrc +')'}" />
+    <div v-if="!isFullView" class="post-image" :style="{ backgroundImage: 'url(' + url + imageSrc +')'}" />
+    <img v-if="isFullView" :src="url + imageSrc" class="post-image full-view">
   </NuxtLink>
 </template>
 
@@ -14,6 +15,13 @@
   background-size: cover;
   background-position: center;
   cursor: pointer;
+
+  &.full-view {
+    width: 100%;
+    height: auto;
+    margin-left: 0;
+    margin-top: $space_normal;
+  }
 }
 
 @media only screen and (max-width: 768px) {
@@ -38,6 +46,11 @@ export default class PostImage extends Vue {
   @Prop({
     type: String
   }) imageSrc!: string
+
+  @Prop({
+    type: Boolean,
+    default: false
+  }) isFullView!: boolean
 
   url: string = environment.ipfsUrl
 }

@@ -3,60 +3,57 @@
     <v-card>
       <v-navigation-drawer
         v-model="drawer"
-        :expand-on-hover="!isMobile()"
+        :expand-on-hover="!isMobileView"
         absolute
-        width="230"
+        width="220"
+        @transitionend="onDrawerChange"
       >
         <v-list class="px-5">
           <v-list-item link :href="links.reactApp">
             <v-list-item-icon>
               <img class="logo" src="../../assets/image/react-logo.svg" alt="React logo">
             </v-list-item-icon>
-            <v-list-item-title>React app</v-list-item-title>
+            <v-list-item-title>{{ $t('drawer.reactApp') }}</v-list-item-title>
           </v-list-item>
 
           <v-list-item link :href="links.angularApp">
             <v-list-item-icon>
               <img class="logo" src="../../assets/image/angular-logo.svg" alt="Angular logo">
             </v-list-item-icon>
-            <v-list-item-title>Angular app</v-list-item-title>
+            <v-list-item-title>{{ $t('drawer.angularApp') }}</v-list-item-title>
           </v-list-item>
-        </v-list>
 
-        <v-divider />
+          <v-divider />
 
-        <v-list
-          nav
-        >
           <v-list-item link :href="links.subsocial">
             <v-list-item-icon>
               <img class="logo" src="../../assets/image/subsocial-icon.svg" alt="Subsocial logo">
             </v-list-item-icon>
-            <v-list-item-title>Subsocial app</v-list-item-title>
+            <v-list-item-title>{{ $t('drawer.subsocialApp') }}</v-list-item-title>
           </v-list-item>
           <v-list-item link :href="links.landingPage">
             <v-list-item-icon>
               <v-icon>mdi-web</v-icon>
             </v-list-item-icon>
-            <v-list-item-title>Landing page</v-list-item-title>
+            <v-list-item-title>{{ $t('drawer.landingPage') }}</v-list-item-title>
           </v-list-item>
           <v-list-item link :href="links.legalDocuments">
             <v-list-item-icon>
               <v-icon>mdi-file-document-outline</v-icon>
             </v-list-item-icon>
-            <v-list-item-title>Legal Documents</v-list-item-title>
+            <v-list-item-title>{{ $t('drawer.legalDocuments') }}</v-list-item-title>
           </v-list-item>
           <v-list-item link :href="links.github">
             <v-list-item-icon>
               <v-icon>mdi-github</v-icon>
             </v-list-item-icon>
-            <v-list-item-title>Github</v-list-item-title>
+            <v-list-item-title>{{ $t('drawer.github') }}</v-list-item-title>
           </v-list-item>
           <v-list-item link :href="links.whatIsSubsocial">
             <v-list-item-icon>
               <v-icon>mdi-help-circle-outline</v-icon>
             </v-list-item-icon>
-            <v-list-item-title>What is Subsocial?</v-list-item-title>
+            <v-list-item-title>{{ $t('drawer.whatIsSubsocial') }}</v-list-item-title>
           </v-list-item>
         </v-list>
 
@@ -64,7 +61,7 @@
           <v-list-item class="bottom-title">
             <v-list-item-icon />
             <v-list-item-title class="social-title">
-              Our social links:
+              {{ $t('drawer.ourSocialLinks') }}
             </v-list-item-title>
           </v-list-item>
 
@@ -102,6 +99,10 @@
     height: 24px;
   }
 
+  & .v-divider {
+    margin: 0 16px;
+  }
+
   .v-list--nav .v-list-item:not(:last-child):not(:only-child) {
     margin-bottom: 0!important;
   }
@@ -113,6 +114,7 @@
       color: $color_dark_gray;
       font-weight: 500;
       line-height: 125%;
+      z-index: 10;
 
       &.social-title {
         font-weight: normal;
@@ -121,22 +123,32 @@
 
       .social-link {
         margin-right: $space_normal;
+        & img {
+          border: 1px solid transparent;
+        }
+        
+        &:hover img {
+          border-radius: 50%;
+          border-color: $color_hover_social_linK;
+        }
       }
+    }
+    
+    &__icon {
+      z-index: 10;
     }
 
     .twitter-link {
       margin-right: $space_normal;
       position: relative;
 
-      &::after {
-        content: '';
-        background-image: url("assets/image/3-dots.svg ");
-        width: 5px;
-        height: 15px;
-        display: block;
-        position: absolute;
-        right: -8px;
-        top: 8px;
+      & img {
+        border: 1px solid transparent;
+      }
+
+      &:hover img {
+        border-radius: 50%;
+        border-color: $color_hover_social_linK;
       }
     }
   }
@@ -173,17 +185,39 @@ import { isMobile } from '~/utils/utils'
 export default class LeftSideMenu extends Vue {
   links: {} = MenuLinks
   drawer: boolean = false
+  isMobileView: boolean = false
+  isSetMobile: boolean = false
 
   created () {
-    this.drawer = !isMobile()
-
     this.$nuxt.$on('openDrawer', (isOpen: boolean) => {
       this.drawer = isOpen
     })
+
+    if (process.browser) {
+      window.addEventListener('resize', this.getIsMobile)
+      this.getIsMobile()
+    }
   }
 
-  isMobile () {
+  getIsMobile () {
+    this.isMobileView = isMobile()
+    if (!isMobile()) {
+      this.drawer = true
+    } else if (!this.isSetMobile) {
+      this.drawer = false
+    }
+
+    if (window.innerWidth < 991 && !this.isSetMobile) {
+      this.isSetMobile = true
+    } else if (window.innerWidth > 991 && this.isSetMobile) {
+      this.isSetMobile = false
+    }
+
     return isMobile()
+  }
+
+  onDrawerChange () {
+    this.$nuxt.$emit('changeHeaderIcon', this.drawer)
   }
 }
 </script>

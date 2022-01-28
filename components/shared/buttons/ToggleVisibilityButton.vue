@@ -31,7 +31,7 @@ export default class ToggleVisibilityButton extends TransactionButton {
   }) toggleType!: string
 
   hidden: boolean | undefined = false
-  type: string = this.post ? this.postType(this.post) : this.$t('general.space') as string
+  type: string = this.toggleType === 'post' ? this.postType(this.post) : this.$t('general.space') as string
 
   created () {
     this.hidden = this.toggleType === 'post' ? this.post.hidden : this.space.struct.hidden

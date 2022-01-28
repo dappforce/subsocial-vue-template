@@ -2,7 +2,7 @@
   <div>
     <SpaceEdit v-if="havePermission" :is-edit="isEdit" :profile-item="profile" :is-profile="true" />
     <div v-if="!havePermission && profile" class="error">
-      You do not have permission to edit this profile
+      {{ $t('generalMessages.dontHavePermissionToEditProfile') }}
     </div>
     <BounceSpinner v-if="!havePermission && !profile" />
   </div>
@@ -31,7 +31,6 @@ export default class ProfilePage extends Vue {
           this.$store.dispatch('profiles/getProfile', { id: this.userId }).then(() => {
             this.getAccount().then((data) => {
               this.profile = data
-              this.profile?.contentId ? this.isEdit = true : this.isEdit = false
               this.isUserCanEdit()
               unsubscribe()
             })
@@ -43,6 +42,7 @@ export default class ProfilePage extends Vue {
 
   isUserCanEdit () {
     const user = this.$store.state.profiles.currentUser
+    this.isEdit = !!this.profile?.contentId
     if (user.id === this.profile?.id) {
       this.havePermission = !this.havePermission
     }

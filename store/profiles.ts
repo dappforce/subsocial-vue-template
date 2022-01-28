@@ -158,7 +158,7 @@ export const actions = {
     dispatch('subscribeOnBalance', account.id)
     dispatch('getProfile', { id: account.id, isSetAccount: true })
 
-    if (config.feedType === 'offChain') {
+    if (config.isOffChainFeed) {
       await dispatch('feeds/getFeedCount', account.id, { root: true })
       await dispatch('feeds/getFeedIds', { id: account.id, offset: 0 }, { root: true })
     } else {

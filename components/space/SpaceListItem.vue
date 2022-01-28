@@ -8,7 +8,8 @@
         <div class="alert-text">
           <v-icon color="#EFB041">
             mdi-alert-circle
-          </v-icon>This space is unlisted and only you can see it
+          </v-icon>
+          {{ $t('generalMessages.hiddenSpace') }}
         </div>
         <div class="unhidden-btn">
           <span class="make-visible">
@@ -22,9 +23,15 @@
           :avatar-size="avatarSize"
         />
         <div class="button-wp">
-          <EditButton v-if="isMyOwnSpace && isSpaceView && !isMobileScreen()" :link="'/space?space=' + spaceItemData.struct.id" />
           <FollowButton v-if="!isSpaceView" :follow="isFollowing" class="follow-btn" type="space" :entity-id="spaceItemData.struct.id" />
-          <OptionButton :no-reactions="true" :space="spaceItemData" :can-edit="isMyOwnSpace" :toggle-type="'space'" :is-space-view="isSpaceView" />
+          <OptionButton
+            :no-reactions="true"
+            :space="spaceItemData"
+            :can-edit="isMyOwnSpace"
+            :toggle-type="'space'"
+            :is-space-view="isSpaceView"
+            :follow="isFollowing"
+          />
         </div>
       </div>
       <div v-if="space.content.summary.length" class="description">
@@ -42,9 +49,10 @@
         <Tag v-for="tag in space.content.tags" :key="tag" :tag-name="tag" size="medium" />
       </div>
       <div v-if="isSpaceView" class="action-row">
+        <EditSpaceButton v-if="isMyOwnSpace" :space-id="space.struct.id" />
         <SendTipsButton v-if="!isMyOwnSpace" :user-id="space.struct.ownerId" />
         <WritePostButton v-if="isMyOwnSpace" :space-id="space.struct.id" />
-        <FollowButton :follow="isFollowing" type="space" :entity-id="space.struct.id" />
+        <FollowButton v-if="!isMyOwnSpace" :follow="isFollowing" type="space" :entity-id="space.struct.id" />
       </div>
     </v-card>
   </div>
@@ -129,8 +137,12 @@
       justify-content: space-between;
       margin-top: 22px;
 
-      & button, & a {
+      & button, & a, & .btn-tooltip-wrapper {
         width: calc(50% - 8px);
+      }
+
+      & .write-post-btn {
+        width: 100%;
       }
     }
   }

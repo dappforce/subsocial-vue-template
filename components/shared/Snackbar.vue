@@ -1,15 +1,17 @@
 <template>
-  <v-snackbar
-    v-model="snackbar"
-    :timeout="timeout"
-    fixed
-    bottom
-    color="#fff"
-    class="snack"
-    left
-  >
-    {{ text }}
-  </v-snackbar>
+  <div data-app>
+    <v-snackbar
+      v-model="snackbar"
+      :timeout="timeout"
+      fixed
+      bottom
+      color="#fff"
+      class="snack"
+      left
+    >
+      {{ text }}
+    </v-snackbar>
+  </div>
 </template>
 
 <style lang="scss">

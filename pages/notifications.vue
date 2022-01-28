@@ -1,7 +1,7 @@
 <template>
   <v-card class="notification">
     <div class="header">
-      Notifications
+      {{ $t('notificationItem.title') }}
     </div>
     <NotificationItem
       v-for="(item, index) in notifications"

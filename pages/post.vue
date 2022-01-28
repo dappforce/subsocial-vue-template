@@ -2,7 +2,8 @@
   <div>
     <PostEdit v-if="havePermission" :is-edit="isEdit" :post-item="post" />
     <div v-if="!havePermission && post" class="error">
-      You do not have permission to edit this post
+      <img src="../assets/image/alert.svg" alt="Alert">
+      {{ $t('generalMessages.dontHavePermissionToEditPost') }}
     </div>
     <BounceSpinner v-if="!havePermission && !post" />
   </div>

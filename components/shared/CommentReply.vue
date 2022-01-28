@@ -1,6 +1,6 @@
 <template>
   <div class="reply-container">
-    <Avatar :id="currentUser.id" :size="36" :src="currentUser.avatar" />
+    <Avatar v-if="currentUser" :id="currentUser.id" :size="36" :src="currentUser.avatar" />
     <div class="text-area-wp">
       <mde-editor
         v-if="showEditor"
@@ -20,7 +20,7 @@
         row-height="15"
         @focus="showButton"
       />
-      <span v-if="!showBtn" class="placeholder">Add a reply...</span>
+      <span v-if="!showBtn" class="placeholder">{{ $t('post.addReply') }}</span>
       <SendCommentButton v-if="showBtn" :comment="comment" :root-post-id="id" :parent-comment-id="parentCommentId" @createdComment="addCommentToList" />
       <v-btn class="cancel-btn" @click="onCancel">
         {{ $t('buttons.cancel') }}

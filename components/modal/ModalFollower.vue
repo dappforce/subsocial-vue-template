@@ -1,24 +1,26 @@
 <template>
-  <v-dialog
-    v-model="openModal"
-    max-width="500px"
-  >
-    <v-card v-if="usersIds" class="v-modal-container">
-      <v-card-title>
-        {{ usersIds.length }} {{ usersIds.length | pluralize('en', [$tc('general.follower'), $tc('general.followers')]) }}
+  <div data-app>
+    <v-dialog
+      v-model="openModal"
+      max-width="500px"
+    >
+      <v-card v-if="usersIds" class="v-modal-container">
+        <v-card-title>
+          {{ usersIds.length }} {{ usersIds.length | pluralize('en', [$tc('general.follower'), $tc('general.followers')]) }}
 
-        <v-icon medium class="close-icon" @click="onClick">
-          mdi-close
-        </v-icon>
-      </v-card-title>
+          <v-icon class="close-icon" @click="onClick">
+            mdi-close
+          </v-icon>
+        </v-card-title>
 
-      <v-card flat>
-        <v-card-text>
-          <ModalInfinityScrollContainer :user-ids="usersIds" />
-        </v-card-text>
+        <v-card flat>
+          <v-card-text>
+            <ModalInfinityScrollContainer :user-ids="usersIds" />
+          </v-card-text>
+        </v-card>
       </v-card>
-    </v-card>
-  </v-dialog>
+    </v-dialog>
+  </div>
 </template>
 
 <style lang="scss">
