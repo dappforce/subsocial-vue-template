@@ -27,8 +27,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 @Component
 export default class NoPosts extends Vue {
   @Prop({
-    type: String,
-    default: 'No posts yet'
+    type: String
   }) message!: string
 }
 </script>

@@ -1,50 +1,52 @@
 <template>
-  <v-dialog
-    v-model="openModal"
-    max-width="500px"
-    @click:outside="clickOutside"
-  >
-    <v-card v-if="reactions" class="v-modal-container">
-      <v-card-title>
-        {{ reactions.length }} {{ reactions.length | pluralize('en', [$tc('modals.likes.reaction'), $tc('modals.likes.reactions')]) }}
+  <div data-app>
+    <v-dialog
+      v-model="openModal"
+      max-width="500px"
+      @click:outside="clickOutside"
+    >
+      <v-card class="v-modal-container">
+        <v-card-title>
+          {{ reactions.length }} {{ reactions.length | pluralize('en', [$tc('modals.likes.reaction'), $tc('modals.likes.reactions')]) }}
 
-        <v-icon medium class="close-icon" @click="onClick">
-          mdi-close
-        </v-icon>
-      </v-card-title>
-      <v-card>
-        <v-tabs
-          v-if="upvote && downvote"
-          v-model="activeTab"
-          grow
-          centered
-        >
-          <v-tabs-slider class="slider-color" />
-          <v-tab
-            v-for="(i, index) in tabs"
-            :key="i"
-            :href="`#tab-${i}`"
+          <v-icon class="close-icon" @click="onClick">
+            mdi-close
+          </v-icon>
+        </v-card-title>
+        <v-card>
+          <v-tabs
+            v-if="upvote && downvote"
+            v-model="activeTab"
+            grow
+            centered
           >
-            {{ i }} <span class="votes-count">{{ index === 0 ? upvote.length : downvote.length }}</span>
-          </v-tab>
-        </v-tabs>
+            <v-tabs-slider class="slider-color" />
+            <v-tab
+              v-for="(i, index) in tabs"
+              :key="i"
+              :href="`#tab-${i}`"
+            >
+              {{ i }} <span class="votes-count">{{ index === 0 ? upvote.length : downvote.length }}</span>
+            </v-tab>
+          </v-tabs>
 
-        <v-tabs-items v-model="activeTab">
-          <v-tab-item
-            v-for="(i, index) in tabs"
-            :key="i"
-            :value="`tab-${i}`"
-          >
-            <v-card flat>
-              <v-card-text>
-                <ModalInfinityScrollContainer :user-ids="index === 0 ? upvote : downvote" />
-              </v-card-text>
-            </v-card>
-          </v-tab-item>
-        </v-tabs-items>
+          <v-tabs-items v-model="activeTab">
+            <v-tab-item
+              v-for="(i, index) in tabs"
+              :key="i"
+              :value="`tab-${i}`"
+            >
+              <v-card flat>
+                <v-card-text>
+                  <ModalInfinityScrollContainer :user-ids="index === 0 ? upvote : downvote" />
+                </v-card-text>
+              </v-card>
+            </v-tab-item>
+          </v-tabs-items>
+        </v-card>
       </v-card>
-    </v-card>
-  </v-dialog>
+    </v-dialog>
+  </div>
 </template>
 
 <style lang="scss">
@@ -124,7 +126,7 @@ export default class ModalLikes extends Vue {
   tabs: string[] = [this.$t('tabs.upvotes') as string, this.$t('tabs.downvotes') as string]
   activeTab: string = ''
   currentUser: undefined
-  reactions: any = null
+  reactions: any = []
   upvote: string[] = []
   downvote: string[] = []
 

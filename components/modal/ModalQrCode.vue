@@ -1,30 +1,32 @@
 <template>
-  <v-dialog
-    v-model="openModal"
-    max-width="328"
-  >
-    <v-card class="qr-container">
-      <v-icon medium class="close-icon" size="24" @click="onClick">
-        mdi-close
-      </v-icon>
-      <div>
-        <span class="title">{{ $t('modals.qrCode.title') }}</span>
-        <qrcode-vue :value="address" :size="size" level="M" class="qr" />
-        <span class="address">{{ address }}</span>
-      </div>
-      <div class="btn-container">
-        <v-btn class="close-btn" @click="onClick">
-          {{ $t('buttons.close') }}
-        </v-btn>
-        <v-btn class="copy-btn" @click="copyAddress">
-          <v-icon :size="16">
-            mdi-content-copy
-          </v-icon>
-          {{ $t('buttons.copy') }}
-        </v-btn>
-      </div>
-    </v-card>
-  </v-dialog>
+  <div data-app>
+    <v-dialog
+      v-model="openModal"
+      max-width="328"
+    >
+      <v-card class="qr-container">
+        <v-icon class="close-icon" size="24" @click="onClick">
+          mdi-close
+        </v-icon>
+        <div>
+          <span class="title">{{ $t('modals.qrCode.title') }}</span>
+          <qrcode-vue :value="address" :size="size" level="M" class="qr" />
+          <span class="address">{{ address }}</span>
+        </div>
+        <div class="btn-container">
+          <v-btn class="close-btn" @click="onClick">
+            {{ $t('buttons.close') }}
+          </v-btn>
+          <v-btn class="copy-btn" @click="copyAddress">
+            <v-icon :size="16">
+              mdi-content-copy
+            </v-icon>
+            {{ $t('buttons.copy') }}
+          </v-btn>
+        </div>
+      </v-card>
+    </v-dialog>
+  </div>
 </template>
 
 <style lang="scss">

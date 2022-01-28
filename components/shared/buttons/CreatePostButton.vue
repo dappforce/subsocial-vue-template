@@ -12,7 +12,6 @@
   border-radius: $border_small;
   background-color: $color_white !important;
   box-shadow: none;
-  margin-right: $space_large;
 
   .v-btn__content {
     font-weight: 500;
@@ -28,7 +27,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 
 @Component
-export default class CreatePostButton extends Vue {
+export default class CreateSpaceButtonComponentCreatePostButton extends Vue {
   onClick () {
     this.$router.push(this.$nuxt.localePath('/post?new'))
   }

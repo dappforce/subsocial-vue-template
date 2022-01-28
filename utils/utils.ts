@@ -126,7 +126,7 @@ export function selectPostStructByIds (ids: string[], state: SharedPostStruct[])
 
 export function isMobile () {
   if (process.browser) {
-    if (window.innerWidth <= 760) {
+    if (window.innerWidth <= 991) {
       return true
     } else {
       return false

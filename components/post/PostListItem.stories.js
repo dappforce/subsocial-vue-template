@@ -1,5 +1,3 @@
-import avatar from '../../assets/image/avatar1.png'
-import imageURL from '../../assets/image/post-image-example.png'
 import PostListItemComponent from '~/components/post/PostListItem'
 
 export default {
@@ -22,7 +20,7 @@ PostItem.args = {
     createdAtTime: '1632837930000',
     downvotesCount: 0,
     hiddenRepliesCount: 0,
-    imageUrl: imageURL,
+    imageUrl: 'QmYS7oGo1FNFCmik9U2mpvabjCgGMUNDe623P9djLtnhbd',
     isComment: false,
     isSharedPost: false,
     isShowMore: false,
@@ -32,7 +30,7 @@ PostItem.args = {
     repliesCount: 0,
     sharesCount: 0,
     spaceId: '1',
-    spaceName: 'subsocial',
+    spaceName: 'Subsocial',
     summary:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod ... ',
     tags: ['FAQ', 'SEO', 'UX', 'Feature'],

@@ -5,21 +5,32 @@ export default {
   general: {
     title: `${config.appName}`,
     post: 'post',
+    posts: 'posts',
     space: 'space',
+    profile: 'profile',
     comment: 'comment',
+    comments: 'comments',
     edit: 'Edit',
     new: 'New',
     follower: 'Follower',
-    followers: 'Followers'
+    followers: 'Followers',
+    following: 'Following',
+    seeMore: 'See more',
+    seeLess: 'See less',
+    person: 'person',
+    people: 'people',
+    upload: 'Upload'
   },
   tabs: {
-    following: 'FOLLOWING',
-    followers: 'FOLLOWERS',
+    following: 'following',
+    followers: 'followers',
     upvotes: 'upvotes',
     downvotes: 'downvotes',
     posts: 'posts',
     spaces: 'spaces',
-    feed: 'feed'
+    feed: 'feed',
+    article: 'article',
+    video: 'video'
   },
   buttons: {
     cancel: 'Cancel',
@@ -35,6 +46,7 @@ export default {
     viewReactions: 'View reactions',
     viewOnIPFS: 'View on IPFS',
     reply: 'Reply',
+    replies: 'replies',
     send: 'Send',
     update: 'Update',
     share: 'Share',
@@ -77,14 +89,18 @@ export default {
     },
     login: {
       title: 'Sign In',
+      waitSec: 'Wait a sec...',
       accountScreen: {
-        message: 'Click on your account to sign in:'
+        message: 'Click on your account to sign in:',
+        notLoginMessage: 'You need to sign in to access this functionality. Click on your account below:'
       },
       noAccountScreen: {
-        message: 'No accounts found. Please open your <b>Polkadot extension</b> and create a new account or import existing. Then reload this page.'
+        message: 'No accounts found. Please open your <b>Polkadot extension</b> and create a new account or import existing. Then reload this page.',
+        notLoginMessage: 'You need to sign in to access this functionality.'
       },
       noExtension: {
         message: '<span>Polkadot Extension</span> was not found or disabled. Install the extension with the button below.',
+        notLoginMessage: 'To continue connect with <span>Polkadot Extension</span>. </br>Enable extension with the button below.',
         installForChrome: 'Install for Chrome',
         installForFirefox: 'Install for Firefox',
         needHelp: 'Need help? Read our',
@@ -98,7 +114,8 @@ export default {
   },
   post: {
     sharePost: 'Share post',
-    addComment: 'Add a comment...'
+    addComment: 'Add a comment...',
+    addReply: 'Add a reply...'
   },
   forms: {
     validations: {
@@ -107,11 +124,15 @@ export default {
     },
     fieldName: {
       description: 'Description',
-      tags: 'Tags'
+      postTitle: 'Post title',
+      tags: 'Tags',
+      videoUrl: 'Video URL',
+      spaceProfileName: '{type} name'
     },
     placeholder: {
       postBody: 'Post body',
-      tags: 'Press \'Enter\' or \'Tab\' key to add tags'
+      tags: 'Press \'Enter\' or \'Tab\' key to add tags',
+      postInSpace: 'Post in a space'
     },
     permissions: {
       whoCanPost: {
@@ -124,19 +145,20 @@ export default {
   generalMessages: {
     hiddenPostBySpace: 'This post is not visible because its space is hidden',
     hiddenPost: 'This post is unlisted and only you can see it',
-    emptyFeed: 'Your feed is empty. Try to follow more spaces ;)'
-  },
+    hiddenSpace: 'This space is unlisted and only you can see it',
+    emptyFeed: 'Your feed is empty. Try to follow more spaces ;)',
+    uploadCoverImage: 'Upload cover image',
+    dontHavePermissionToEditPost: 'You do not have permission to edit this post',
+    dontHavePermissionToEditProfile: 'You do not have permission to edit this profile',
+    dontHavePermissionToEditSpace: 'You do not have permission to edit this space',
+    noPostYet: 'No posts yet',
+    noSpaceYet: 'No spaces yet'
 
-  formHints: {
-    whoCanPost: {
-      space_owner: 'Only you can create and edit posts in this space.',
-      follower: 'You and followers of this space can create and edit own posts.',
-      everyone: 'Everyone can create and edit their own posts in this space.',
-      none: 'None can create or edit posts in this space.'
-    },
-    embedded: 'You can embed links from YouTube, Vimeo and SoundCloud.'
   },
-
+  notificationItem: {
+    message: 'and {count} other {message}',
+    title: 'Notifications'
+  },
   notifications: {
     AccountFollowed: 'followed your account',
     SpaceFollowed: 'followed your space',
@@ -148,6 +170,34 @@ export default {
     PostReactionCreated: 'reacted to your post',
     CommentReactionCreated: 'reacted to your comment on'
   },
+  drawer: {
+    myProfile: 'My profile',
+    editMyProfile: 'Edit my profile',
+    settings: 'Settings',
+    signOut: 'Sign Out',
+    reactApp: 'React app',
+    angularApp: 'Angular app',
+    subsocialApp: 'Subsocial app',
+    landingPage: 'Landing page',
+    legalDocuments: 'Legal Documents',
+    github: 'Github',
+    whatIsSubsocial: 'What is Subsocial?',
+    ourSocialLinks: 'Our social links:',
+    language: 'Language'
+  },
+
+  // unused
+
+  formHints: {
+    whoCanPost: {
+      space_owner: 'Only you can create and edit posts in this space.',
+      follower: 'You and followers of this space can create and edit own posts.',
+      everyone: 'Everyone can create and edit their own posts in this space.',
+      none: 'None can create or edit posts in this space.'
+    },
+    embedded: 'You can embed links from YouTube, Vimeo and SoundCloud.'
+  },
+
   activities: {
     AccountFollowed: 'followed the account',
     SpaceFollowed: 'followed the space',

@@ -1,49 +1,51 @@
 <template>
-  <v-dialog
-    v-model="openModal"
-    max-width="500px"
-  >
-    <v-card class="v-modal-container">
-      <v-card-title>
-        {{ $t('modals.connections.connections') }}
+  <div data-app>
+    <v-dialog
+      v-model="openModal"
+      max-width="500px"
+    >
+      <v-card class="v-modal-container">
+        <v-card-title>
+          {{ $t('modals.connections.connections') }}
 
-        <v-icon medium class="close-icon" @click="onClick">
-          mdi-close
-        </v-icon>
-      </v-card-title>
-      <v-card>
-        <v-tabs
-          v-model="activeTab"
-          grow
-          centered
-          slider-color="yellow"
-        >
-          <v-tabs-slider class="slider-color" />
-          <v-tab
-            v-for="(i, index) in tabs"
-            :key="i"
-            :href="`#tab-${i}`"
+          <v-icon class="close-icon" @click="onClick">
+            mdi-close
+          </v-icon>
+        </v-card-title>
+        <v-card>
+          <v-tabs
+            v-model="activeTab"
+            grow
+            centered
+            slider-color="yellow"
           >
-            {{ i }} <span class="votes-count">{{ index === 0 ? followingUserIds.length : followersUserIds.length }}</span>
-          </v-tab>
-        </v-tabs>
+            <v-tabs-slider class="slider-color" />
+            <v-tab
+              v-for="(i, index) in tabs"
+              :key="i"
+              :href="`#tab-${i}`"
+            >
+              {{ i }} <span class="votes-count">{{ index === 0 ? followingUserIds.length : followersUserIds.length }}</span>
+            </v-tab>
+          </v-tabs>
 
-        <v-tabs-items v-if="openModal" v-model="activeTab">
-          <v-tab-item
-            v-for="(i, index) in tabs"
-            :key="i"
-            :value="`tab-${i}`"
-          >
-            <v-card flat>
-              <v-card-text>
-                <ModalInfinityScrollContainer :user-ids="index === 0 ? followingUserIds : followersUserIds" :type="'connections'" />
-              </v-card-text>
-            </v-card>
-          </v-tab-item>
-        </v-tabs-items>
+          <v-tabs-items v-if="openModal" v-model="activeTab">
+            <v-tab-item
+              v-for="(i, index) in tabs"
+              :key="i"
+              :value="`tab-${i}`"
+            >
+              <v-card flat>
+                <v-card-text>
+                  <ModalInfinityScrollContainer :user-ids="index === 0 ? followingUserIds : followersUserIds" :type="'connections'" />
+                </v-card-text>
+              </v-card>
+            </v-tab-item>
+          </v-tabs-items>
+        </v-card>
       </v-card>
-    </v-card>
-  </v-dialog>
+    </v-dialog>
+  </div>
 </template>
 
 <style lang="scss">

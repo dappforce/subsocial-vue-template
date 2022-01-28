@@ -32,7 +32,7 @@
   .container {
     width: 100%;
     box-sizing: border-box;
-    padding: 0 14px;
+    padding: 56px 14px 0;
   }
 }
 </style>

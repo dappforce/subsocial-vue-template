@@ -6,7 +6,7 @@
         <span class="name">
           <Title :id="notification.profile.id" :link="'/accounts/'+ notification.profile.id" :name="notification.profile.name" size="medium" />
         </span>
-        <span>{{ notification.activity.agg_count ? 'and ' + notification.activity.agg_count + ' other ' + aggregateMessage : '' }}{{ getMessage }}</span>
+        <span>{{ notification.activity.agg_count ? $t('notificationItem.message', {count: notification.activity.agg_count, message: aggregateMessage}) : '' }}{{ getMessage }}</span>
         <span class="name">
           <Title :id="notification.followingAccount ? notification.followingAccount.id : ''" :link="getUrl" :name="getName" size="medium" />
         </span>
@@ -74,7 +74,7 @@ export default class NotificationItem extends Vue {
   }
 
   get getMessage () {
-    return OwnerNotificationEntity[this.notification.activity.event as any]
+    return this.$t('notifications.' + this.notification.activity.event)
   }
 
   get getName () {
@@ -97,12 +97,8 @@ export default class NotificationItem extends Vue {
         : this.notification.followingAccount ? '/accounts/' + this.notification.activity.following_id : ''
   }
 
-  getAccount () {
-    this.$store.dispatch('pro')
-  }
-
   get aggregateMessage () {
-    return this.$options?.filters?.pluralize(this.notification.activity.agg_count, 'en', ['person', 'people']) + ' '
+    return this.$options?.filters?.pluralize(this.notification.activity.agg_count, 'en', [this.$tc('general.person'), this.$tc('general.people')]) + ' '
   }
 }
 </script>

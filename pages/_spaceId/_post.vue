@@ -8,9 +8,7 @@
         <div class="post-main-wp">
           <div class="post-data">
             <div class="post-item-header">
-              <PostInfoItem
-                :post-item="post"
-              />
+              <PostInfoItem :post-item="post" />
 
               <div class="button-wp">
                 <EditButton v-if="isPostOwner && !isMobileScreen()" :link="'/post/?post=' + post.id" />
@@ -28,6 +26,7 @@
             <Title size="large" :link="post.postLink" :name="post.title" />
 
             <Youtube v-if="post.link" :link="post.link" />
+            <PostImage :image-src="post.imageUrl" :link="post.postLink" :is-full-view="true" />
 
             <p class="markdown-body" v-html="$md.render(post.body, {html: true})" />
 
@@ -46,7 +45,6 @@
               <Tag v-for="(item, index) in post.tags" :key="index" :tag-name="item" size="medium" />
             </div>
           </div>
-          <PostImage :image-src="post.imageUrl" :link="post.postLink" />
         </div>
         <v-divider
           class="mx-4"

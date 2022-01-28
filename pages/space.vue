@@ -2,7 +2,7 @@
   <div>
     <SpaceEdit v-if="havePermission" :is-edit="isEdit" :space-item="space" />
     <div v-if="!havePermission && space" class="error">
-      You do not have permission to edit this space
+      {{ $t('generalMessages.dontHavePermissionToEditSpace') }}
     </div>
     <BounceSpinner v-if="!havePermission && !space" />
   </div>

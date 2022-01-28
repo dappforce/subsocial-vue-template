@@ -35,7 +35,7 @@
             <PostInfoItem
               :post-item="post"
             />
-            <div class="button-wp">
+            <div v-if="!isSharedPost" class="button-wp">
               <OptionButton :post-id="post.id" :account-id="post.ownerId" :post="post" :can-edit="isPostOwner" :toggle-type="'post'" />
             </div>
           </div>

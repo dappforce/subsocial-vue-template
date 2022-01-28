@@ -1,125 +1,150 @@
 <template>
-  <v-navigation-drawer
-    v-model="drawer"
-    class="drawer-container"
-    right
-    temporary
-  >
-    <div class="user-info">
-      <div class="close" @click="closeDrawer">
-        <v-icon size="24">
-          mdi-close
-        </v-icon>
-      </div>
-      <div class="profile-info-wp">
-        <Avatar :id="user.id" :src="user.avatar" :size="40" :name="user.name" />
-        <div class="info-container">
-          <div class="profile-name-wp">
-            <Title :id="user.id" size="large" :name="user.name" :link="'/accounts/' + user.id" />
-          </div>
-          <div class="profile-stats-wp">
-            <span @click="openModal"><b>{{ user.followingCount | numeral('0,0a') }}</b> {{ user.followingCount | pluralize('en', ['Following', 'Following']) }}</span>
-            <span @click="openModal"><b>{{ user.followersCount | numeral('0,0a') }}</b> {{ user.followersCount | pluralize('en', ['Follower', 'Followers']) }}</span>
+  <div data-app>
+    <v-navigation-drawer
+      v-model="drawer"
+      class="drawer-container"
+      right
+      temporary
+    >
+      <div class="user-info">
+        <div class="close" @click="closeDrawer">
+          <v-icon size="24">
+            mdi-close
+          </v-icon>
+        </div>
+        <div class="profile-info-wp">
+          <Avatar :id="user.id" :src="user.avatar" :size="40" :name="user.name" />
+          <div class="info-container">
+            <div class="profile-name-wp">
+              <Title :id="user.id" size="large" :name="user.name" :link="'/accounts/' + user.id" />
+            </div>
+            <div class="profile-stats-wp">
+              <span @click="openModal"><b>{{ user.followingCount | numeral('0,0a') }}</b> {{ user.followingCount | pluralize('en', [$t('general.following'), $t('general.following')]) }}</span>
+              <span @click="openModal"><b>{{ user.followersCount | numeral('0,0a') }}</b> {{ user.followersCount | pluralize('en', [$t('general.follower'), $t('general.followers')]) }}</span>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="account-info-wp">
-        <v-icon size="24" class="account-icon">
-          mdi-wallet-outline
-        </v-icon>
-        <Address :address="user.address || user.id" :size="'large'" :length="addressLength" :show-icon="true" />
-        <QrCodeButton :address="user.address || user.id" />
-      </div>
-
-      <div class="account-amount">
-        <v-icon class="account-icon">
-          mdi-currency-usd
-        </v-icon>
-        <Tokens :balance="balance" />
-      </div>
-    </div>
-
-    <v-divider />
-
-    <v-list class="account-btn" dense>
-      <v-list-item link :to="localePath('/accounts/' + user.id)">
-        <v-list-item-icon>
-          <v-icon class="account-icon">
-            mdi-account-outline
+        <div class="account-info-wp">
+          <v-icon size="24" class="account-icon">
+            mdi-wallet-outline
           </v-icon>
-        </v-list-item-icon>
+          <Address :address="user.address || user.id" :size="'large'" :length="addressLength" :show-icon="true" />
+          <QrCodeButton :address="user.address || user.id" />
+        </div>
 
-        <v-list-item-content>
-          <v-list-item-title>
-            My profile
-          </v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-
-      <v-list-item link :to="localePath('/profile/?id=' + user.id)">
-        <v-list-item-icon>
+        <div class="account-amount">
           <v-icon class="account-icon">
-            mdi-pencil-outline
+            mdi-currency-usd
           </v-icon>
-        </v-list-item-icon>
-
-        <v-list-item-content>
-          <v-list-item-title>
-            Edit my profile
-          </v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-
-      <v-list-item link>
-        <v-list-item-icon>
-          <v-icon class="account-icon">
-            mdi-cog-outline
-          </v-icon>
-        </v-list-item-icon>
-
-        <v-tooltip top>
-          <template #activator="{ on, attrs }">
-            <v-list-item-content>
-              <v-list-item-title
-                v-bind="attrs"
-                v-on="on"
-              >
-                Settings
-              </v-list-item-title>
-            </v-list-item-content>
-          </template>
-          <span>Coming soon</span>
-        </v-tooltip>
-      </v-list-item>
-    </v-list>
-
-    <v-divider />
-
-    <div class="user-list">
-      <div
-        v-for="(item, index) in accounts"
-        :key="index"
-        class="user-item"
-        @click="setAccount(item)"
-      >
-        <VoteUserItem
-          :user-info="item"
-          :type="'account'"
-          class="user-account"
-        />
+          <Tokens :balance="balance" />
+        </div>
       </div>
-      <div class="shadow">
-        <v-divider light />
-      </div>
-    </div>
 
-    <div class="sign-out">
-      <v-btn class="sign-out__btn" @click="signOut">
-        Sign Out
-      </v-btn>
-    </div>
-    <ModalConnections :is-modal="isOpenModal" :account-id="user.id" />
-  </v-navigation-drawer>
+      <v-divider />
+
+      <v-list class="account-btn" dense>
+        <v-list-item link :to="localePath('/accounts/' + user.id)">
+          <v-list-item-icon>
+            <v-icon class="account-icon">
+              mdi-account-outline
+            </v-icon>
+          </v-list-item-icon>
+
+          <v-list-item-content>
+            <v-list-item-title>
+              {{ $t('drawer.myProfile') }}
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item link :to="localePath('/profile/?id=' + user.id)">
+          <v-list-item-icon>
+            <v-icon class="account-icon">
+              mdi-pencil-outline
+            </v-icon>
+          </v-list-item-icon>
+
+          <v-list-item-content>
+            <v-list-item-title>
+              {{ $t('drawer.editMyProfile') }}
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item link>
+          <v-list-item-icon>
+            <v-icon class="account-icon">
+              mdi-cog-outline
+            </v-icon>
+          </v-list-item-icon>
+
+          <v-tooltip top>
+            <template #activator="{ on, attrs }">
+              <v-list-item-content>
+                <v-list-item-title
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  {{ $t('drawer.settings') }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </template>
+            <span>Coming soon</span>
+          </v-tooltip>
+        </v-list-item>
+
+        <v-list-item v-click-outside="changeLocal" link>
+          <v-list-item-icon>
+            <v-icon class="account-icon">
+              mdi-web
+            </v-icon>
+          </v-list-item-icon>
+          <v-list-item-content class="language-container" @click="toggleSelect = !toggleSelect">
+            <v-list-item-title>
+              {{ $t('drawer.language') }}: {{ getLanguageName() }}
+
+              <v-select
+                v-model="selectedHeaders"
+                :items="availableLocales"
+                :menu-props="{value: toggleSelect}"
+                return-object
+                item-text="name"
+                class="select-language-input"
+                @change="changeLocal"
+              />
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+
+      <v-divider />
+
+      <div class="user-list">
+        <div
+          v-for="(item, index) in accounts"
+          :key="index"
+          class="user-item"
+          @click="setAccount(item)"
+        >
+          <VoteUserItem
+            :user-info="item"
+            :type="'account'"
+            class="user-account"
+          />
+        </div>
+        <div class="shadow">
+          <v-divider light />
+        </div>
+      </div>
+
+      <div class="sign-out">
+        <v-btn class="sign-out__btn" @click="signOut">
+          {{ $t('drawer.signOut') }}
+        </v-btn>
+      </div>
+      <ModalConnections :is-modal="isOpenModal" :account-id="user.id" />
+    </v-navigation-drawer>
+  </div>
 </template>
 
 <style lang="scss">
@@ -239,11 +264,11 @@
     padding-left: 5px;
 
     .v-list-item {
-      color: $color_black;
+      color: $color_icon_gray;
       padding: 0;
 
       .v-icon {
-        color: $color_black;
+        color: $color_icon_gray;
         margin-right: $space_small;
       }
 
@@ -252,6 +277,7 @@
         font-weight: normal;
         letter-spacing: 0.25px;
         line-height: 1.1rem;
+        color: $color_icon_gray;
 
         a {
           text-decoration: none;
@@ -261,8 +287,42 @@
     }
   }
 
+  .language-container {
+    height: 34px;
+    
+    .v-select__selection {
+      display: none;
+    }
+
+    .v-list-item__title {
+      height: 19px;
+      display: flex;
+      cursor: pointer;
+      align-items: center;
+    }
+
+    & .v-text-field {
+      padding: 0;
+      margin: 0;
+
+      &__details {
+        display: none;
+      }
+    }
+
+    & .v-input {
+      &__slot {
+        margin: 0;
+
+        &:before, &:after {
+          display: none;
+        }
+      }
+    }
+  }
+
   .user-list {
-    height: calc(100% - 335px);
+    height: calc(100% - 373px);
     overflow: hidden;
     overflow-y: auto;
     position: relative;
@@ -354,6 +414,8 @@ export default class AccountDrawer extends Vue {
   isOpenModal: boolean = false
   accounts: AccountData[] = []
   addressLength: number = config.addressLengthShort
+  toggleSelect: boolean = false
+  selectedHeaders: any[] = []
 
   created () {
     const currentAcc = this.$store.state.profiles.currentUser
@@ -390,6 +452,21 @@ export default class AccountDrawer extends Vue {
     storageService.removeAccountId()
     this.$store.dispatch('profiles/signOut')
     this.drawer = false
+  }
+
+  get availableLocales () {
+    return this.$i18n.locales
+  }
+
+  changeLocal (event: any) {
+    this.toggleSelect = false
+    this.$router.push(this.switchLocalePath(event.code))
+  }
+
+  getLanguageName (): string {
+    const locales = this.$i18n.locales as [{ code: string, name: string }]
+    const currentLang = locales.find((i: { code: string, name: string }) => i.code === this.$i18n.locale)
+    return currentLang ? currentLang.name : ''
   }
 }
 </script>

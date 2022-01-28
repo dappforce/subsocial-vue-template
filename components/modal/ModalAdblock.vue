@@ -1,30 +1,32 @@
 <template>
-  <v-dialog
-    v-model="openModal"
-    max-width="432"
-  >
-    <v-card class="adblock-modal-container">
-      <v-icon medium class="close-icon" size="24" @click="onClick">
-        mdi-close
-      </v-icon>
-      <div class="subsocial-logo">
-        <img src="../../assets/image/subsocial-logo.svg" alt="Subsocial logo">
-      </div>
-      <div class="title">
-        {{ $t('modals.adblock.title') }}
-      </div>
-      <div class="subtitle">
-        {{ $t('modals.adblock.subtitle') }}
-      </div>
-      <div class="btn-container">
-        <div class="disable-btn">
-          <v-btn @click="reloadPage">
-            {{ $t('modals.adblock.button') }}
-          </v-btn>
+  <div data-app>
+    <v-dialog
+      v-model="openModal"
+      max-width="432"
+    >
+      <v-card class="adblock-modal-container">
+        <v-icon class="close-icon" size="24" @click="onClick">
+          mdi-close
+        </v-icon>
+        <div class="subsocial-logo">
+          <img src="../../assets/image/subsocial-logo.svg" alt="Subsocial logo">
         </div>
-      </div>
-    </v-card>
-  </v-dialog>
+        <div class="title">
+          {{ $t('modals.adblock.title') }}
+        </div>
+        <div class="subtitle">
+          {{ $t('modals.adblock.subtitle') }}
+        </div>
+        <div class="btn-container">
+          <div class="disable-btn">
+            <v-btn @click="reloadPage">
+              {{ $t('modals.adblock.button') }}
+            </v-btn>
+          </div>
+        </div>
+      </v-card>
+    </v-dialog>
+  </div>
 </template>
 
 <style lang="scss">

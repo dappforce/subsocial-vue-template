@@ -11,7 +11,7 @@
             <v-icon color="#EFB041">
               mdi-alert-circle
             </v-icon>
-            This comment is unlisted and only you can see it
+            {{ $t('generalMessages.hiddenPost') }}
           </div>
           <div class="unhidden-btn">
             <span class="make-visible">
@@ -66,7 +66,7 @@
       <div class="action-wp">
         <ActionPanel
           :id="comment.id"
-          :is-show-label="true"
+          :is-show-label="getIsMobileView() ? false : true"
           :is-show-comment-btn="false"
           :is-show-shared-btn="false"
           :is-show-reply-btn="true"
@@ -84,7 +84,7 @@
       />
 
       <span v-if="commentIds.length" class="show-reply" @click="showReplies()">
-        {{ isShowReplies ? 'Hide' : 'Show' }} {{ commentIds.length | numeral('0,0a') }} {{ commentIds.length | pluralize('en', ['reply', 'replies']) }}
+        {{ isShowReplies ? 'Hide' : 'Show' }} {{ commentIds.length | numeral('0,0a') }} {{ commentIds.length | pluralize('en', [$t('buttons.reply'), $t('buttons.replies')]) }}
 
         <v-icon color="#F759AB" size="16">{{ isShowReplies ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
       </span>
@@ -222,7 +222,7 @@
 
 @media only screen and (max-width: 768px) {
   .message-container {
-    width: calc(100% - 36px);
+    width: calc(100% - 36px) !important;
   }
 }
 
@@ -232,7 +232,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { PostListItemData } from '~/models/post/post-list-item.model'
 import { ReplyIdStruct } from '~/types/reply-id.type'
-import { getIsPostOwner } from '~/utils/utils'
+import { getIsPostOwner, isMobile } from '~/utils/utils'
 
 @Component
 export default class CommentMessage extends Vue {
@@ -356,6 +356,10 @@ export default class CommentMessage extends Vue {
     } else {
       return this.$dayjs(+this.comment.createdAtTime).format('d MMM YY')
     }
+  }
+
+  getIsMobileView (): boolean {
+    return isMobile()
   }
 }
 </script>

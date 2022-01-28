@@ -38,7 +38,9 @@ export default class CommentButton extends Vue {
   }) count!: number
 
   onClick () {
-    this.$nuxt.$emit(this.id, true)
+    if (this.id) {
+      this.$nuxt.$emit(this.id, true)
+    }
   }
 }
 </script>

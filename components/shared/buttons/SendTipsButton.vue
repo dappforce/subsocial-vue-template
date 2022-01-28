@@ -7,9 +7,9 @@
 
 <style lang="scss">
 .tips-btn {
-  width: 99px;
+  background-color: $color_white !important;
   height: $buttons_height;
-  border: 1px solid $color_primary;
+  border: 1px solid $color_border;
   box-sizing: border-box;
   border-radius: $border_small;
   font-style: normal;
@@ -17,16 +17,11 @@
   line-height: $normal_line_height;
   letter-spacing: 1.25px;
   text-transform: capitalize;
-  background-color: $color_white !important;
-  .v-btn__content {
-    color: $color_primary;
-    font-size: $font_small;
-  }
 
-  &:disabled {
-    border: none;
-    color: #B3B3B3 !important;
-    opacity: 0.5;
+  .v-btn__content {
+    color: $color_font_normal;
+    font-size: $font_normal;
+    flex: initial;
   }
 }
 </style>

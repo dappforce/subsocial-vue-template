@@ -60,7 +60,7 @@ export default abstract class TransactionButton extends Vue {
 
     if (txType === 'unsigned') {
       if (this.isAuthRequired && !this.isFreeTx) {
-        await this.$nuxt.$emit('isShowLoginModal', true)
+        await this.$nuxt.$emit('isShowLoginModal', { isOpen: true, isLoginClicked: false })
 
         return this.setIsSending(false)
       }

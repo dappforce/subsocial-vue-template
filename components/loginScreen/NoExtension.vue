@@ -1,10 +1,10 @@
 <template>
   <div class="no-extension">
     <div class="title">
-      {{ $t('modals.login.title') }}
+      {{ isLoginText ? $t('modals.login.title') : $t('modals.login.waitSec') }}
     </div>
 
-    <div class="sub-title" v-html="$t('modals.login.noExtension.message')" />
+    <div class="sub-title" v-html="isLoginText ? $t('modals.login.noExtension.message') : $t('modals.login.noExtension.notLoginMessage')" />
 
     <div class="btn-container">
       <v-btn class="signin-button">
@@ -30,8 +30,8 @@
 
 <style lang="scss">
 .no-extension {
-  width: $modal_width;
-  height: 267px;
+  max-width: $modal_width;
+  min-height: 267px;
   padding: $space_normal;
 
   .title {
@@ -113,9 +113,12 @@
 </style>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
 @Component
 export default class LoginScreenNoExtension extends Vue {
+  @Prop({
+    type: Boolean
+  }) isLoginText!: boolean
 }
 </script>

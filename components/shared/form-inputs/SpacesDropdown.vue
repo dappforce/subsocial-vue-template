@@ -4,7 +4,7 @@
       v-model="selectedItem"
       :items="spaces"
       item-text="name"
-      label="Post in a space"
+      :label="$t('forms.placeholder.postInSpace')"
       hide-details="auto"
       outlined
       :readonly="isEdit"

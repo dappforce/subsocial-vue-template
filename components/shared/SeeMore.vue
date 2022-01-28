@@ -1,6 +1,6 @@
 <template>
   <NuxtLink :to="localePath(link)" class="see-more-button">
-    See more
+    {{ $t('general.seeMore') }}
   </NuxtLink>
 </template>
 

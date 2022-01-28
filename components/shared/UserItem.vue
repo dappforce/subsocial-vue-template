@@ -101,7 +101,7 @@ export default class UserItem extends Vue {
   }
 
   get isNotCurrentUser (): boolean {
-    return this.userInfo.id !== this.$store.state.profiles.currentUser.id
+    return this.$store.state.profiles.currentUser ? this.userInfo.id !== this.$store.state.profiles.currentUser.id : false
   }
 }
 </script>

@@ -14292,7 +14292,7 @@ sane@^4.0.3:
     minimist "^1.1.1"
     walker "~1.0.5"
 
-sanitize-html@^2.1.1, sanitize-html@^2.6.1:
+sanitize-html@^2.6.1:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/sanitize-html/-/sanitize-html-2.6.1.tgz#5d37c08e189c61c0631560a889b10d9d155d000e"
   integrity sha512-DzjSz3H5qDntD7s1TcWCSoRPmNR8UmA+y+xZQOvWgjATe2Br9ZW73+vD3Pj6Snrg0RuEuJdXgrKvnYuiuixRkA==
@@ -16295,13 +16295,6 @@ vue-router@^3.5.1:
   version "3.5.3"
   resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-3.5.3.tgz#041048053e336829d05dafacf6a8fb669a2e7999"
   integrity sha512-FUlILrW3DGitS2h+Xaw8aRNvGTwtuaxrRkNSHWTizOfLUie7wuYwezeZ50iflRn8YPV5kxmU2LQuu3nM/b3Zsg==
-
-vue-sanitize@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/vue-sanitize/-/vue-sanitize-0.2.1.tgz#60df0ef1dcd7268b04713e470ce993319cc5ea61"
-  integrity sha512-MhrfAaAqIQ8JXWfdlhK6f+H2WnZ7KQwkOgLNeUyfACI2bq/3HPZ2zeUQDathnLdsXMXAa8pJehOgPYtlaG9Jew==
-  dependencies:
-    sanitize-html "^2.1.1"
 
 vue-server-renderer@^2.6.12:
   version "2.6.14"
