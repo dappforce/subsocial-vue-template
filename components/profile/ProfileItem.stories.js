@@ -15,6 +15,7 @@ export const ProfileItem = Template.bind({})
 ProfileItem.args = {
   profileData: {
     id: '3osmnRNnrcScHsgkTJH1xyBF5kGjpbWHsGrqM31BJpy4vwn8',
+    address: '3osmnRNnrcScHsgkTJH1xyBF5kGjpbWHsGrqM31BJpy4vwn8',
     contentId: '3osmnRNnrcScHsgkTJH1xyBF5kGjpbWHsGrqM31BJpy4vwn8',
     followersCount: 10,
     followingAccountsCount: 54,
@@ -26,5 +27,6 @@ ProfileItem.args = {
     avatar: 'QmYS7oGo1FNFCmik9U2mpvabjCgGMUNDe623P9djLtnhbd',
     summary: '',
     about: ''
-  }
+  },
+  tabLinks: ['posts', 'spaces']
 }

@@ -31,7 +31,7 @@
     text-transform: capitalize;
     .v-btn__content {
       color: $color_primary;
-      font-size: $font_small;
+      font-size: $font_normal;
       flex: initial;
     }
     &.follow {

@@ -2,7 +2,7 @@
   <section class="edit-space-container">
     <v-card>
       <h2 class="edit-space-title">
-        {{ isEdit ? 'Edit' : 'New' }} {{ isProfile ? 'profile' : 'space' }}
+        {{ isEdit ? $t('general.edit') : $t('general.new') }} {{ isProfile ? $t('general.profile') : $t('general.space') }}
       </h2>
 
       <ImageLoader :avatar="avatar" :type="'round'" @avatar="updateImageCID" />
@@ -13,7 +13,7 @@
               <v-text-field
                 v-model="name"
                 outlined
-                :label="'* ' + (isProfile ? 'Profile' : 'Space') + ' name'"
+                :label="'* ' + $t('forms.fieldName.spaceProfileName', {type: isProfile ? $t('general.profile') : $t('general.space') })"
                 required
                 hide-details="auto"
                 :messages="errors[0]"
@@ -28,13 +28,13 @@
               v-model="selectTags"
               multiple
               outlined
-              label="Tags"
+              :label="$t('forms.fieldName.tags')"
               append-icon
               chips
               deletable-chips
               class="tag-input"
               :search-input.sync="search"
-              placeholder="Press 'Enter' or 'Tab' key to add tags"
+              :placeholder="$t('forms.placeholder.postBody')"
               hide-details="auto"
               @keyup.tab="updateTags"
               @paste="updateTags"
@@ -83,6 +83,10 @@
   .form-row {
     width: 100%;
     margin-bottom: $space_big;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
 
     .editor-toolbar, .CodeMirror {
       border-color: $color_border;
@@ -284,7 +288,7 @@ export default class SpaceEdit extends TransactionButton {
   }
 
   onSuccess (result: SubmittableResult): void {
-    if (this.isEdit) {
+    if (this.isEdit && (this.cid !== this.spaceItem?.struct.contentId || this.cid !== this.profileItem?.contentId)) {
       transactionService.removeIpfsContent(this.spaceItem?.struct.contentId || this.profileItem?.contentId || '').catch(err => new Error(err))
     }
 

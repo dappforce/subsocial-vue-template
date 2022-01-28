@@ -1,17 +1,19 @@
 <template class="login-modal">
-  <v-dialog
-    v-model="openModal"
-    max-width="432"
-  >
-    <v-card class="login-modal-container">
-      <v-icon medium class="close-icon" size="24" @click="onClick">
-        mdi-close
-      </v-icon>
-      <LoginScreenNoExtension v-if="status === statusEnum.EXTENSION_NOT_FOUND" />
-      <LoginScreenNoAccount v-if="status === statusEnum.ACCOUNTS_NOT_FOUND" />
-      <LoginScreenAccounts v-if="status === statusEnum.UNAUTHORIZED" />
-    </v-card>
-  </v-dialog>
+  <div data-app>
+    <v-dialog
+      v-model="openModal"
+      max-width="432"
+    >
+      <v-card class="login-modal-container">
+        <v-icon class="close-icon" size="24" @click="onClick">
+          mdi-close
+        </v-icon>
+        <LoginScreenNoExtension v-if="status === statusEnum.EXTENSION_NOT_FOUND" :is-login-text="isLoginText" />
+        <LoginScreenNoAccount v-if="status === statusEnum.ACCOUNTS_NOT_FOUND" :is-login-text="isLoginText" />
+        <LoginScreenAccounts v-if="status === statusEnum.UNAUTHORIZED" :is-login-text="isLoginText" />
+      </v-card>
+    </v-dialog>
+  </div>
 </template>
 
 <style lang="scss">
@@ -22,7 +24,6 @@
     top: $space_normal;
   }
 }
-
 </style>
 
 <script lang="ts">
@@ -37,7 +38,8 @@ export default class ModalLogin extends Vue {
   }) isModal!: boolean
 
   openModal: boolean = false
-  status: string = ''
+  status: ACCOUNT_STATUS = ACCOUNT_STATUS.INIT
+  isLoginText: boolean = false
 
   @Watch('isModal')
   isModalHandler () {
@@ -51,8 +53,9 @@ export default class ModalLogin extends Vue {
         this.status = this.$store.state.profiles.status
       }
     })
-    this.$nuxt.$on('isShowLoginModal', (data: boolean) => {
-      this.openModal = data
+    this.$nuxt.$on('isShowLoginModal', (data: { isOpen: boolean, isLoginClicked: boolean }) => {
+      this.openModal = data.isOpen
+      this.isLoginText = data.isLoginClicked
     })
   }
 

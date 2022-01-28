@@ -1,8 +1,10 @@
 <template>
   <div class="no-account">
     <div class="title">
-      {{ $t('modals.login.title') }}
-      Sign In
+      {{ isLoginText ? $t('modals.login.title') : $t('modals.login.waitSec') }}
+    </div>
+    <div v-if="!isLoginText" class="sub-title">
+      {{ $t('modals.login.noAccountScreen.notLoginMessage') }}
     </div>
     <div class="message" v-html="$t('modals.login.noAccountScreen.message')" />
     <div class="privacy">
@@ -14,7 +16,7 @@
 
 <style lang="scss">
 .no-account {
-  width: $modal_width;
+  max-width: $modal_width;
   padding: $space_normal;
 
   .title {
@@ -25,6 +27,11 @@
     width: 100%;
     text-align: center;
     margin-bottom: 14px;
+  }
+
+  .sub-title {
+    text-align: center;
+    margin-bottom: $space_normal;
   }
 
   .message {
@@ -57,9 +64,12 @@
 </style>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
 @Component
 export default class LoginScreenNoAccount extends Vue {
+  @Prop({
+    type: Boolean
+  }) isLoginText!: boolean
 }
 </script>

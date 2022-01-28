@@ -6,9 +6,9 @@
 
 <style lang="scss">
 .edit-space-btn {
-  background-color: $color_primary !important;
+  background-color: $color_white !important;
   height: $buttons_height;
-  border: none;
+  border: 1px solid $color_border;
   box-sizing: border-box;
   border-radius: $border_small;
   font-style: normal;
@@ -18,8 +18,8 @@
   text-transform: capitalize;
 
   .v-btn__content {
-    color: $color_white;
-    font-size: $font_small;
+    color: $color_font_normal;
+    font-size: $font_normal;
     flex: initial;
   }
 }
@@ -29,7 +29,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
 @Component
-export default class FollowButton extends Vue {
+export default class EditSpaceButton extends Vue {
   @Prop({
     type: String
   }) spaceId!: string

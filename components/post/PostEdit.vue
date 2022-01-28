@@ -8,6 +8,7 @@
           </h2>
 
           <v-tabs
+            v-if="!isSharedPost"
             v-model="tab"
             background-color="transparent"
             color="basil"
@@ -26,7 +27,7 @@
 
           <SpacesDropdown :is-edit="isEdit" :space-id="getSpaceId" @selectedSpace="updateSpaceID" />
 
-          <v-tabs-items v-model="tab">
+          <v-tabs-items v-if="!isSharedPost" v-model="tab">
             <v-tab-item
               :key="items[0]"
               :value="items[0]"
@@ -45,7 +46,7 @@
                     :hide-details="!isArticleTab ? 'auto' : true"
                     :messages="errors[0]"
                     outlined
-                    :label="(!isArticleTab ? '*' : '') + ' Video URL'"
+                    :label="(!isArticleTab ? '* ' : '') + $t('forms.fieldName.videoUrl')"
                   />
                 </ValidationProvider>
                 <client-only>
@@ -55,12 +56,12 @@
             </v-tab-item>
           </v-tabs-items>
           <div class="form-container">
-            <div class="form-row">
+            <div v-if="!isSharedPost" class="form-row">
               <v-text-field
                 v-model="postName"
                 hide-details="auto"
                 outlined
-                label="Post title"
+                :label="$t('forms.fieldName.postTitle')"
               />
             </div>
             <div class="form-row description-row">
@@ -81,7 +82,7 @@
                 />
               </ValidationProvider>
             </div>
-            <div class="form-row">
+            <div v-if="!isSharedPost" class="form-row">
               <v-combobox
                 v-model="selectTags"
                 hide-details="auto"
@@ -97,6 +98,9 @@
                 @keyup.tab="updateTags"
                 @paste="updateTags"
               />
+            </div>
+            <div v-if="isSharedPost" class="form-row">
+              <PostListItem v-if="sharedPost" :post-item-data="sharedPost" :current-user-id="null" :is-shared-post="true" />
             </div>
           </div>
           <div class="button-wp">
@@ -291,7 +295,7 @@ export default class PostEdit extends TransactionButton {
 
   post: PostListItemData | null = null
   tab: string | null = null
-  items: string[] = ['article', 'video']
+  items: string[] = [this.$t('tabs.article') as string, this.$t('tabs.video') as string]
   postName: string = ''
   description: string = ''
   image: string = ''
@@ -300,6 +304,7 @@ export default class PostEdit extends TransactionButton {
   videoUrl: string = ''
   spaceId: string = ''
   cid: IpfsCid | undefined
+  sharedPost: PostListItemData | null = null
 
   @Watch('postItem')
   postItemHandler (newVal: any, OldVal: any) {
@@ -312,6 +317,16 @@ export default class PostEdit extends TransactionButton {
   created () {
     if (this.isEdit) {
       this.insertDataInForm()
+
+      if (this.postItem.isSharedPost) {
+        if (this.$store.getters['posts/getPostInfo'](this.postItem?.sharedPostId)) {
+          this.sharedPost = this.$store.getters['posts/getPostInfo'](this.postItem?.sharedPostId)
+        } else {
+          this.$store.dispatch('posts/getPostById', this.postItem?.sharedPostId).then(() => {
+            this.sharedPost = this.$store.getters['posts/getPostInfo'](this.postItem?.sharedPostId)
+          })
+        }
+      }
     }
   }
 
@@ -382,7 +397,7 @@ export default class PostEdit extends TransactionButton {
   }
 
   onSuccess (result: SubmittableResult): void {
-    if (this.isEdit) {
+    if (this.isEdit && this.cid !== this.post?.contentId) {
       transactionService.removeIpfsContent(this.post?.contentId || '').catch(err => new Error(err))
     }
     const id = this.postItem?.id || getNewIdFromEvent(result)?.toString()
@@ -399,6 +414,7 @@ export default class PostEdit extends TransactionButton {
     const space: SpaceListItemData = await this.$store.getters['space/getSpaceWithContent'](this.spaceId)
     const slug = createPostSlug(id, { title: this.postName, body: this.description })
 
+    await this.$store.dispatch('posts/getSuggestedPostIds')
     await this.$store.dispatch('posts/getPostById', id).then(() => {
       this.$router.push(this.$nuxt.localePath('/' + (space.struct?.handle || space.struct.id) + '/' + slug))
     })
@@ -425,6 +441,10 @@ export default class PostEdit extends TransactionButton {
     await this.initExtrinsic({ pallet, params, method })
 
     await this.sentTransaction()
+  }
+
+  get isSharedPost (): boolean {
+    return this.postItem ? this.postItem?.isSharedPost : false
   }
 }
 

@@ -12,12 +12,12 @@
         <div v-if="!showMoreActive" class="less-view">
           <p :style="{ marginBlockStart: marginTop + 'px', marginBlockEnd: marginBottom + 'px' }">
             {{ spaceAbout }}
-            <span v-if="isShowMore && !redirect" class="see-more-button" @click="showMore(true)">See more</span>
+            <span v-if="isShowMore && !redirect" class="see-more-button" @click="showMore(true)">{{ $t('general.seeMore') }}</span>
           </p>
         </div>
         <div v-if="showMoreActive" class="more-view">
           <p class="markdown-body" :style="{ marginBlockStart: marginTop + 'px', marginBlockEnd: marginBottom + 'px' }" v-html="$md.render(spaceAbout ? spaceAbout : '')" />
-          <span v-if="isShowMore && !redirect" class="see-more-button" @click="showMore(false)">See less</span>
+          <span v-if="isShowMore && !redirect" class="see-more-button" @click="showMore(false)">{{ $t('general.seeLess') }}</span>
         </div>
       </div>
     </div>

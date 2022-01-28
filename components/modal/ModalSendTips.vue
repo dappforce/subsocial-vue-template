@@ -1,52 +1,54 @@
 <template>
-  <v-dialog
-    v-model="openModal"
-    max-width="500px"
-  >
-    <v-card class="v-modal-container">
-      <v-card-title class="st-title">
-        {{ $t('modals.tips.title') }}
-        <v-icon medium class="close-icon" @click="onClick">
-          mdi-close
-        </v-icon>
-      </v-card-title>
+  <div data-app>
+    <v-dialog
+      v-model="openModal"
+      max-width="500px"
+    >
+      <v-card class="v-modal-container">
+        <v-card-title class="st-title">
+          {{ $t('modals.tips.title') }}
+          <v-icon class="close-icon" @click="onClick">
+            mdi-close
+          </v-icon>
+        </v-card-title>
 
-      <v-card flat>
-        <div class="send-tips-container">
-          <UserItem v-if="userInfo" :user-info="userInfo" />
-          <ValidationObserver ref="form" v-slot="{ handleSubmit, handleReset }">
-            <form @submit.prevent="handleSubmit(submit)" @reset.prevent="handleReset(onCancel)">
-              <ValidationProvider v-slot="{ errors }" :rules="'required|numeric'">
-                <div class="form-row">
-                  <v-text-field
-                    v-model="amount"
-                    outlined
-                    required
-                    suffix="SUB"
-                    height="36"
-                    hide-details="auto"
-                    :messages="errors[0]"
-                    :label="$t('modals.tips.inputPlaceholder')"
-                  />
-                </div>
-              </ValidationProvider>
-            </form>
-          </ValidationObserver>
-          <div class="my-balance">
-            {{ $t('modals.tips.availableBalance') }}: <strong>{{ myBalance }}</strong>
+        <v-card flat>
+          <div class="send-tips-container">
+            <UserItem v-if="userInfo" :user-info="userInfo" />
+            <ValidationObserver ref="form" v-slot="{ handleSubmit, handleReset }">
+              <form @submit.prevent="handleSubmit(submit)" @reset.prevent="handleReset(onCancel)">
+                <ValidationProvider v-slot="{ errors }" :rules="'required|numeric'">
+                  <div class="form-row">
+                    <v-text-field
+                      v-model="amount"
+                      outlined
+                      required
+                      suffix="SUB"
+                      height="36"
+                      hide-details="auto"
+                      :messages="errors[0]"
+                      :label="$t('modals.tips.inputPlaceholder')"
+                    />
+                  </div>
+                </ValidationProvider>
+              </form>
+            </ValidationObserver>
+            <div class="my-balance">
+              {{ $t('modals.tips.availableBalance') }}: <strong>{{ myBalance }}</strong>
+            </div>
+            <div class="button-container">
+              <v-btn class="button-third-color" @click="onCancel">
+                {{ $t('buttons.cancel') }}
+              </v-btn>
+              <v-btn class="button-main-color" @click="submit">
+                {{ $t('buttons.sendTips') }}
+              </v-btn>
+            </div>
           </div>
-          <div class="button-container">
-            <v-btn class="button-third-color" @click="onCancel">
-              {{ $t('buttons.cancel') }}
-            </v-btn>
-            <v-btn class="button-main-color" @click="submit">
-              {{ $t('buttons.sendTips') }}
-            </v-btn>
-          </div>
-        </div>
+        </v-card>
       </v-card>
-    </v-card>
-  </v-dialog>
+    </v-dialog>
+  </div>
 </template>
 
 <style lang="scss">
@@ -177,11 +179,11 @@ export default class ModalSendTips extends Vue {
   toAccount: string = ''
   amount: string = ''
   fromAccount: string = ''
-  myBalance?: number
+  myBalance: string = ''
 
   created () {
-    this.fromAccount = this.$store.state.profiles.currentUser.id
-    this.myBalance = this.$store.state.profiles.myBalance
+    this.fromAccount = this.$store.state.profiles.currentUser?.id
+    this.myBalance = this.$store.state.profiles.myBalance.toString()
   }
 
   submit () {

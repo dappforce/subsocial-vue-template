@@ -71,7 +71,7 @@ export default class Address extends Vue implements AddressInt {
   async copyAddress () {
     try {
       await navigator.clipboard.writeText(this.address).then(() => {
-        this.$nuxt.$emit('isShowSnackbar', { show: true, text: 'Address copied!' })
+        this.$nuxt.$emit('isShowSnackbar', { show: true, text: this.$t('snackbars.addressCopied') })
       })
     } catch ($e) {
       console.log('Cannot copy')

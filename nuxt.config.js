@@ -71,8 +71,8 @@ export default {
     langDir: 'locales/',
     differentDomains: false,
     locales: [
-      { code: 'en', file: 'en.js' },
-      { code: 'ru', file: 'ru.js' }
+      { code: 'en', file: 'en.js', name: 'English' },
+      { code: 'ru', file: 'ru.js', name: 'Russian' }
     ]
   },
 

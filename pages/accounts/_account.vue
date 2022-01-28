@@ -1,6 +1,14 @@
 <template>
   <div class="account-container">
-    <ProfileItem v-if="!showSpinner" :profile-data="accountData" :tabs-event="'accountPage'" :is-owner="isOwner" :is-account-view="true" />
+    <ProfileItem
+      v-if="!showSpinner"
+      :profile-data="accountData"
+      :tabs-event="'accountPage'"
+      :is-owner="isOwner"
+      :is-account-view="true"
+      :is-have-space="!!spaces.length"
+      :tab-links="tabs"
+    />
 
     <v-tabs-items v-model="currentTab">
       <v-tab-item
@@ -8,8 +16,8 @@
         :value="tabs[0]"
         class="items-list"
       >
-        <PostContainer v-if="currentTab === 'posts' && allPostsIds.length" :ids="allPostsIds" :type="isOwner ? 'all' : 'public'" />
-        <NoPosts v-if="!allPostsIds.length && !showSpinner" />
+        <PostContainer v-if="currentTab === tabs[0] && allPostsIds.length" :ids="allPostsIds" :type="isOwner ? 'all' : 'public'" />
+        <NoPosts v-if="!allPostsIds.length && !showSpinner" :message="$t('generalMessages.noPostYet')" />
         <BounceSpinner v-if="showSpinner" />
       </v-tab-item>
 
@@ -25,9 +33,7 @@
           :current-user="currentUser"
           :is-my-own-space="isOwner"
         />
-        <div v-if="!spaces.length" class="no-posts">
-          No spaces yet
-        </div>
+        <NoPosts v-if="!spaces.length" :message="$t('generalMessages.noSpaceYet')" />
       </v-tab-item>
     </v-tabs-items>
   </div>
@@ -50,8 +56,8 @@ import { ProfileStruct } from '@subsocial/api/flat-subsocial/flatteners'
 export default class Account extends Vue {
   accountData: ProfileStruct | undefined
   spaces: [] = []
-  tabs: string[] = ['posts', 'spaces']
-  currentTab: string = 'posts'
+  tabs: string[] = [this.$t('tabs.posts') as string, this.$t('tabs.spaces') as string]
+  currentTab: string = this.tabs[0]
   allPostsIds: [] = []
   currentUser?: ProfileStruct
   showSpinner: boolean = false
@@ -63,9 +69,8 @@ export default class Account extends Vue {
       this.load()
     } else {
       this.$store.subscribe((mutation) => {
-        if (mutation.type === 'profiles/SET_CURRENT_USER') {
-          this.load().then(() => {
-          })
+        if (mutation.type === 'loading/SET_LOADING') {
+          this.load()
         }
       })
     }
@@ -82,7 +87,6 @@ export default class Account extends Vue {
 
   async load () {
     this.currentUser = this.$store.state.profiles.currentUser
-    this.isOwner = this.$route.params.account === this.currentUser?.id
 
     return await this.$store.dispatch('profiles/getProfile', { id: this.$route.params.account }).then(() => {
       this.getAccount().then((data) => {
@@ -91,6 +95,7 @@ export default class Account extends Vue {
           this.getSpacesData().then(data => this.spaces = data)
           this.$store.dispatch('posts/getAccountPosts', this.$store.state.space.accountSpaceIds).then(() => {
             setTimeout(() => {
+              this.isOwner = this.$route.params.account === this.$store.state.profiles.currentUser?.id
               this.allPostsIds = this.$store.state.posts.accountPostsIds
               this.showSpinner = false
             }, 500)

@@ -56,6 +56,14 @@
         </v-list-item-icon>
         <v-list-item-title>{{ $t('buttons.viewOnIPFS') }}</v-list-item-title>
       </v-list-item>
+      <v-list-item v-if="canEdit && space && isSpaceView">
+        <v-list-item-icon>
+          <v-icon>mdi-account-check-outline</v-icon>
+        </v-list-item-icon>
+        <v-list-item-title>
+          <FollowButton v-if="space" class="follow-btn-in-option" :entity-id="space.struct.id" :follow="follow" type="space" />
+        </v-list-item-title>
+      </v-list-item>
     </v-list>
     <ModalLikes v-if="isOpen && !noReactions" :key="postId" :is-modal="isOpenReaction" :post-id="postId" />
   </v-menu>
@@ -76,6 +84,7 @@
 
     &__title {
       color: $color_icon_gray;
+      font-size: $font_normal;
     }
 
     .v-list-item__icon {
@@ -89,6 +98,20 @@
 
     &:hover {
       background-color: rgba(0,0,0,0.05);
+    }
+  }
+
+  .follow-btn-in-option {
+    border: none;
+    background-color: transparent !important;
+    justify-content: left;
+    padding: 0 !important;
+
+    .v-btn__content {
+      color: $color_icon_gray;
+      font-size: $font_normal;
+      line-height: 1.2;
+      font-weight: normal;
     }
   }
 }
@@ -143,6 +166,11 @@ export default class OptionButton extends Vue {
   @Prop({
     type: String
   }) toggleType!: string
+
+  @Prop({
+    type: Boolean,
+    default: false
+  }) follow!: boolean
 
   showMenu: boolean = false
   isOpenReaction: boolean = false

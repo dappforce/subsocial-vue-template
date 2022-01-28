@@ -1,6 +1,6 @@
 <template>
   <v-btn class="shared-button" @click="onClick">
-    <v-icon medium class="vote-icon">
+    <v-icon class="vote-icon">
       mdi-repeat
     </v-icon>
     <span v-if="isShowLabel" class="share-label">{{ $t('buttons.share') }}</span>
@@ -62,11 +62,17 @@ export default class SharedButton extends Vue {
   }
 
   onClick (): void {
-    this.isOpen = true
+    if (this.$store.state.profiles.currentUser) {
+      this.isOpen = true
+    } else {
+      this.$nuxt.$emit('isShowLoginModal', { isOpen: true, isLoginClicked: false })
+    }
   }
 
   get getPostId (): string | undefined {
-    return this.post.isSharedPost ? this.post.sharedPostId : this.post.id
+    if (this.post) {
+      return this.post.isSharedPost ? this.post.sharedPostId : this.post.id
+    }
   }
 }
 </script>

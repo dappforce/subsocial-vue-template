@@ -6,8 +6,8 @@
         <Title size="medium" :link="spaceItem.struct.handle ? '/@'+spaceItem.struct.handle : '/'+spaceItem.struct.id" :name="spaceItem.content.name" />
       </div>
       <div class="space-stats-wp">
-        <span v-if="hidePostCount" class="post-count"><span class="count">{{ spaceItem.struct.postsCount | numeral('0,0a') }} </span>{{ spaceItem.struct.postsCount | pluralize('en', ['post', 'posts']) }}</span>
-        <span class="followers-count" @click="openModal"><span class="count">{{ spaceItem.struct.followersCount | numeral('0,0a') }}</span> {{ spaceItem.struct.followersCount | pluralize('en', ['follower', 'followers']) }}</span>
+        <span v-if="hidePostCount" class="post-count"><span class="count">{{ spaceItem.struct.postsCount | numeral('0,0a') }} </span>{{ spaceItem.struct.postsCount | pluralize('en', [$t('general.post'), $t('general.posts')]) }}</span>
+        <span class="followers-count" @click="openModal"><span class="count">{{ spaceItem.struct.followersCount | numeral('0,0a') }}</span> {{ spaceItem.struct.followersCount | pluralize('en', [$t('general.follower'), $t('general.followers')]) }}</span>
       </div>
     </div>
     <ModalFollower :is-modal="isOpenModal" :space-id="spaceItem.struct.id" />

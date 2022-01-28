@@ -1,5 +1,5 @@
 <template>
-  <v-btn depressed class="create-space-btn" @click="onClick">
+  <v-btn depressed class="create-space-btn" :class="[isHaveSpace ? 'have-space' : '']" @click="onClick">
     {{ isHeaderBtn ? '+ Create Space' : 'Create space' }}
   </v-btn>
 </template>
@@ -17,11 +17,19 @@
   letter-spacing: 1.25px;
   text-transform: capitalize;
   background-color: $color_white !important;
-  margin-right: $space_large;
 
   .v-btn__content {
     color: $color_primary;
-    font-size: $font_small;
+    font-size: $font_normal;
+  }
+
+  &.have-space {
+    background-color: $color_white !important;
+    border: 1px solid $color_border;
+
+    .v-btn__content {
+      color: $color_font_normal;
+    }
   }
 
   &:disabled {
@@ -41,6 +49,11 @@ export default class CreateSpaceButton extends Vue {
     type: Boolean,
     default: false
   }) isHeaderBtn!: boolean
+
+  @Prop({
+    type: Boolean,
+    default: false
+  }) isHaveSpace!: boolean
 
   onClick () {
     this.$router.push(this.$nuxt.localePath('/space?new'))

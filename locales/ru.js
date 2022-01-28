@@ -4,27 +4,38 @@ export default {
   imageShouldBeLessThanTwoMB: 'Image should be less than 2 MB',
   general: {
     title: 'Вью',
-    post: 'post',
-    space: 'space',
-    comment: 'comment',
-    edit: 'Edit',
-    new: 'New',
+    post: 'пост',
+    posts: 'посты',
+    space: 'спейс',
+    profile: 'профиль',
+    comment: 'комментарий',
+    comments: 'комментариев',
+    edit: 'Редактировать',
+    new: 'Новый',
     follower: 'Follower',
-    followers: 'Followers'
+    followers: 'Followers',
+    following: 'Following',
+    seeMore: 'See more',
+    seeLess: 'See less',
+    person: 'person',
+    people: 'people',
+    upload: 'Upload'
   },
   tabs: {
-    following: 'FOLLOWING',
-    followers: 'FOLLOWERS',
+    following: 'following',
+    followers: 'followers',
     upvotes: 'upvotes',
     downvotes: 'downvotes',
-    posts: 'posts',
-    spaces: 'spaces',
-    feed: 'feed'
+    posts: 'посты',
+    spaces: 'спейсы',
+    feed: 'фиды',
+    article: 'статья',
+    video: 'видео'
   },
   buttons: {
-    cancel: 'Cancel',
-    save: 'Save',
-    close: 'Close',
+    cancel: 'Отмена',
+    save: 'Сохранить',
+    close: 'Закрыть',
     copy: 'Copy',
     newPost: 'New post',
     createAPost: 'Create a post',
@@ -35,6 +46,7 @@ export default {
     viewReactions: 'View reactions',
     viewOnIPFS: 'View on IPFS',
     reply: 'Reply',
+    replies: 'replies',
     send: 'Send',
     update: 'Update',
     share: 'Share',
@@ -98,7 +110,11 @@ export default {
   },
   post: {
     sharePost: 'Share post',
-    addComment: 'Add a comment...'
+    addComment: 'Add a comment...',
+    addReply: 'Add a reply...'
+  },
+  space: {
+
   },
   forms: {
     validations: {
@@ -107,11 +123,15 @@ export default {
     },
     fieldName: {
       description: 'Description',
-      tags: 'Tags'
+      postTitle: 'Post title',
+      tags: 'Tags',
+      videoUrl: 'Video URL',
+      spaceProfileName: '{type} name'
     },
     placeholder: {
       postBody: 'Post body',
-      tags: 'Press \'Enter\' or \'Tab\' key to add tags'
+      tags: 'Press \'Enter\' or \'Tab\' key to add tags',
+      postInSpace: 'Post in a space'
     },
     permissions: {
       whoCanPost: {
@@ -124,19 +144,20 @@ export default {
   generalMessages: {
     hiddenPostBySpace: 'This post is not visible because its space is hidden',
     hiddenPost: 'This post is unlisted and only you can see it',
-    emptyFeed: 'Your feed is empty. Try to follow more spaces ;)'
-  },
+    hiddenSpace: 'This space is unlisted and only you can see it',
+    emptyFeed: 'Your feed is empty. Try to follow more spaces ;)',
+    uploadCoverImage: 'Upload cover image',
+    dontHavePermissionToEditPost: 'You do not have permission to edit this post',
+    dontHavePermissionToEditProfile: 'You do not have permission to edit this profile',
+    dontHavePermissionToEditSpace: 'You do not have permission to edit this space',
+    noPostYet: 'No posts yet',
+    noSpaceYet: 'No spaces yet'
 
-  formHints: {
-    whoCanPost: {
-      space_owner: 'Only you can create and edit posts in this space.',
-      follower: 'You and followers of this space can create and edit own posts.',
-      everyone: 'Everyone can create and edit their own posts in this space.',
-      none: 'None can create or edit posts in this space.'
-    },
-    embedded: 'You can embed links from YouTube, Vimeo and SoundCloud.'
   },
-
+  notificationItem: {
+    message: 'and {count} other {message}',
+    title: 'Notifications'
+  },
   notifications: {
     AccountFollowed: 'followed your account',
     SpaceFollowed: 'followed your space',
@@ -148,6 +169,34 @@ export default {
     PostReactionCreated: 'reacted to your post',
     CommentReactionCreated: 'reacted to your comment on'
   },
+  drawer: {
+    myProfile: 'My profile',
+    editMyProfile: 'Edit my profile',
+    settings: 'Settings',
+    signOut: 'Sign Out',
+    reactApp: 'React app',
+    angularApp: 'Angular app',
+    subsocialApp: 'Subsocial app',
+    landingPage: 'Landing page',
+    legalDocuments: 'Legal Documents',
+    github: 'Github',
+    whatIsSubsocial: 'What is Subsocial?',
+    ourSocialLinks: 'Our social links:',
+    language: 'Language'
+  },
+
+  // unused
+
+  formHints: {
+    whoCanPost: {
+      space_owner: 'Only you can create and edit posts in this space.',
+      follower: 'You and followers of this space can create and edit own posts.',
+      everyone: 'Everyone can create and edit their own posts in this space.',
+      none: 'None can create or edit posts in this space.'
+    },
+    embedded: 'You can embed links from YouTube, Vimeo and SoundCloud.'
+  },
+
   activities: {
     AccountFollowed: 'followed the account',
     SpaceFollowed: 'followed the space',

@@ -4,7 +4,7 @@
     <div v-if="postListIds.length" class="post-list-container">
       <PostContainer :ids="postListIds" :type="isMyOwnSpace ? 'all' : 'public'" />
     </div>
-    <NoPosts v-if="!postListIds.length" />
+    <NoPosts v-if="!postListIds.length" :message="$t('generalMessages.noPostYet')" />
   </div>
 </template>
 

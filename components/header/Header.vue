@@ -3,8 +3,8 @@
     <div class="header-container">
       <div class="header-line">
         <div class="left-bar">
-          <div v-if="isMobileView()" class="hamburger" @click="openLeftDrawer">
-            <v-icon>mdi-menu</v-icon>
+          <div v-if="isMobileView" class="hamburger" @click="openLeftDrawer">
+            <v-icon>{{ isOpenLeftMenu ? 'mdi-close' : 'mdi-menu' }}</v-icon>
           </div>
           <div class="project-name" @click="returnHome">
             <NuxtLink :to="localePath('/')">
@@ -12,7 +12,6 @@
             </NuxtLink>
           </div>
         </div>
-
         <div class="user-block">
           <CreateSpaceButton v-if="user && !hasSpace" :is-header-btn="true" />
           <CreatePostButton v-if="user && hasSpace" />
@@ -23,6 +22,7 @@
                 mdi-bell-outline
               </v-icon>
             </NuxtLink>
+
             <div class="user-container" @click.stop="openDrawer">
               <v-list-item>
                 <v-list-item-avatar size="36">
@@ -65,7 +65,7 @@ header {
       align-items: center;
 
       .notification-icon {
-        margin-right: $space_large;
+        margin: 0 $space_large;
       }
 
       .user-info-block {
@@ -141,11 +141,15 @@ header {
       line-height:$main_line_height;
       letter-spacing: 0.15px;
       color: $color_font_normal;
-      margin-left: $space_huge;
+      margin-left: $space_normal;
 
       & a {
         text-decoration: none;
         color: inherit;
+      }
+
+      @media (min-width: 991px) {
+        margin-left: $space_huge;
       }
     }
   }
@@ -162,25 +166,22 @@ header {
 </style>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
 import { config } from '~/config/config'
 import { isMobile } from '~/utils/utils'
 
 @Component
 export default class Header extends Vue {
-  @Prop({
-    type: String,
-    default: config.appName
-  }) socialName!: string
-
   user: ProfileItemModel | null = null
   isOpenDrawer: boolean = false
   balance: string = ''
   isOpenModal: boolean = false
-  tabLinks: string[] = ['posts', 'spaces']
+  tabLinks: string[] = [this.$t('tabs.posts') as string, this.$t('tabs.spaces') as string]
   hasSpace: boolean = false
   addressLength: number = config.addressLengthShort
+  isMobileView: boolean = false
+  isOpenLeftMenu: boolean = false
 
   created () {
     this.$store.subscribe((mutation) => {
@@ -214,6 +215,14 @@ export default class Header extends Vue {
         }
       }
     })
+
+    if (process.browser) {
+      window.addEventListener('resize', this.getIsMobileView)
+    }
+
+    this.$nuxt.$on('changeHeaderIcon', (isOpen: boolean) => {
+      this.isOpenLeftMenu = isOpen
+    })
   }
 
   openDrawer (): void {
@@ -226,6 +235,7 @@ export default class Header extends Vue {
 
   mounted () {
     this.checkAdBlock()
+    this.getIsMobileView()
   }
 
   checkAdBlock (): void {
@@ -242,8 +252,8 @@ export default class Header extends Vue {
     this.$nuxt.$emit('openDrawer', true)
   }
 
-  isMobileView (): boolean {
-    return isMobile()
+  getIsMobileView (): void {
+    this.isMobileView = isMobile()
   }
 }
 </script>

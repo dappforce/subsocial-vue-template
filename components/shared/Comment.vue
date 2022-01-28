@@ -5,7 +5,7 @@
       class="mx-4 divider"
     />
     <div class="comments-counter">
-      {{ count | numeral('0,0a') }} {{ count | pluralize('en', ['comment', 'comments']) }}
+      {{ count | numeral('0,0a') }} {{ count | pluralize('en', [$t('general.comment'), $t('general.comments')]) }}
     </div>
 
     <div class="send-message-wp">
@@ -32,7 +32,7 @@
             row-height="15"
             @focus="showButton"
           />
-          <span v-if="!showBtn" class="placeholder">Add a comment...</span>
+          <span v-if="!showBtn" class="placeholder">{{ $t('post.addComment') }}</span>
         </div>
         <div class="btn-container">
           <SendCommentButton v-if="showBtn" :comment="comment" :root-post-id="id" @createdComment="addCommentToList" />
@@ -208,6 +208,7 @@ export default class Comment extends Vue {
   showButton (): void {
     this.showEditor = !this.showEditor
     this.showBtn = !this.showBtn
+    this.comment = ''
   }
 
   async getNewPosts (ids: []) {

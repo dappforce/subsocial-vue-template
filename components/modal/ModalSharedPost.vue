@@ -1,41 +1,42 @@
 <template>
-  <v-dialog
-    v-model="openModal"
-    max-width="763"
-    @click:outside="clickOutside"
-  >
-    <v-card v-if="post && openModal" class="shared-post-container">
-      <v-icon medium class="close-icon" size="24" @click="onClick">
-        mdi-close
-      </v-icon>
+  <div data-app>
+    <v-dialog
+      v-model="openModal"
+      max-width="763"
+      @click:outside="clickOutside"
+    >
+      <v-card v-if="post && openModal" class="shared-post-container">
+        <v-icon class="close-icon" size="24" @click="onClick">
+          mdi-close
+        </v-icon>
 
-      <div class="title">
-        {{ $t('post.sharePost') }}
-      </div>
+        <div class="title">
+          {{ $t('post.sharePost') }}
+        </div>
 
-      <SpacesDropdown class="modal-space-dropdown" :space-id="post.spaceId" :is-filter="true" @selectedSpace="updateSpaceID" />
+        <SpacesDropdown class="modal-space-dropdown" :space-id="post.spaceId" :is-filter="true" @selectedSpace="updateSpaceID" />
 
-      <MdeEditor
-        v-if="spaceId.length"
-        :show-editor="true"
-        :height="'50px'"
-        :placeholder="$t('post.addComment')"
-        :text="comment"
-        @contentUpdate="updateComment"
-      />
+        <MdeEditor
+          :show-editor="true"
+          :height="'50px'"
+          :placeholder="$t('post.addComment')"
+          :text="comment"
+          @contentUpdate="updateComment"
+        />
 
-      <PostListItem v-if="post" :post-item-data="post" :current-user-id="currentUser ? currentUser.id : null" :is-shared-post="true" />
+        <PostListItem v-if="post" :post-item-data="post" :current-user-id="currentUser ? currentUser.id : null" :is-shared-post="true" />
 
-      <div class="button-container">
-        <v-btn class="button-third-color" @click="onClick">
-          {{ $t('buttons.cancel') }}
-        </v-btn>
-        <v-btn class="button-main-color" @click="sharePost">
-          {{ $t('buttons.createAPost') }}
-        </v-btn>
-      </div>
-    </v-card>
-  </v-dialog>
+        <div class="button-container">
+          <v-btn class="button-third-color" @click="onClick">
+            {{ $t('buttons.cancel') }}
+          </v-btn>
+          <v-btn class="button-main-color" @click="sharePost">
+            {{ $t('buttons.createAPost') }}
+          </v-btn>
+        </div>
+      </v-card>
+    </v-dialog>
+  </div>
 </template>
 
 <style lang="scss">
@@ -151,7 +152,7 @@ import { SpaceListItemData } from '~/models/space/space-list-item.model'
 const transactionService = new TransactionService()
 
 @Component
-export default class ModalAdblock extends TransactionButton {
+export default class ModalSharedPost extends TransactionButton {
   @Prop({
     type: Boolean,
     default: false
@@ -198,7 +199,9 @@ export default class ModalAdblock extends TransactionButton {
   }
 
   private getPost () {
-    this.post = this.$store.getters['posts/getPostInfo'](this.postId)
+    if (this.postId) {
+      this.post = this.$store.getters['posts/getPostInfo'](this.postId)
+    }
   }
 
   setCurrentUser (): void {

@@ -1,6 +1,7 @@
 import { Commit } from 'vuex'
 import FeedService from '~/services/feed.service'
 import AccountService from '~/services/account.service'
+import { config } from '~/config/config'
 
 const feedService = new FeedService()
 const accountService = new AccountService()
@@ -39,7 +40,7 @@ export const mutations = {
 
 export const actions = {
   async getFeedIds ({ commit }: {commit: Commit}, payload: {id: string, offset: number}) {
-    const feed = await feedService.getNewsFeed(payload.id, payload.offset, 20)
+    const feed = await feedService.getNewsFeed(payload.id, payload.offset, config.stepForLoading)
     const feedIds = feed.map(i => i.post_id)
     commit(SET_FEED_IDS, feedIds)
     return feedIds

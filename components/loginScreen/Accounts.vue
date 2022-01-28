@@ -1,10 +1,10 @@
 <template>
   <div class="account-present">
     <div class="title">
-      {{ $t('modals.login.title') }}
+      {{ isLoginText ? $t('modals.login.title') : $t('modals.login.waitSec') }}
     </div>
     <div class="message">
-      {{ $t('modals.login.accountScreen.message') }}
+      {{ isLoginText ? $t('modals.login.accountScreen.message') : $t('modals.login.accountScreen.notLoginMessage') }}
     </div>
     <div class="accounts-container">
       <div
@@ -34,7 +34,7 @@
 
 <style lang="scss">
 .account-present {
-  width: $modal_width;
+  max-width: $modal_width;
   padding: $space_normal;
 
   .title {
@@ -128,7 +128,7 @@
 </style>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 import { AccountData } from '~/types/account.types'
 
 export interface Balance {
@@ -138,12 +138,16 @@ export interface Balance {
 
 @Component
 export default class LoginScreenAccounts extends Vue {
+  @Prop({
+    type: Boolean
+  }) isLoginText!: boolean
+
   accounts: AccountData[] = []
   balances: Balance[] = []
 
   created () {
     this.accounts = this.$store.state.profiles.polkadotAccounts
-    this.getBalance(this.$store.state.profiles.polkadotAccounts)
+    this.getBalance(this.accounts)
   }
 
   getBalance (accounts: AccountData[]) {
