@@ -8,10 +8,10 @@
         <div class="post-main-wp">
           <div class="post-data">
             <div class="post-item-header">
-              <PostInfoItem :post-item="post" />
+              <PostInfoItem :post-item="post"/>
 
               <div class="button-wp">
-                <EditButton v-if="isPostOwner && !isMobileScreen()" :link="'/post/?post=' + post.id" />
+                <EditButton v-if="isPostOwner && !isMobileScreen()" :link="'/post/?post=' + post.id"/>
 
                 <OptionButton
                   :post-id="post.id"
@@ -23,12 +23,16 @@
                 />
               </div>
             </div>
-            <Title size="large" :link="post.postLink" :name="post.title" />
+            <Title size="large" :link="post.postLink" :name="post.title"/>
 
-            <Youtube v-if="post.link" :link="post.link" />
-            <PostImage :image-src="post.imageUrl" :link="post.postLink" :is-full-view="true" />
+            <Youtube v-if="post.link" :link="post.link"/>
+            <PostImage :image-src="post.imageUrl" :link="post.postLink" :is-full-view="true"/>
+            
+            <div v-if="post.isComment && rootPost" class="root-comment">
+              In response to <NuxtLink :to="localePath(rootPost.postLink)">{{rootPost.title ? rootPost.title : rootPost.summary}}</NuxtLink>
+            </div>
 
-            <p class="markdown-body" v-html="$md.render(post.body, {html: true})" />
+            <p class="markdown-body" v-html="$md.render(post.body, {html: true})"/>
 
             <PostListItem
               v-if="isShowHiddenPost()"
@@ -42,7 +46,7 @@
             </div>
 
             <div class="post-tags">
-              <Tag v-for="(item, index) in post.tags" :key="index" :tag-name="item" size="medium" />
+              <Tag v-for="(item, index) in post.tags" :key="index" :tag-name="item" size="medium"/>
             </div>
           </div>
         </div>
@@ -50,20 +54,24 @@
           class="mx-4"
         />
         <div class="action-panel-wp">
-          <ActionPanel :is-show-label="true" :is-show-comment-btn="false" :post="post" />
+          <ActionPanel :is-show-label="true" :is-show-comment-btn="false" :post="post"/>
         </div>
       </v-card>
     </div>
 
     <div class="space-item-container">
-      <SpaceListItem v-if="space && currentUser" :space-item-data="space" :avatar-size="40" :current-user="currentUser" />
+      <SpaceListItem v-if="space && currentUser" :space-item-data="space" :avatar-size="40"
+                     :current-user="currentUser"
+      />
     </div>
 
     <v-card
       elevation="2"
       class="comment-container"
     >
-      <Comment :id="post.id" :avatar-src="post.ownerImageUrl" :handle="post.handle" :count="post.visibleRepliesCount" :show-divider="false" />
+      <Comment :id="post.id" :avatar-src="post.ownerImageUrl" :handle="post.handle" :count="post.visibleRepliesCount"
+               :show-divider="false"
+      />
     </v-card>
   </div>
 </template>
@@ -111,6 +119,15 @@
         }
       }
     }
+    
+    .root-comment {
+      font-weight: 500;
+      font-size: $font_huge;
+      a {
+        color: $text_color_primary;
+        text-decoration: none;
+      }
+    }
 
     .markdown-body {
       margin-top: $space_small;
@@ -126,12 +143,12 @@
 
     .hidden-post-text {
       text-align: center;
-      background: $color_white;
-      border: 1px solid $color_light_border;
+      background: $button_bg_white;
+      border: 1px solid $button_outline_gray;
       box-sizing: border-box;
       border-radius: $border_small;
       padding: $space_large;
-      color: $color_dark_gray;
+      color: $text_color_dark_gray;
       font-size: $font_normal;
     }
   }
@@ -144,16 +161,17 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { ProfileStruct, SpaceStruct } from '@subsocial/api/flat-subsocial/flatteners'
+import { ProfileStruct, SpaceStruct } from '@subsocial/types/dto'
 import { PostListItemData } from '~/models/post/post-list-item.model'
 import { getIsPostOwner, getPostIdFromLink, isMobile } from '~/utils/utils'
 
 @Component({})
 export default class PostPage extends Vue {
-  space: SpaceStruct | undefined | null = null
+  space: SpaceStruct | null = null
   post: PostListItemData | null = null
   currentUser?: ProfileStruct
   sharedPost: PostListItemData | null = null
+  rootPost: PostListItemData | null = null
   isPostOwner: boolean = false
   isSharedPostOwner: boolean = false
 
@@ -162,6 +180,7 @@ export default class PostPage extends Vue {
       this.post = this.$store.getters['posts/getPostInfo'](getPostIdFromLink(this.$route.params.post))
       this.setCurrentUser()
       this.getSharedPost()
+      this.getRootPost()
       this.$store.dispatch('space/findSpaceById', this.$route.params.spaceId).then((space) => {
         this.space = space
       })
@@ -173,8 +192,10 @@ export default class PostPage extends Vue {
       if (mutation.type === 'posts/SET_SUGGESTED_POST_IDS' && this.post === null) {
         this.$store.dispatch('posts/getPostById', getPostIdFromLink(this.$route.params.post)).then(() => {
           this.post = this.$store.getters['posts/getPostInfo'](getPostIdFromLink(this.$route.params.post))
+
           this.setCurrentUser()
           this.getSharedPost()
+          this.getRootPost()
           unsubscribe()
         })
         this.$store.dispatch('space/getSpaceById', this.$route.params.spaceId).then((space) => {
@@ -195,6 +216,15 @@ export default class PostPage extends Vue {
       this.$store.dispatch('posts/getPostById', this.post?.sharedPostId).then(() => {
         this.sharedPost = this.$store.getters['posts/getPostInfo'](this.post?.sharedPostId)
         this.isSharedPostOwner = this.currentUser && this.sharedPost ? getIsPostOwner(this.sharedPost?.ownerId, this.currentUser.id) : false
+      })
+    }
+  }
+  
+  getRootPost () {
+    const sharedPostId = this.post?.isComment
+    if (sharedPostId) {
+      this.$store.dispatch('posts/getPostById', this.post?.rootPostId).then(() => {
+        this.rootPost = this.$store.getters['posts/getPostInfo'](this.post?.rootPostId)
       })
     }
   }

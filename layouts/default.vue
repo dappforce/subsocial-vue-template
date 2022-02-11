@@ -16,7 +16,7 @@
 }
 
 #__layout, .theme--light.v-tabs-items {
-  background: $color_page_bg;
+  background: $body_bg;
   width: 100%;
 }
 .container {
@@ -39,6 +39,9 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import StorageService from '~/services/storage.service'
+
+const storageService = new StorageService()
 
 @Component
 export default class Default extends Vue {
@@ -46,6 +49,12 @@ export default class Default extends Vue {
 
   created (): void {
     this.showHideSpinner = !this.showHideSpinner
+    if (typeof window !== 'undefined') {
+      const lang = storageService.getSelectedLanguage()
+      if (lang) {
+        this.$router.push(this.switchLocalePath(lang))
+      }
+    }
     this.$store.dispatch('posts/getSuggestedPostIds').then(() => {
       this.$store.dispatch('profiles/initAccount').then(() => {
         this.$store.dispatch('loading/setLoading', true)

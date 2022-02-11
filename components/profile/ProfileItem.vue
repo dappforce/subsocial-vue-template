@@ -12,14 +12,17 @@
               <Title size="large" :name="profileData.name || profileData.id | addressShortness(addressLength)" />
             </div>
             <div class="profile-stats-wp">
-              <span @click="openModal"><b>{{ profileData.followingCount | numeral('0,0a') }}</b> {{ profileData.followingCount | pluralize('en', ['Following', 'Following']) }}</span>
-              <span @click="openModal"><b>{{ profileData.followersCount | numeral('0,0a') }}</b> {{ profileData.followersCount | pluralize('en', ['Follower', 'Followers']) }}</span>
+              <span @click="openModal">
+                <b>{{profileData.followersCount | numeral('0,0a')}}</b> {{$tc('plural.follower', profileData.followersCount)}}
+              </span>
+              <span @click="openModal">
+                <b>{{profileData.followingCount | numeral('0,0a')}}</b> {{$tc('plural.following', profileData.followingCount)}}
+              </span>
             </div>
           </div>
         </div>
         <div class="button-wp">
           <EditButton v-if="isOwner && isAccountView" :link="'/profile?id=' + profileData.id" />
-          <!--          <OptionButton />-->
         </div>
       </div>
 
@@ -63,13 +66,8 @@
   margin-top: $space_normal;
 
   .account-icon {
-    color: $color_font_secondary;
+    color: $icon_color_dark_gray;
     margin-right: 5px;
-  }
-
-  .gray {
-    color: $color_font_secondary;
-    font-weight: normal;
   }
 
   .profile-item {
@@ -100,7 +98,7 @@
         line-height: $main_line_height;
         align-items: center;
         letter-spacing: 0.15px;
-        color: $color_font_normal;
+        color: $text_color_normal;
 
         a {
           text-decoration: none;
@@ -123,7 +121,7 @@
     .link {
       font-weight: 500;
       letter-spacing: 0.25px;
-      color: $color_primary;
+      color: $text_color_primary;
       text-decoration: none;
     }
 
@@ -144,7 +142,7 @@
 
       .qr-icon {
         margin-left: 10px;
-        color: $color_black;
+        color: $icon_color_normal;
       }
     }
 
@@ -154,11 +152,11 @@
   }
 
   .address-text {
-    color: $color_font_normal;
+    color: $text_color_normal;
   }
 
   .mdi-content-copy {
-    color: $color_black;
+    color: $icon_color_normal;
   }
 
   .action-row {

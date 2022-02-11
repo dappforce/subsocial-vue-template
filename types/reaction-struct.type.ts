@@ -1,4 +1,4 @@
-import { EntityId } from '@subsocial/api/flat-subsocial/dto'
+import { EntityId } from '@subsocial/types/dto'
 
 type AccountAndPostId = string
 export type ReactionId = EntityId

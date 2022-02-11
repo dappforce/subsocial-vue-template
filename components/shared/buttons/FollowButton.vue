@@ -13,15 +13,15 @@
 
 <style lang="scss">
   .follow {
-    background-color: $color_primary !important;
+    background-color: $button_bg_primary !important;
   }
   .following {
-    background-color: $color_white  !important;
+    background-color: $button_bg_white  !important;
   }
   .follow-btn {
     width: 99px;
     height: $buttons_height;
-    border: 1px solid $color_primary;
+    border: 1px solid $button_outline_primary;
     box-sizing: border-box;
     border-radius: $border_small;
     font-style: normal;
@@ -30,14 +30,14 @@
     letter-spacing: 1.25px;
     text-transform: capitalize;
     .v-btn__content {
-      color: $color_primary;
+      color: $text_color_primary;
       font-size: $font_normal;
       flex: initial;
     }
     &.follow {
       border: none;
       .v-btn__content {
-        color: $color_white;
+        color: $text_color_white;
       }
     }
   }

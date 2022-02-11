@@ -8,13 +8,13 @@
 <style scoped lang="scss">
 .space-item {
   padding: 11px 0;
-  border-bottom: 1px solid $color_border;
+  border-bottom: 1px solid $border_outline_gray;
   cursor: pointer;
 
   .space-item-name {
     font-size: $font_normal;
     font-weight: 500;
-    color: $color_black;
+    color: $text_color_normal;
     padding-left: $space_normal;
   }
 }

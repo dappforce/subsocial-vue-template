@@ -9,12 +9,11 @@ export default {
 const Template = (args, { argTypes }) => ({
   props: Object.keys(argTypes),
   components: { AccountDrawerComponent },
-  template: '<AccountDrawer v-bind="$props" />'
+  template: '<AccountDrawer v-bind="$props" :drawer="true" />'
 })
 
 export const AccountDrawer = Template.bind({})
 AccountDrawer.args = {
-  isOpen: false,
   user: {
     avatar: 'QmYS7oGo1FNFCmik9U2mpvabjCgGMUNDe623P9djLtnhbd',
     name: 'Gbaci',

@@ -8,9 +8,9 @@
 
 <style lang="scss">
 .create-post-btn {
-  border: 1px solid $color_border;
+  border: 1px solid $button_outline_gray;
   border-radius: $border_small;
-  background-color: $color_white !important;
+  background-color: $button_bg_white !important;
   box-shadow: none;
 
   .v-btn__content {
@@ -18,7 +18,7 @@
     font-size: $font_normal;
     line-height: 125%;
     text-align: center;
-    color: $color_font_normal;
+    color: $text_color_normal;
   }
 }
 </style>
@@ -27,9 +27,11 @@
 import { Component, Vue } from 'vue-property-decorator'
 
 @Component
-export default class CreateSpaceButtonComponentCreatePostButton extends Vue {
+export default class CreatePostButton extends Vue {
   onClick () {
-    this.$router.push(this.$nuxt.localePath('/post?new'))
+    if (this.$store.state.profiles.currentUser) {
+      this.$router.push(this.$nuxt.localePath('/post?new'))
+    }
   }
 }
 </script>

@@ -10,16 +10,16 @@
 
 <style lang="scss">
 .signin-button {
-  border: 1px solid $color_primary;
+  border: 1px solid $button_bg_primary;
   border-radius: $border_small;
-  background-color: $color_white !important;
+  background-color: $button_bg_white !important;
 
   .v-btn__content {
     font-weight: 500;
     font-size: $font_normal;
     line-height: 125%;
     text-align: center;
-    color: $color_primary;
+    color: $text_color_primary;
     text-transform: capitalize;
   }
 

@@ -19,8 +19,12 @@
               <Title :id="user.id" size="large" :name="user.name" :link="'/accounts/' + user.id" />
             </div>
             <div class="profile-stats-wp">
-              <span @click="openModal"><b>{{ user.followingCount | numeral('0,0a') }}</b> {{ user.followingCount | pluralize('en', [$t('general.following'), $t('general.following')]) }}</span>
-              <span @click="openModal"><b>{{ user.followersCount | numeral('0,0a') }}</b> {{ user.followersCount | pluralize('en', [$t('general.follower'), $t('general.followers')]) }}</span>
+              <span @click="openModal">
+                <b>{{user.followersCount | numeral('0,0a')}}</b> {{$tc('plural.follower', user.followersCount)}}
+              </span>
+              <span @click="openModal">
+                <b>{{user.followingCount | numeral('0,0a')}}</b> {{$tc('plural.following', user.followingCount)}}
+              </span>
             </div>
           </div>
         </div>
@@ -42,7 +46,7 @@
 
       <v-divider />
 
-      <v-list class="account-btn" dense>
+      <v-list class="account-btn custom-hover" dense>
         <v-list-item link :to="localePath('/accounts/' + user.id)">
           <v-list-item-icon>
             <v-icon class="account-icon">
@@ -52,7 +56,7 @@
 
           <v-list-item-content>
             <v-list-item-title>
-              {{ $t('drawer.myProfile') }}
+              {{ $t('buttons.myProfile') }}
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -66,7 +70,7 @@
 
           <v-list-item-content>
             <v-list-item-title>
-              {{ $t('drawer.editMyProfile') }}
+              {{ $t('buttons.editMyProfile') }}
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -85,7 +89,7 @@
                   v-bind="attrs"
                   v-on="on"
                 >
-                  {{ $t('drawer.settings') }}
+                  {{ $t('buttons.settings') }}
                 </v-list-item-title>
               </v-list-item-content>
             </template>
@@ -101,7 +105,7 @@
           </v-list-item-icon>
           <v-list-item-content class="language-container" @click="toggleSelect = !toggleSelect">
             <v-list-item-title>
-              {{ $t('drawer.language') }}: {{ getLanguageName() }}
+              {{ $t('buttons.language') }}: {{ getLanguageName() }}
 
               <v-select
                 v-model="selectedHeaders"
@@ -119,27 +123,29 @@
 
       <v-divider />
 
-      <div class="user-list">
-        <div
-          v-for="(item, index) in accounts"
-          :key="index"
-          class="user-item"
-          @click="setAccount(item)"
-        >
-          <VoteUserItem
-            :user-info="item"
-            :type="'account'"
-            class="user-account"
-          />
+      <div class="drawer-user-container">
+        <div class="user-list">
+          <div
+            v-for="(item, index) in accounts"
+            :key="index"
+            class="user-item"
+            @click="setAccount(item)"
+          >
+            <ProfileAccountListItem
+              :user-info="item"
+              :type="'account'"
+              class="user-account"
+            />
+          </div>
         </div>
         <div class="shadow">
           <v-divider light />
         </div>
       </div>
-
+      
       <div class="sign-out">
         <v-btn class="sign-out__btn" @click="signOut">
-          {{ $t('drawer.signOut') }}
+          {{ $t('buttons.signOut') }}
         </v-btn>
       </div>
       <ModalConnections :is-modal="isOpenModal" :account-id="user.id" />
@@ -190,7 +196,7 @@
           line-height: $main_line_height;
           align-items: center;
           letter-spacing: 0.15px;
-          color: $color_font_normal;
+          color: $text_color_normal;
 
           a {
             text-decoration: none;
@@ -221,12 +227,12 @@
         align-items: center;
 
         .address-text {
-          color: $color_font_normal;
+          color: $text_color_normal;
           font-size: $font_normal;
         }
 
         .v-icon {
-          color: $color_black;
+          color: $icon_color_normal;
           margin-left: 10px;
         }
       }
@@ -242,7 +248,7 @@
 
       .qr-icon {
         margin-left: 10px;
-        color: $color_black;
+        color: $text_color_normal;
       }
     }
 
@@ -254,7 +260,7 @@
       align-items: center;
 
       .gray {
-        color: $color_font_secondary;
+        color: $text_color_dark_gray;
         font-weight: normal;
       }
     }
@@ -264,11 +270,11 @@
     padding-left: 5px;
 
     .v-list-item {
-      color: $color_icon_gray;
+      color: $text_color_dark_gray;
       padding: 0;
 
       .v-icon {
-        color: $color_icon_gray;
+        color: $icon_color_dark_gray;
         margin-right: $space_small;
       }
 
@@ -277,11 +283,12 @@
         font-weight: normal;
         letter-spacing: 0.25px;
         line-height: 1.1rem;
-        color: $color_icon_gray;
+        color: $text_color_dark_gray;
+        z-index: 10;
 
         a {
           text-decoration: none;
-          color: $color_black;
+          color: $text_color_normal;
         }
       }
     }
@@ -320,65 +327,72 @@
       }
     }
   }
-
-  .user-list {
-    height: calc(100% - 373px);
-    overflow: hidden;
-    overflow-y: auto;
+  
+  .drawer-user-container {
+    height: calc(100% - 360px);
     position: relative;
-    margin-bottom: $space_large;
-
-    &::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    &::-webkit-scrollbar-track {
-      box-shadow: none;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background-color: $color_gray;
-      width: 6px;
-    }
-
-    .user-item {
-      padding: 3px 0;
-
-      .user-account {
-        transition: all .2s ease;
-        &:hover {
-          background-color: rgba(238, 236, 236, 0.7);
-          cursor: pointer;
-        }
-      }
-    }
 
     .shadow {
       display: flex;
-      align-items: end;
+      align-items: flex-end;
       height: 50px;
       position: absolute;
-      bottom: 0;
+      bottom: 15px;
       right: 0;
       left: 0;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.4) 17.71%, rgba(255, 255, 255, 0.6) 40.1%, #FFFFFF 78.12%);
+      background: $drawer_shadow;
+    }
+
+    .user-list {
+      height: calc(100% - 15px);
+      overflow: hidden;
+      overflow-y: auto;
+      position: relative;
+      margin-bottom: $space_large;
+      padding-bottom: 30px;
+
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      &::-webkit-scrollbar-track {
+        box-shadow: none;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-color: $scroll_outline_gray;
+        width: 6px;
+      }
+
+      .user-item {
+        padding: 3px 0;
+
+        .user-account {
+          transition: all .2s ease;
+          &:hover {
+            background-color: $hover_menu_item;
+            cursor: pointer;
+          }
+        }
+      }
     }
   }
-
+  
   .sign-out {
     padding-left: 5px;
+    
     &__btn {
-      border: 1px solid $color_primary;
+      border: 1px solid $button_outline_primary;
       box-sizing: border-box;
       border-radius: $border_small;
       width: 100%;
       height: $buttons_height;
-      color: $color_primary;
+      color: $text_color_primary;
       font-size: $font_normal;
       font-weight: 500;
       letter-spacing: 1.25px;
       box-shadow: none;
-      background-color: $color_white !important;
+      background-color: $button_bg_white !important;
     }
   }
 }
@@ -460,6 +474,9 @@ export default class AccountDrawer extends Vue {
 
   changeLocal (event: any) {
     this.toggleSelect = false
+    if (event.code) {
+      storageService.setSelectedLanguage(event.code)
+    }
     this.$router.push(this.switchLocalePath(event.code))
   }
 

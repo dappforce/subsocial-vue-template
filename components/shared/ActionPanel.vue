@@ -50,10 +50,10 @@
       justify-content: center;
       min-height: 40px;
       align-items: center;
-      color: $main_text_color;
+      color: $text_color_dark_gray;
 
       &:hover {
-        color: #E5E5E5;
+        color: $text_color_primary;
       }
     }
   }
@@ -62,7 +62,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { PostStruct } from '@subsocial/api/flat-subsocial/flatteners'
+import { PostStruct } from '@subsocial/types/dto'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
 
 export interface ActionPanelInt {

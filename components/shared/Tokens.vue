@@ -9,18 +9,18 @@
 <style lang="scss">
 .tokens-wp {
   line-height: $main_line_height;
-  color: $color_font_secondary;
+  color: $text_color_dark_gray;
   display: flex;
   align-items: center;
   font-weight: 500;
 
   .strong{
-    color: $color_font_normal;
+    color: $text_color_normal;
   }
 
   &>span:last-child {
     margin-left: 4px;
-    color: $color_font_normal;
+    color: $text_color_normal;
   }
 }
 </style>

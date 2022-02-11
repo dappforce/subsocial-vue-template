@@ -17,7 +17,7 @@
     font-size: $font_small;
     line-height: 20px;
     letter-spacing: 0.25px;
-    color: rgba(0, 0, 0, 0.38);
+    color: $text_color_normal;
   }
 
   .mat-icon-button {

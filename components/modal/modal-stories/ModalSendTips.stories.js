@@ -6,7 +6,7 @@ export default {
     isModal: {
       name: 'Open modal',
       control: 'boolean',
-      defaultValue: false
+      defaultValue: true
     }
   },
   myBalance: {
@@ -23,13 +23,13 @@ const Template = (args, { argTypes }) => ({
   props: Object.keys(argTypes),
   components: { ModalSendTipsComponent },
   data: () => ({ myBalance, fromAccount }),
-  template: '<ModalSendTips v-bind="$props" :fromAccount="fromAccount" :myBalance="myBalance"/>'
+  template: '<ModalSendTips v-bind="$props" :fromAccount="fromAccount" :myBalance="myBalance" :openModal="isModal" />'
 })
 
 export const ModalSendTips = Template.bind({})
 
 ModalSendTips.args = {
-  isModal: false,
+  isModal: true,
   myBalance,
   userInfo: {
     avatar: 'QmWRGfA1MwTzF4RRXUv9QqPZTrbzRP7CQGNfTgSgj342w4',

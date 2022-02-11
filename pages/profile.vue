@@ -2,7 +2,7 @@
   <div>
     <SpaceEdit v-if="havePermission" :is-edit="isEdit" :profile-item="profile" :is-profile="true" />
     <div v-if="!havePermission && profile" class="error">
-      {{ $t('generalMessages.dontHavePermissionToEditProfile') }}
+      {{ $t('generalMessages.dontHavePermission', {type: $t('general.profile')}) }}
     </div>
     <BounceSpinner v-if="!havePermission && !profile" />
   </div>

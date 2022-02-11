@@ -1,6 +1,6 @@
 <template>
   <v-btn class="reply-button" @click="onClick">
-    <v-icon medium class="shared-icon">
+    <v-icon class="shared-icon">
       mdi-reply
     </v-icon>
     <span v-if="isShowLabel" class="vote-label">{{ $t('buttons.reply') }}</span>
@@ -8,18 +8,21 @@
 </template>
 
 <style lang="scss">
-.reply-button-button {
+.reply-button {
   display: flex;
   align-items: center;
-}
+  background-color: transparent !important;
+  color: $icon_color_dark_gray !important;
+  box-shadow: none;
 
-.vote-label {
-  margin-left: 9px;
-  font-weight: 500;
-  font-size: $font_small;
-  line-height: $main_line_height;
-  letter-spacing: 0.1px;
-  text-transform: capitalize;
+  .vote-label {
+    margin-left: 9px;
+    font-weight: 500;
+    font-size: $font_normal;
+    line-height: $main_line_height;
+    letter-spacing: 0.1px;
+    text-transform: capitalize;
+  }
 }
 </style>
 

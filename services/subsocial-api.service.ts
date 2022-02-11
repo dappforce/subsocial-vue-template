@@ -1,6 +1,6 @@
-import { newFlatSubsocialApi, SubsocialApi } from '@subsocial/api'
+import { newFlatSubsocialApi } from '@subsocial/api'
 import { FlatSubsocialApi } from '@subsocial/api/flat-subsocial'
-import { AnyId } from '@subsocial/api/flat-subsocial/dto'
+import { AnyId } from '@subsocial/types/dto';
 import { environment } from '~/environments/environment'
 
 type FetchSubstrateProps = {

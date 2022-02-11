@@ -12,7 +12,7 @@ export default {
     isModal: {
       name: 'Open modal',
       control: 'boolean',
-      defaultValue: false
+      defaultValue: true
     },
     status: {
       options: [ACCOUNT_STATUS.EXTENSION_NOT_FOUND, ACCOUNT_STATUS.ACCOUNTS_NOT_FOUND, ACCOUNT_STATUS.UNAUTHORIZED],
@@ -37,12 +37,12 @@ const Template = (args, { argTypes }) => ({
   props: Object.keys(argTypes),
   components: { ModalLoginComponent },
   data: () => ({ status, isLoginText }),
-  template: '<ModalLogin v-bind="$props" :status="status" :isLoginText="isLoginText" />'
+  template: '<ModalLogin v-bind="$props" :status="status" :isLoginText="isLoginText" :openModal="isModal" />'
 })
 
 export const ModalLogin = Template.bind({})
 
 ModalLogin.args = {
-  isModal: false,
+  isModal: true,
   status
 }

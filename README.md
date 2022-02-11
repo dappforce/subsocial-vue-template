@@ -20,6 +20,15 @@ $ yarn start
 $ yarn generate
 ```
 
+## Storybook development server
+
+Run `yarn storybook`. Navigate to `http://localhost:3003/`.
+
+## Build storybook
+
+Run `yarn build-storybook`.
+
+
 For detailed explanation on how things work, check out the [documentation](https://nuxtjs.org).
 
 ## Special Directories

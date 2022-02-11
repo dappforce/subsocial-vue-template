@@ -23,6 +23,7 @@ export interface PostListItemData {
   spaceId?: string;
   handle?: string;
   link?: string;
+  rootPostId?: string | undefined;
   sharedPostId?: string;
   hidden?: boolean;
   hiddenSpace?: boolean;

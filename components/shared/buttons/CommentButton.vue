@@ -1,6 +1,6 @@
 <template>
-  <v-btn class="comment-button" @click="onClick">
-    <v-icon medium class="shared-icon">
+  <v-btn depressed class="comment-button" @click="onClick">
+    <v-icon class="shared-icon">
       mdi-comment-text-outline
     </v-icon>
     <span class="count-label">{{ count ? count : '' }}</span>
@@ -11,11 +11,13 @@
 .comment-button {
   display: flex;
   align-items: center;
+  background-color: transparent !important;
+  color: $icon_color_dark_gray !important;
 
   .count-label {
     margin-left: 9px;
     font-weight: 500;
-    font-size: $font_small;
+    font-size: $font_normal;
     line-height: $main_line_height;
     letter-spacing: 0.1px;
     text-transform: capitalize;

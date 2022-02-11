@@ -7,7 +7,6 @@
     <template #activator="{ on, attrs }">
       <v-icon
         v-bind="attrs"
-        medium
         class="options-button"
         color="#000000DE"
         v-on="on"
@@ -83,8 +82,9 @@
     height: 36px;
 
     &__title {
-      color: $color_icon_gray;
+      color: $text_color_dark_gray;
       font-size: $font_normal;
+      z-index: 10;
     }
 
     .v-list-item__icon {
@@ -92,12 +92,12 @@
       margin: 0 $space_normal 0 0 ;
 
       .v-icon {
-        color: $color_icon_gray;
+        color: $icon_color_dark_gray;
       }
     }
 
     &:hover {
-      background-color: rgba(0,0,0,0.05);
+      background-color: $hover_menu_item;
     }
   }
 
@@ -108,7 +108,7 @@
     padding: 0 !important;
 
     .v-btn__content {
-      color: $color_icon_gray;
+      color: $text_color_dark_gray;
       font-size: $font_normal;
       line-height: 1.2;
       font-weight: normal;

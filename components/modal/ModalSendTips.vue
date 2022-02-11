@@ -3,6 +3,7 @@
     <v-dialog
       v-model="openModal"
       max-width="500px"
+      @click:outside="onCancel"
     >
       <v-card class="v-modal-container">
         <v-card-title class="st-title">
@@ -17,7 +18,7 @@
             <UserItem v-if="userInfo" :user-info="userInfo" />
             <ValidationObserver ref="form" v-slot="{ handleSubmit, handleReset }">
               <form @submit.prevent="handleSubmit(submit)" @reset.prevent="handleReset(onCancel)">
-                <ValidationProvider v-slot="{ errors }" :rules="'required|numeric'">
+                <ValidationProvider v-slot="{ errors }" :rules="'required|numeric|min_value:1'">
                   <div class="form-row">
                     <v-text-field
                       v-model="amount"
@@ -40,7 +41,7 @@
               <v-btn class="button-third-color" @click="onCancel">
                 {{ $t('buttons.cancel') }}
               </v-btn>
-              <v-btn class="button-main-color" @click="submit">
+              <v-btn :disabled="validate" class="button-main-color" @click="submit">
                 {{ $t('buttons.sendTips') }}
               </v-btn>
             </div>
@@ -77,10 +78,6 @@
       &__slot {
         min-height: 36px;
       }
-
-      & .v-label {
-        top: 9px;
-      }
     }
 
     .v-text-field__details {
@@ -89,17 +86,17 @@
 
     .v-messages__message {
       font-size: $font_extra_small;
-      color: $color_red;
+      color: $text_color_red;
     }
 
     .my-balance {
       font-size: $font_small;
-      color: $color_font_secondary;
+      color: $text_color_dark_gray;
       line-height: 22px;
       margin-top: 3px;
 
       strong {
-        color: $color_black;
+        color: $text_color_normal;
       }
     }
 
@@ -111,24 +108,24 @@
       gap: $space_normal;
 
       .button-main-color {
-        background-color: $color_primary;
+        background-color: $button_bg_primary;
       }
 
       .button-third-color {
-        background-color: $color_white
+        background-color: $button_bg_white
       }
 
       button {
         min-width: 110px !important;
         font-size: $font_normal;
-        border: 1px solid #E0E0E0 !important;
+        border: 1px solid $button_outline_gray !important;
         border-radius: $border_small;
         box-shadow: none;
         text-transform: initial;
 
         &:last-child {
           border: none;
-          color: $color_white;
+          color: $text_color_white;
         }
       }
     }
@@ -140,8 +137,8 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { extend, ValidationObserver, ValidationProvider } from 'vee-validate'
-import { numeric, required } from 'vee-validate/dist/rules'
-import { ProfileData } from '@subsocial/api/flat-subsocial/dto'
+import { numeric, required, min_value } from 'vee-validate/dist/rules'
+import { ProfileData } from '@subsocial/types/dto'
 import { config } from '~/config/config'
 
 extend('numeric', {
@@ -151,6 +148,10 @@ extend('numeric', {
 extend('required', {
   ...required,
   message: 'This field is required'
+})
+extend('min_value', {
+  ...min_value,
+  message: 'The field must be greater than 0'
 })
 
 @Component({
@@ -204,6 +205,10 @@ export default class ModalSendTips extends Vue {
   onCancel (): void {
     this.amount = ''
     this.onClick()
+  }
+  
+  get validate (): boolean {
+    return +this.amount > +this.myBalance
   }
 }
 </script>

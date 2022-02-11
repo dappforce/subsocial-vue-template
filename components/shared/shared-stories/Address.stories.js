@@ -8,7 +8,7 @@ export default {
 const Template = (args, { argTypes }) => ({
   props: Object.keys(argTypes),
   components: { AddressComponent },
-  template: '<Address @onClick="click" v-bind="$props" />'
+  template: '<Address v-bind="$props" />'
 })
 
 export const Address = Template.bind({})

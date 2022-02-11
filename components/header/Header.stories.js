@@ -13,7 +13,7 @@ const user = {
 const balance = '10.000'
 
 export default {
-  title: 'Header',
+  title: 'Header/Header',
   argTypes: {
     balance: {
       control: {

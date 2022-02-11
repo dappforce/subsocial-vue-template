@@ -1,4 +1,4 @@
-import { ProfileData } from '@subsocial/api/flat-subsocial/dto'
+import { ProfileData } from '@subsocial/types/dto'
 
 export type PolkadotAccount = {
   address: string;

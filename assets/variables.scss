@@ -7,37 +7,79 @@ $font_huge: 1.375rem;
 
 //Box shadows
 $box_shadow_for_tabs: 0 1px 8px rgb(0 0 0 / 20%);
+$box_shadow_left_drawer: 0px 4px 15px rgba(0, 0, 0, 0.1);
 $box_shadow_card: 0px 1px 1px rgba(0, 0, 0, 0.14), 0px 2px 1px rgba(0, 0, 0, 0.12), 0px 1px 3px rgba(0, 0, 0, 0.2);
 $header_shadow: 0px 3px 10px rgba(153, 153, 153, 0.14), 0px 3px 9px rgba(153, 153, 153, 0.12), 0px 1px 20px rgba(153, 153, 153, 0.2);
+$drawer_shadow: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.4) 17.71%, rgba(255, 255, 255, 0.6) 40.1%, #FFFFFF 78.12%);
 
-//Colors 
-$main_text_color: rgba(0, 0, 0, 0.6);
-$color_page_bg: #f2f2f2;
-$color_font_normal: #222;
-$color_font_secondary: #a0a0a0;
-$color_primary: #eb2f96;
-$color_link_hover: #f759ab;
-$color_light_border: #ddd;
-$color_warn_border: #f3e8ac;
-$color_warn_border2: #ED6C02;
-$color_hover_selectable_bg: #fff0f6;
-$color_border: #e8e8e8;
-$color_shadow: #eeecec;
-$color_yellow: #f3e8ac;
-$color_white: #fff;
-$color_black: #000;
-$color_gray: #5f5f5f;
-$color_disabled_gray: #B3B3B3;
-$color_red: #d42c19;
-$color_green: #34c759;
-$color_disabled: #ccc;
-$color_dark_gray: #888888;
-$color_warning_border: #F1E8B3;
-$color_icon_gray: #666666;
-$color_hover_social_linK: #d9d9d9;
+:root {
+  --primary-color: #eb2f96;
+  --seconadry-color: #222;
+  --dark-gray: #888888;
+  --outline-color: #DDDDDD;
+  --bg-color: #F2F2F2;
+  --white-color: #fff;
+  --text-red-color: #d42c19;
+  --text-disabled-color: #BCBCBC;
+  --green-color: #3BB356;
+  --red-color: #EA3323;
+  --yellow-color: #EFB041;
+  --light-yellow-color: #FFFAD5;
+  --warning-light-color: #f3e8ac;
+  --warning-color: #ED6C02;
+  --hover-color: #FCF1F6;
+}
 
-//Hover effects
-$button_hover: rgba(0, 0, 0, 0.2);
+//Colors background
+$comment_bg_gray: var(--bg-color);
+$comment_bg_white: var(--white-color);
+$icon_bg_gray: var(--bg-color);
+$tag_bg_gray: var(--bg-color);
+$body_bg: var(--bg-color);
+$snackbar_bg: var(--white-color);
+$tab_bg_white: var(--white-color);
+$button_bg_primary: var(--primary-color);
+$button_bg_disabled: var(--bg-color);
+$button_bg_white: var(--white-color);
+$spinner_bg: var(--primary-color);
+$container_bg_white: var(--white-color);
+$alert_message_bg: var(--light-yellow-color);
+$hidden_container_bg: var(--light-yellow-color);
+
+//Colors text
+$text_color_dark_gray: var(--dark-gray);
+$text_color_primary: var(--primary-color);
+$text_color_normal: var(--seconadry-color);
+$text_color_white: var(--white-color);
+$text_color_red: var(--text-red-color);
+$text_color_disabled: var(--text-disabled-color);
+
+//Colors outline&border
+$button_outline_gray: var(--outline-color);
+$button_outline_primary: var(--primary-color);
+$input_outline_gray: var(--outline-color);
+$input_focused_outline: var(--seconadry-color);
+$line_outline_gray: var(--outline-color);
+$photo_outline_gray: var(--outline-color);
+$border_outline_gray: var(--outline-color);
+$border_outline_warn: var(--warning-light-color);
+$border_outline_warn_2: var(--warning-color);
+
+//Colors icon
+$icon_color_dark_gray: var(--dark-gray);
+$icon_color_normal: var(--seconadry-color);
+$icon_color_white: var(--white-color);
+$icon_color_alert: var(--yellow-color);
+$icon_color_like: var(--green-color);
+$icon_color_dislike: var(--red-color);
+
+//Colors hover
+$hover_menu_item: var(--hover-color);
+
+//Colors general
+$scroll_outline_gray: var(--outline-color);
+$slider_color: var(--primary-color);
+
 
 //Space
 $space_mini: .25rem;

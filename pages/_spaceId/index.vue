@@ -4,7 +4,7 @@
     <div v-if="postListIds.length" class="post-list-container">
       <PostContainer :ids="postListIds" :type="isMyOwnSpace ? 'all' : 'public'" />
     </div>
-    <NoPosts v-if="!postListIds.length" :message="$t('generalMessages.noPostYet')" />
+    <NoPosts v-if="!postListIds.length" :message="$t('content.noPosts')" />
   </div>
 </template>
 
@@ -16,7 +16,7 @@
   align-items: center;
 
   .space-stats-wp {
-    color: $color_font_normal !important;
+    color: $text_color_normal !important;
     margin-top: $space_small;
 
     .count {

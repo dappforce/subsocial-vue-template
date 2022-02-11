@@ -7,9 +7,9 @@
 
 <style lang="scss">
 .tips-btn {
-  background-color: $color_white !important;
+  background-color: $button_bg_white !important;
   height: $buttons_height;
-  border: 1px solid $color_border;
+  border: 1px solid $button_outline_gray;
   box-sizing: border-box;
   border-radius: $border_small;
   font-style: normal;
@@ -19,16 +19,25 @@
   text-transform: capitalize;
 
   .v-btn__content {
-    color: $color_font_normal;
+    color: $input_focused_outline;
     font-size: $font_normal;
     flex: initial;
+  }
+
+  &:disabled {
+    border: none;
+    background-color: $button_bg_disabled !important;
+
+    .v-btn__content {
+      color: $text_color_disabled;
+    }
   }
 }
 </style>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { ProfileData } from '@subsocial/api/flat-subsocial/dto'
+import { ProfileData } from '@subsocial/types/dto'
 
 @Component
 export default class SendTipsButton extends Vue {

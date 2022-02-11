@@ -1,3 +1,4 @@
+//Set font 
 body {
   font-family: Roboto, sans-serif
 }
@@ -6,22 +7,96 @@ iframe {
   border: none !important;
 }
 
+//Update hover styles for drawer
+
+.custom-hover .v-list-item--link:before {
+  background-color: $hover_menu_item !important;
+}
+.custom-hover .theme--light.v-list-item:hover {
+  .v-list-item__title {
+    color: $text_color_primary;
+  }
+
+  .v-list-item__icon .v-icon {
+    color: $text_color_primary;
+  }
+  
+  &::before {
+    opacity: 1!important;
+  }
+}
+
+//Delete default focus/hover for button
+
 .theme--light.v-btn:focus::before {
   opacity: 0 !important;
 }
 
-theme--light.v-btn:hover::before {
+.theme--light.v-btn:hover::before {
   opacity: 0 !important;
 }
 
 
-.v-list-item--link:before {
-  background-color: #FCF1F6 !important;
-}
-.theme--light.v-list-item:hover::before {
-  opacity: 1!important;
+//Scroll
+body {
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    box-shadow: none;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $scroll_outline_gray;
+    width: 6px;
+  }
 }
 
+.action-panel-wp {
+  button.v-btn.v-btn--has-bg {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+
+//Updates Vuetify styles
+
+.v-label:first-letter {
+  text-transform: capitalize !important;
+}
+
+.v-select--chips.v-text-field--outlined .v-label.v-label--active {
+  padding-left: 7px;
+}
+
+.v-select.v-select--chips:not(.v-text-field--single-line).v-text-field--enclosed .v-select__selections {
+  min-height: 54px !important;
+}
+
+.v-text-field--filled > .v-input__control > .v-input__slot, 
+.v-text-field--full-width > .v-input__control > .v-input__slot, 
+.v-text-field--outlined > .v-input__control > .v-input__slot {
+  min-height: 54px !important;
+}
+
+.v-text-field--outlined fieldset {
+  padding-left: 19px;
+}
+
+.v-text-field--outlined .v-label.v-label--active {
+  top: 15px !important;
+  display: block;
+}
+
+.v-select-list {
+  .space-image {
+    width: 36px;
+    height: 36px;
+    margin-right: 10px;
+    border-radius: 50%;
+  }
+}
 
 .v-btn {
   &__content {
@@ -35,65 +110,58 @@ theme--light.v-btn:hover::before {
 }
 
 .v-menu__content {
-  z-index: 10!important;
+  z-index: 204!important;
 }
 
-body {
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-track {
-    box-shadow: none;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: $color_gray;
-    width: 6px;
-  }
-}
-
-.action-panel-wp {
-  button.v-btn.v-btn--has-bg {
-    background-color: transparent;
-    box-shadow: none;
-
-  }
-}
-
-.v-text-field--outlined fieldset {
-  padding-left: 19px;
-}
-
-.v-text-field--outlined .v-label.v-label--active {
-  top: 15px !important;
-  display: block;
-}
-
-.v-label:first-letter {
-  text-transform: capitalize !important;
-}
-
-.v-select.v-select--chips:not(.v-text-field--single-line).v-text-field--enclosed .v-select__selections {
-  min-height: 55px !important;
-}
-
-.v-select--chips.v-text-field--outlined .v-label.v-label--active {
-  padding-left: 7px;
-}
-
+//Error state for inputs
 .error {
-  border: 2px solid $color_warn_border2;
+  border: 2px solid $border_outline_warn_2;
   border-radius: 4px;
   width: fit-content;
   display: flex;
   align-items: center;
   font-size: $font_normal;
   padding: $space_small $space_normal;
-  color: $color_font_normal;
+  color: $text_color_normal;
   margin: 10vh auto;
 
   & img {
     margin-right: $space_tiny;
+  }
+}
+
+//Global styles
+
+.hidden-container {
+  margin: (-$space_normal) (-$space_normal) $space_normal;
+  height: 40px;
+  background: $hidden_container_bg;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 $space_normal;
+  color: $text_color_normal;
+  font-size: $font_small;
+  border-bottom: 1px solid $border_outline_warn;
+
+  .v-icon {
+    margin-right: 10px;
+    color: $icon_color_alert !important;
+  }
+
+  .make-visible {
+    border: 1px solid $button_outline_gray;
+    box-sizing: border-box;
+    border-radius: $border_small;
+    color: $text_color_normal;
+    font-weight: 500;
+    line-height: 125%;
+    padding: 3px 5px;
+    transition: all .2s ease;
+
+    &:hover {
+      cursor: pointer;
+      color: $text_color_primary;
+    }
   }
 }

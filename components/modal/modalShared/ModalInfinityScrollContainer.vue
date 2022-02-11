@@ -25,7 +25,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { ProfileStruct } from '@subsocial/api/flat-subsocial/flatteners'
+import { ProfileStruct } from '@subsocial/types/dto'
 import { config } from '~/config/config'
 
 const stepNumber = config.stepForLoading

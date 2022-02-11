@@ -1,11 +1,9 @@
-import { PostStruct, SpaceStruct } from '@subsocial/api/flat-subsocial/flatteners'
+import { PostStruct, SpaceStruct, AnyId } from '@subsocial/types/dto'
 import { Commit, Dispatch } from 'vuex/types/index'
-import { AnyId } from '@subsocial/api/flat-subsocial/dto'
 import { SpaceContentExtend, SpaceListItemData } from '~/models/space/space-list-item.model'
 import SpaceService from '~/services/space.service'
 import { Content } from '~/types/content'
 import { config } from '~/config/config'
-import { PostModel } from '~/store/posts'
 
 const spaceServices = new SpaceService()
 
