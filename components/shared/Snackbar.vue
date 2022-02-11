@@ -5,7 +5,6 @@
       :timeout="timeout"
       fixed
       bottom
-      color="#fff"
       class="snack"
       left
     >
@@ -20,10 +19,11 @@
 
   .v-snack__wrapper {
     min-width: 150px;
+    background-color: $snackbar_bg;
   }
 
   .v-snack__content {
-    color: $color_font_normal;
+    color: $text_color_normal;
   }
 }
 </style>

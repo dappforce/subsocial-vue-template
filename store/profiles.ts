@@ -1,6 +1,5 @@
 import { Commit, Dispatch } from 'vuex/types/index'
-import { ProfileStruct } from '@subsocial/api/flat-subsocial/flatteners'
-import { ProfileContent } from '@subsocial/api/flat-subsocial/dto'
+import { ProfileStruct, ProfileContent } from '@subsocial/types/dto'
 import ProfileService from '~/services/profile.service'
 import { Content } from '~/types/content'
 import { ACCOUNT_STATUS } from '~/models/enum/account-status.enum'

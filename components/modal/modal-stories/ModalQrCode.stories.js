@@ -6,7 +6,7 @@ export default {
     isModal: {
       name: 'Open modal',
       control: 'boolean',
-      defaultValue: false
+      defaultValue: true
     }
   }
 }
@@ -14,12 +14,12 @@ export default {
 const Template = (args, { argTypes }) => ({
   props: Object.keys(argTypes),
   components: { ModalQrCodeComponent },
-  template: '<ModalQrCode v-bind="$props"  />'
+  template: '<ModalQrCode v-bind="$props" :openModal="isModal" />'
 })
 
 export const ModalQrCode = Template.bind({})
 
 ModalQrCode.args = {
-  isModal: false,
+  isModal: true,
   address: 'QmWRGfA1MwTzF4RRXUv9QqPZTrbzRP7CQGNfTgSgj342w4'
 }

@@ -6,9 +6,9 @@
 
 <style lang="scss">
 .edit-space-btn {
-  background-color: $color_white !important;
+  background-color: $button_bg_white !important;
   height: $buttons_height;
-  border: 1px solid $color_border;
+  border: 1px solid $button_outline_gray;
   box-sizing: border-box;
   border-radius: $border_small;
   font-style: normal;
@@ -18,7 +18,7 @@
   text-transform: capitalize;
 
   .v-btn__content {
-    color: $color_font_normal;
+    color: $input_focused_outline;
     font-size: $font_normal;
     flex: initial;
   }
@@ -35,7 +35,9 @@ export default class EditSpaceButton extends Vue {
   }) spaceId!: string
 
   onClick (): void {
-    this.$router.push(this.$nuxt.localePath('/space/?space=' + this.spaceId))
+    if (this.$store.state.profiles.currentUser) {
+      this.$router.push(this.$nuxt.localePath('/space/?space=' + this.spaceId))
+    }
   }
 }
 </script>

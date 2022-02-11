@@ -14,25 +14,31 @@
           {{ $t('post.sharePost') }}
         </div>
 
-        <SpacesDropdown class="modal-space-dropdown" :space-id="post.spaceId" :is-filter="true" @selectedSpace="updateSpaceID" />
+        <div v-if="!isEmptySpaces">
+          <SpacesDropdown class="modal-space-dropdown" :space-id="post.spaceId" :is-filter="true" @selectedSpace="updateSpaceID" />
+          
+          <MdeEditor
+            :show-editor="true"
+            :height="'50px'"
+            :placeholder="$t('forms.placeholder.addComment')"
+            :text="comment"
+            @contentUpdate="updateComment"
+          />
 
-        <MdeEditor
-          :show-editor="true"
-          :height="'50px'"
-          :placeholder="$t('post.addComment')"
-          :text="comment"
-          @contentUpdate="updateComment"
-        />
+          <PostListItem v-if="post" :post-item-data="post" :current-user-id="currentUser ? currentUser.id : null" :is-shared-post="true" />
 
-        <PostListItem v-if="post" :post-item-data="post" :current-user-id="currentUser ? currentUser.id : null" :is-shared-post="true" />
+          <div class="button-container">
+            <v-btn class="button-third-color" @click="onClick">
+              {{ $t('buttons.cancel') }}
+            </v-btn>
+            <v-btn class="button-main-color" @click="sharePost">
+              {{ $t('buttons.createAPost') }}
+            </v-btn>
+          </div>
+        </div>
 
-        <div class="button-container">
-          <v-btn class="button-third-color" @click="onClick">
-            {{ $t('buttons.cancel') }}
-          </v-btn>
-          <v-btn class="button-main-color" @click="sharePost">
-            {{ $t('buttons.createAPost') }}
-          </v-btn>
+        <div v-if="isEmptySpaces" class="space-is-not-exist">
+          <CreateSpaceButton/>
         </div>
       </v-card>
     </v-dialog>
@@ -58,7 +64,7 @@
     }
 
     &::-webkit-scrollbar-thumb {
-      background-color: $color_gray;
+      background-color: $scroll_outline_gray;
       width: 6px;
     }
   }
@@ -90,17 +96,21 @@
   }
 
   .editor-toolbar, .CodeMirror {
-    border-color: $color_border;
+    border-color: $border_outline_gray;
   }
 
   .v-text-field--outlined fieldset {
-    border-color: $color_border;
+    border-color: $input_outline_gray;
   }
 
   .v-text-field--outlined.v-input--is-focused fieldset,
   .v-text-field--outlined.v-input--has-state fieldset {
     border-width: 1px;
-    border-color: $color_font_normal;
+    border-color: $text_color_normal;
+  }
+  
+  .space-is-not-exist {
+    margin-top: $space_large;
   }
 
   .button-container {
@@ -111,24 +121,24 @@
     gap: $space_normal;
 
     .button-main-color {
-      background-color: $color_primary;
+      background-color: $button_bg_primary;
     }
 
     .button-third-color {
-      background-color: $color_white
+      background-color: $button_bg_white
     }
 
     button {
       min-width: 110px !important;
       font-size: $font_normal;
-      border: 1px solid #E0E0E0 !important;
+      border: 1px solid $button_outline_gray !important;
       border-radius: $border_small;
       box-shadow: none;
       text-transform: initial;
 
       &:last-child {
         border: none;
-        color: $color_white;
+        color: $text_color_white;
       }
     }
   }
@@ -137,7 +147,7 @@
 
 <script lang="ts">
 import { Component, Prop, Watch } from 'vue-property-decorator'
-import { ProfileStruct } from '@subsocial/api/flat-subsocial/flatteners'
+import { ProfileStruct } from '@subsocial/types/dto'
 import { CommonContent, IpfsCid } from '@subsocial/types'
 import { SubmittableResult } from '@polkadot/api'
 import { createPostSlug } from '@subsocial/utils'
@@ -148,10 +158,13 @@ import { METHODS, PALLETS } from '~/constants/query'
 import TransactionService from '~/services/transaction.service'
 import { getNewIdFromEvent } from '~/utils/utils'
 import { SpaceListItemData } from '~/models/space/space-list-item.model'
+import CreateSpaceButton from '~/components/shared/buttons/CreateSpaceButton.vue'
+import SpacesDropdown from '~/components/space/SpacesDropdown.vue'
 
 const transactionService = new TransactionService()
-
-@Component
+@Component({
+  components: { SpacesDropdown, CreateSpaceButton }
+})
 export default class ModalSharedPost extends TransactionButton {
   @Prop({
     type: Boolean,
@@ -173,12 +186,19 @@ export default class ModalSharedPost extends TransactionButton {
   post: PostListItemData | null = null
   currentUser?: ProfileStruct
   cid: IpfsCid | undefined
+  isEmptySpaces: boolean = false
 
   @Watch('isModal')
   isModalHandler () {
     this.openModal = this.isModal
     this.getPost()
     this.setCurrentUser()
+  }
+  
+  created () {
+    this.$nuxt.$on('isSpaceExist', (payload: boolean) => {
+      this.isEmptySpaces = payload
+    })
   }
 
   onClick (): void {

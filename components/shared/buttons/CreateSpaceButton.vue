@@ -1,6 +1,6 @@
 <template>
   <v-btn depressed class="create-space-btn" :class="[isHaveSpace ? 'have-space' : '']" @click="onClick">
-    {{ isHeaderBtn ? '+ Create Space' : 'Create space' }}
+    {{ isHeaderBtn ? '+ ' + $t('buttons.createSpace') : $t('buttons.createSpace') }}
   </v-btn>
 </template>
 
@@ -8,7 +8,7 @@
 .create-space-btn {
   min-width: 99px;
   height: $buttons_height;
-  border: 1px solid $color_primary;
+  border: 1px solid $button_outline_primary;
   box-sizing: border-box;
   border-radius: $border_small;
   font-style: normal;
@@ -16,25 +16,25 @@
   line-height: 16px;
   letter-spacing: 1.25px;
   text-transform: capitalize;
-  background-color: $color_white !important;
+  background-color: $button_bg_white !important;
 
   .v-btn__content {
-    color: $color_primary;
+    color: $text_color_primary;
     font-size: $font_normal;
   }
 
   &.have-space {
-    background-color: $color_white !important;
-    border: 1px solid $color_border;
+    background-color: $button_bg_white !important;
+    border: 1px solid $button_outline_gray;
 
     .v-btn__content {
-      color: $color_font_normal;
+      color: $text_color_normal;
     }
   }
 
   &:disabled {
     border: none;
-    color: #B3B3B3 !important;
+    color: $text_color_disabled !important;
     opacity: 0.5;
   }
 }
@@ -56,7 +56,9 @@ export default class CreateSpaceButton extends Vue {
   }) isHaveSpace!: boolean
 
   onClick () {
-    this.$router.push(this.$nuxt.localePath('/space?new'))
+    if (this.$store.state.profiles.currentUser) {
+      this.$router.push(this.$nuxt.localePath('/space?new'))
+    }
   }
 }
 </script>

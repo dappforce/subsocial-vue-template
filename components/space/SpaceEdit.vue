@@ -2,10 +2,12 @@
   <section class="edit-space-container">
     <v-card>
       <h2 class="edit-space-title">
-        {{ isEdit ? $t('general.edit') : $t('general.new') }} {{ isProfile ? $t('general.profile') : $t('general.space') }}
+        {{ isEdit ? $t('general.edit') : $t('general.new') }} {{
+          isProfile ? $t('general.profile') : $t('general.space')
+        }}
       </h2>
 
-      <ImageLoader :avatar="avatar" :type="'round'" @avatar="updateImageCID" />
+      <ImageLoader :avatar="avatar" :type="'round'" @avatar="updateImageCID"/>
       <ValidationObserver ref="form" v-slot="{ handleSubmit, handleReset }">
         <form @submit.prevent="handleSubmit(submit)" @reset.prevent="handleReset(clear)">
           <div class="form-row">
@@ -13,7 +15,7 @@
               <v-text-field
                 v-model="name"
                 outlined
-                :label="'* ' + $t('forms.fieldName.spaceProfileName', {type: isProfile ? $t('general.profile') : $t('general.space') })"
+                :label="'* ' + $t('forms.placeholder.profileName', {type: isProfile ? $t('general.profile') : $t('general.space') })"
                 required
                 hide-details="auto"
                 :messages="errors[0]"
@@ -21,7 +23,13 @@
             </ValidationProvider>
           </div>
           <div class="form-row">
-            <mde-editor :show-editor="true" :text="description" :height="'200px'" @contentUpdate="updateDescription" />
+            <mde-editor
+              :show-editor="true"
+              :text="description"
+              :placeholder="$t('forms.placeholder.postBody')"
+              :height="'200px'"
+              @contentUpdate="updateDescription"
+            />
           </div>
           <div v-if="!isProfile" class="form-row">
             <v-combobox
@@ -34,7 +42,7 @@
               deletable-chips
               class="tag-input"
               :search-input.sync="search"
-              :placeholder="$t('forms.placeholder.postBody')"
+              :placeholder="$t('forms.placeholder.tags')"
               hide-details="auto"
               @keyup.tab="updateTags"
               @paste="updateTags"
@@ -61,6 +69,7 @@
   height: 80px;
   border-radius: 50%;
 }
+
 .edit-space-container {
   max-width: 628px;
   margin: $space_large auto 0;
@@ -77,41 +86,41 @@
   }
 
   .v-text-field__details {
-    padding: 0!important;
+    padding: 0 !important;
   }
 
   .form-row {
     width: 100%;
     margin-bottom: $space_big;
-    
+
     &:last-child {
       margin-bottom: 0;
     }
 
     .editor-toolbar, .CodeMirror {
-      border-color: $color_border;
+      border-color: $border_outline_gray;
     }
 
     .CodeMirror-placeholder {
-      font-size: 16px;
-      color: rgba(0, 0, 0, 0.6);
+      font-size: $font_normal;
+      color: $text_color_dark_gray;
       opacity: 1;
     }
 
     .v-text-field--outlined fieldset {
-      border-color: $color_border;
+      border-color: $input_outline_gray;
     }
 
     .v-text-field--outlined.v-input--is-focused fieldset, .v-text-field--outlined.v-input--has-state fieldset {
       border-width: 1px;
-      border-color: $color_font_normal;
+      border-color: $input_focused_outline;
     }
   }
 
   .v-select--chips {
     .v-chip {
       &__content {
-        color: $main_text_color;
+        color: $text_color_normal;
       }
 
       .tag-input {
@@ -142,25 +151,24 @@
     margin-top: 5px;
 
     .button-main-color {
-      background-color: $color_primary;
+      background-color: $button_bg_primary;
     }
 
     .button-third-color {
-      background-color: $color_white
+      background-color: $button_bg_white
     }
 
     button {
       min-width: 110px !important;
       font-size: $font_normal;
-      border: 1px solid #E0E0E0;
-      border-color: #E0E0E0 !important;
+      border: 1px solid $button_outline_gray !important;
       border-radius: $border_small;
       box-shadow: none;
       text-transform: capitalize;
 
       &:last-child {
         border: none;
-        color: $color_white;
+        color: $text_color_white;
       }
     }
 
@@ -198,12 +206,15 @@ extend('required', {
 const transactionService = new TransactionService()
 
 @Component({
-  components: { ValidationProvider, ValidationObserver }
+  components: {
+    ValidationProvider,
+    ValidationObserver
+  }
 })
 export default class SpaceEdit extends TransactionButton {
   $refs!: {
     form: InstanceType<typeof ValidationObserver>;
-  };
+  }
 
   @Prop({
     type: Boolean,
@@ -256,7 +267,9 @@ export default class SpaceEdit extends TransactionButton {
 
   updateTags (): void {
     this.$nextTick(() => {
-      if (this.search) { this.selectTags.push(...this.search.split(',')) }
+      if (this.search) {
+        this.selectTags.push(...this.search.split(','))
+      }
       this.$nextTick(() => {
         this.search = ''
       })
@@ -325,10 +338,16 @@ export default class SpaceEdit extends TransactionButton {
       avatar: this.avatar
     })
 
-    if (!this.cid) { return }
+    if (!this.cid) {
+      return
+    }
     const params = this.getParams(this.cid)
 
-    await this.initExtrinsic({ pallet, params, method })
+    await this.initExtrinsic({
+      pallet,
+      params,
+      method
+    })
 
     await this.sentTransaction()
   }
@@ -340,11 +359,11 @@ export default class SpaceEdit extends TransactionButton {
       return this.isEdit
         ? [this.spaceItem?.struct.id, { content: { IPFS: cid } }]
         : [
-            new OptionId(),
-            new OptionText(''),
-            { IPFS: cid },
-            null
-          ]
+          new OptionId(),
+          new OptionText(''),
+          { IPFS: cid },
+          null
+        ]
     }
   }
 

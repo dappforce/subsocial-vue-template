@@ -56,7 +56,7 @@
     font-weight: 500;
     text-align: center;
     padding: 0 $space_large;
-    color: $color_black;
+    color: $text_color_normal;
     margin-bottom: $space_normal;
   }
 
@@ -64,7 +64,7 @@
     font-size: $font_normal;
     text-align: center;
     line-height: 125%;
-    color: $color_black;
+    color: $text_color_normal;
     margin-bottom: $space_large;
     text-transform: initial;
   }
@@ -76,10 +76,10 @@
     .disable-btn {
       width: 100%;
       .v-btn {
-        background-color: $color_primary;
+        background-color: $button_bg_primary;
         border: none;
         border-radius: $border_small;
-        color: $color_white;
+        color: $text_color_white;
         width: 100%;
         text-transform: initial;
         font-size: $font_normal;

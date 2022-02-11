@@ -5,8 +5,8 @@ export default {
   ssr: true,
 
   head: {
-    titleTemplate: '%s - subsocial',
-    title: 'Subsocial',
+    titleTemplate: '%s - vSocial',
+    title: 'vSocial',
     htmlAttrs: {
       lang: 'en'
     },
@@ -30,9 +30,7 @@ export default {
   ],
 
   plugins: [
-    '@/plugin/pluralize.ts',
     '~/plugin/linkService.ts',
-    '@/plugin/day.js',
     '@/plugin/numeral.ts',
     '@/plugin/linkFilters.ts',
     '@/plugin/addressShortness.ts',
@@ -49,10 +47,8 @@ export default {
   ],
 
   buildModules: [
-    // https://go.nuxtjs.dev/typescript
     '@nuxt/typescript-build',
     ['@nuxtjs/dotenv', { filename: `.env.${process.env.NODE_ENV}` }],
-    // https://go.nuxtjs.dev/vuetify
     ['@nuxtjs/vuetify', { iconfont: 'mdi' }],
     ['@nuxtclub/slugify']
   ],
@@ -71,8 +67,8 @@ export default {
     langDir: 'locales/',
     differentDomains: false,
     locales: [
-      { code: 'en', file: 'en.js', name: 'English' },
-      { code: 'ru', file: 'ru.js', name: 'Russian' }
+      { code: 'en', file: 'en.json', name: 'English' },
+      { code: 'ru', file: 'ru.json', name: 'Russian' }
     ]
   },
 
@@ -83,24 +79,9 @@ export default {
     typographer: true
   },
 
-  // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
     customVariables: ['~/assets/variables.scss'],
     ltr: true,
-    theme: {
-      dark: false,
-      themes: {
-        dark: {
-          primary: colors.blue.darken2,
-          accent: colors.grey.darken3,
-          secondary: colors.amber.darken3,
-          info: colors.teal.lighten1,
-          warning: colors.amber.base,
-          error: colors.deepOrange.accent4,
-          success: colors.green.accent3
-        }
-      }
-    },
     icons: {
       iconfont: 'mdi'
     }
@@ -110,9 +91,6 @@ export default {
     defaultLocale: 'en',
     plugins: ['relativeTime', 'advancedFormat', 'updateLocale']
 
-  },
-
-  storybook: {
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build

@@ -1,16 +1,18 @@
 import {
   AnyId,
   EntityId,
-  PostData,
+  PostData, 
+  SharedPostStruct,
   SpaceData
-} from '@subsocial/api/flat-subsocial/dto'
+} from '@subsocial/types/dto'
 import slug from 'slugify'
 import BN from 'bn.js'
 
 import { SubmittableResult } from '@polkadot/api'
-import { SharedPostStruct } from '@subsocial/api/flat-subsocial/flatteners'
+import dayjs from 'dayjs'
 import { TransformDataArray } from '~/types/transform-dto'
 import { Content } from '~/types/content'
+import { config } from '~/config/config'
 
 export function getNewIdFromEvent (txResult: SubmittableResult): BN | undefined {
   const [newId] = getNewIdsFromEvent(txResult)
@@ -30,24 +32,6 @@ export const transformEntityDataArray = (
   })
 
   return { structs, contents }
-}
-
-export const sliceEntityArray = (
-  entityArray: Array<any>,
-  contentEntities: any,
-  start: number,
-  end: number
-) => {
-  const entityData: any[] = []
-
-  entityArray.slice(start, end).map((struct) => {
-    if (struct.contentId) {
-      const content = contentEntities[struct.contentId]
-      content ? entityData.push({ struct, content }) : null
-    }
-  })
-
-  return entityData
 }
 
 export const getPostLink = (
@@ -71,16 +55,8 @@ export function bnToId (bnId: BN): EntityId {
   return bnId.toString()
 }
 
-export function convertBN (value: BN) {
-  return value.toString()
-}
-
 export function convertToBNArray (array: string[]) {
   return array.map(el => new BN(el))
-}
-
-export function convertToBN (value: string) {
-  return new BN(value)
 }
 
 export function routerParamsLength (value: object) {
@@ -116,7 +92,7 @@ export function getIsPostOwner (ownerId: string, currentUseId: string | undefine
 export function selectPostStructByIds (ids: string[], state: SharedPostStruct[]): SharedPostStruct[] {
   const structs: SharedPostStruct[] = []
   ids.forEach((id) => {
-    const struct = state.find(i => i.id === id)
+    const struct: any = state.find(i => i.id === id)
     if (struct) {
       structs.push(struct)
     }
@@ -126,10 +102,22 @@ export function selectPostStructByIds (ids: string[], state: SharedPostStruct[])
 
 export function isMobile () {
   if (process.browser) {
-    if (window.innerWidth <= 991) {
+    if (window.innerWidth <= config.mobileScreenWidth) {
       return true
     } else {
       return false
     }
   } else { return false }
+}
+
+export function toDate (date: number | string) {
+  const diff = dayjs().diff(dayjs(date), 'days')
+
+  if (diff < config.weekDays) {
+    return dayjs(date).fromNow().toLowerCase()
+  } else if (diff > config.weekDays && diff < config.yearDays) {
+    return dayjs(date).format('D MMM')
+  } else {
+    return dayjs(date).format('D MMM YY')
+  }
 }

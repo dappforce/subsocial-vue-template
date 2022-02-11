@@ -10,7 +10,7 @@
   font-size: $font_normal;
   line-height: 20px;
   letter-spacing: 0.25px;
-  color: $color_font_normal;
+  color: $text_color_normal;
   text-transform: capitalize;
   text-decoration: none;
 }
@@ -56,7 +56,7 @@ export default class Title extends Vue {
   get nameOrId () {
     if (this.name === this.id) {
       return this.$root.$options.filters?.addressShortness(this.id, this.addressLength)
-    } else if (this.name.length > 0) {
+    } else if (this.name.length) {
       return this.name
     } else if (this.id) {
       return this.$root.$options.filters?.addressShortness(this.id, this.addressLength)

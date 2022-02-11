@@ -9,8 +9,8 @@
   display: inline-flex;
   padding: 6px $space_small;
   margin-right: $space_tiny;
-  color: $main_text_color;
-  background: rgba(33, 33, 33, 0.08);
+  color: $text_color_dark_gray;
+  background: $tag_bg_gray;
   border-radius: 16px;
   letter-spacing: 0.25px;
   font-size: $font_small;

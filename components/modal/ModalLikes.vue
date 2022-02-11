@@ -7,7 +7,7 @@
     >
       <v-card class="v-modal-container">
         <v-card-title>
-          {{ reactions.length }} {{ reactions.length | pluralize('en', [$tc('modals.likes.reaction'), $tc('modals.likes.reactions')]) }}
+          {{reactions.length | numeral('0,0a')}} {{$tc('plural.reaction', reactions.length)}}
 
           <v-icon class="close-icon" @click="onClick">
             mdi-close
@@ -66,7 +66,7 @@
   }
 
   .v-tab--active {
-    color: $color_primary;
+    color: $text_color_primary;
   }
 
   .v-tabs {
@@ -76,13 +76,13 @@
   }
 
   .slider-color {
-    color: $color_primary;
+    color: $slider_color;
   }
 
   .v-tabs-items {
     .v-card {
       overflow: hidden;
-      height: 550px;
+      height: 500px;
       overflow-y: auto;
 
       &::-webkit-scrollbar {
@@ -94,7 +94,7 @@
       }
 
       &::-webkit-scrollbar-thumb {
-        background-color: $color_gray;
+        background-color: $scroll_outline_gray;
         width: 6px;
       }
     }

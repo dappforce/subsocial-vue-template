@@ -17,7 +17,7 @@
         class="items-list"
       >
         <PostContainer v-if="currentTab === tabs[0] && allPostsIds.length" :ids="allPostsIds" :type="isOwner ? 'all' : 'public'" />
-        <NoPosts v-if="!allPostsIds.length && !showSpinner" :message="$t('generalMessages.noPostYet')" />
+        <NoPosts v-if="!allPostsIds.length && !showSpinner" :message="$t('content.noPosts')" />
         <BounceSpinner v-if="showSpinner" />
       </v-tab-item>
 
@@ -33,7 +33,7 @@
           :current-user="currentUser"
           :is-my-own-space="isOwner"
         />
-        <NoPosts v-if="!spaces.length" :message="$t('generalMessages.noSpaceYet')" />
+        <NoPosts v-if="!spaces.length" :message="$t('content.noSpaces')" />
       </v-tab-item>
     </v-tabs-items>
   </div>
@@ -50,7 +50,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { ProfileStruct } from '@subsocial/api/flat-subsocial/flatteners'
+import { ProfileStruct } from '@subsocial/types/dto'
 
 @Component
 export default class Account extends Vue {

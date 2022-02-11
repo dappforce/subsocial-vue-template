@@ -17,7 +17,6 @@
             v-model="activeTab"
             grow
             centered
-            slider-color="yellow"
           >
             <v-tabs-slider class="slider-color" />
             <v-tab
@@ -65,11 +64,11 @@
   }
 
   .slider-color {
-    color: $color_primary;
+    color: $slider_color;
   }
 
   .v-tab--active {
-    color: $color_primary;
+    color: $text_color_primary;
   }
 
   .v-tabs {
@@ -93,7 +92,7 @@
       }
 
       &::-webkit-scrollbar-thumb {
-        background-color: $color_gray;
+        background-color: $scroll_outline_gray;
         width: 6px;
       }
     }

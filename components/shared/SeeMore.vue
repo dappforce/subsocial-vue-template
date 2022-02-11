@@ -10,7 +10,7 @@
   font-size: $font_normal;
   line-height: $main_line_height;
   letter-spacing: 0.25px;
-  color: $color_primary;
+  color: $text_color_primary;
   text-transform: capitalize;
   text-decoration: none;
   cursor: pointer;

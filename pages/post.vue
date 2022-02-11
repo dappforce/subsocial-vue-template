@@ -3,7 +3,7 @@
     <PostEdit v-if="havePermission" :is-edit="isEdit" :post-item="post" />
     <div v-if="!havePermission && post" class="error">
       <img src="../assets/image/alert.svg" alt="Alert">
-      {{ $t('generalMessages.dontHavePermissionToEditPost') }}
+      {{ $t('generalMessages.dontHavePermission', {type: $t('general.post')}) }}
     </div>
     <BounceSpinner v-if="!havePermission && !post" />
   </div>

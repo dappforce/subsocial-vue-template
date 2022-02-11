@@ -1,7 +1,7 @@
 <template>
   <div class="no-extension">
     <div class="title">
-      {{ isLoginText ? $t('modals.login.title') : $t('modals.login.waitSec') }}
+      {{ isLoginText ? $t('modals.login.title') : $t('modals.login.title-wait') }}
     </div>
 
     <div class="sub-title" v-html="isLoginText ? $t('modals.login.noExtension.message') : $t('modals.login.noExtension.notLoginMessage')" />
@@ -38,7 +38,7 @@
     font-weight: 500;
     font-size: $font_huge;
     line-height: 125%;
-    color: $color_font_secondary;
+    color: $text_color_dark_gray;
     width: 100%;
     text-align: center;
     margin-bottom: 14px;
@@ -50,7 +50,7 @@
     text-align: center;
     margin-bottom: $space_large;
     span {
-      color: $color_primary;
+      color: $text_color_primary;
     }
   }
 
@@ -65,7 +65,7 @@
       width: 200px;
       display: flex;
       justify-content: flex-start;
-      border: 1px solid #D9D9D9;
+      border: 1px solid $button_outline_gray;
       box-sizing: border-box;
       border-radius: $border_small;
       box-shadow: none;
@@ -79,11 +79,10 @@
       text-decoration: none;
       font-size: $font_normal;
       line-height: 125%;
-      color: #262626;
+      color: $text_color_normal;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-family: Roboto;
 
       img {
         width: 20px;
@@ -95,17 +94,17 @@
 
   .need-help {
     font-size: $font_small;
-    color: #8C8C8C;
+    color: $text_color_dark_gray;
     line-height: 125%;
     text-align: center;
 
     a {
       text-decoration: none;
-      color: $color_primary;
+      color: $text_color_primary;
       font-weight: 500;
 
       &:hover {
-        color: #8C8C8C;
+        color: $text_color_dark_gray;
       }
     }
   }

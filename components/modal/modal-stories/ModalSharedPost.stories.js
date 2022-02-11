@@ -32,20 +32,27 @@ export default {
     isModal: {
       name: 'Open modal',
       control: 'boolean',
+      defaultValue: true
+    },
+    isEmptySpaces: {
+      name: 'is Empty Spaces',
+      control: 'boolean',
       defaultValue: false
     }
   }
 }
 
+const isEmptySpaces = true
+
 const Template = (args, { argTypes }) => ({
   props: Object.keys(argTypes),
   components: { ModalSharedPostComponent },
-  data: () => ({ post }),
-  template: '<ModalSharedPost v-bind="$props" :post="post"/>'
+  data: () => ({ post, isEmptySpaces }),
+  template: '<ModalSharedPost v-bind="$props" :post="post" :isEmptySpaces="isEmptySpaces" :openModal="isModal" />'
 })
 
 export const ModalSharedPost = Template.bind({})
 
 ModalSharedPost.args = {
-  isModal: false
+  isModal: true
 }

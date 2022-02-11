@@ -1,7 +1,7 @@
 <template>
   <div class="no-account">
     <div class="title">
-      {{ isLoginText ? $t('modals.login.title') : $t('modals.login.waitSec') }}
+      {{ isLoginText ? $t('modals.login.title') : $t('modals.login.title-wait') }}
     </div>
     <div v-if="!isLoginText" class="sub-title">
       {{ $t('modals.login.noAccountScreen.notLoginMessage') }}
@@ -23,7 +23,7 @@
     font-weight: 500;
     font-size: $font_huge;
     line-height: 125%;
-    color: $color_font_secondary;
+    color: $text_color_dark_gray;
     width: 100%;
     text-align: center;
     margin-bottom: 14px;
@@ -37,11 +37,11 @@
   .message {
     width: 100%;
     padding: 21px;
-    background-color: #FFFAD5;
+    background-color: $alert_message_bg;
     text-align: center;
     font-size: $font_normal;
     line-height: 125%;
-    color: #262626;
+    color: $text_color_normal;
     margin-bottom: 22px;
   }
 
@@ -51,12 +51,12 @@
 
     a {
       text-decoration: none;
-      color: $color_font_secondary;
+      color: $text_color_dark_gray;
       font-size: $font_small;
       line-height: 125%;
 
       &:hover {
-        color: $color_primary;
+        color: $text_color_primary;
       }
     }
   }

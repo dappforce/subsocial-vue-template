@@ -57,7 +57,7 @@ export default class AccountService {
   async transferMoney (fromAcc: string, toAcc: string, amount: number, signer: any) {
     const api = await (await this.getApi()).subsocial.substrate.api
     const result = await api.tx.balances
-      .transfer(toAcc, 123456789)
+      .transfer(toAcc, amount)
       .signAndSend(fromAcc, { signer }, (status) => {
         console.log(status)
       })

@@ -1,12 +1,12 @@
-import { AnyId, PostWithAllDetails } from '@subsocial/api/flat-subsocial/dto'
+import { AnyId, PostWithAllDetails, PostStruct, ProfileStruct, SpaceStruct } from '@subsocial/types/dto'
 import { FlatSubsocialApi } from '@subsocial/api/flat-subsocial'
 import { AnySpaceId } from '@subsocial/types'
-import { PostStruct, ProfileStruct, SpaceStruct } from '@subsocial/api/flat-subsocial/flatteners'
 import SubsocialApiService from '~/services/subsocial-api.service'
 import { TransformPostWithAllDetails } from '~/types/transform-dto'
 import { Content } from '~/types/content'
 import { bnsToIds, convertToBNArray } from '~/utils/utils'
 import { config } from '~/config/config'
+
 const subsocialApiService = new SubsocialApiService()
 const suggestedSpaceIds = config.recommendedSpaceIds
 
@@ -28,7 +28,7 @@ export default class PostService {
   }
 
   async getPost (id: AnyId): Promise<TransformPostWithAllDetails> {
-    const postData:PostWithAllDetails[] = []
+    const postData: PostWithAllDetails[] = []
     postData.push(await subsocialApiService.api?.findPostWithAllDetails(id) as PostWithAllDetails)
     return this.splitPostWithAllDataByEntity(postData)
   }
@@ -36,8 +36,6 @@ export default class PostService {
   async getSuggestedPostsIds (spaceIds: string[] = [], isAccount: boolean = false) {
     const ids: string[] = isAccount ? spaceIds : suggestedSpaceIds
     const suggestedPostIds: string[] = []
-
-    // if (suggestedPostIds) { return suggestedPostIds }
 
     const suggestedPostIdsPromises = ids.map(async (spaceId) => {
       return (await this.getApi()).subsocial.substrate.postIdsBySpaceId(spaceId as unknown as AnySpaceId)
@@ -65,14 +63,18 @@ export default class PostService {
     const spaces: SpaceStruct[] = []
     const profiles: ProfileStruct[] = []
     const contents: Content[] = []
-    postsAllData.forEach((postAllData: PostWithAllDetails) => {
-      const { post, space, owner } = postAllData
+    postsAllData.forEach((postAllData) => {
+      const post: any = postAllData.post
+      const { space, owner } = postAllData
       if (post?.content && (space?.content || hidden)) {
-        posts.push(post.struct)
+        post.struct.isComment ? posts.push({ ...post.struct, ...{ spaceId: space.struct.id }, ...{ rootPostId: post.struct.rootPostId } }) : posts.push(post.struct)
         if (!hidden) {
           spaces.push(space.struct)
         }
-        profiles.push(owner ? owner.struct : { id: post.struct.ownerId, contentId: post.struct.ownerId } as ProfileStruct)
+        profiles.push(owner ? owner.struct : {
+          id: post.struct.ownerId,
+          contentId: post.struct.ownerId
+        } as ProfileStruct)
 
         const postContent = post.content as Content
         postContent.id = post.struct.contentId!

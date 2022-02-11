@@ -6,7 +6,7 @@ export default {
     isModal: {
       name: 'Open modal',
       control: 'boolean',
-      defaultValue: false
+      defaultValue: true
     }
   }
 }
@@ -14,11 +14,11 @@ export default {
 const Template = (args, { argTypes }) => ({
   props: Object.keys(argTypes),
   components: { ModalLikesComponent },
-  template: '<ModalLikes v-bind="$props" />'
+  template: '<ModalLikes v-bind="$props" :openModal="isModal" />'
 })
 
 export const ModalLikes = Template.bind({})
 
 ModalLikes.args = {
-  isModal: false
+  isModal: true
 }

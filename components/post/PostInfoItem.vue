@@ -31,10 +31,10 @@
     font-size: $font_small;
     line-height: 20px;
     letter-spacing: 0.25px;
-    color: $main_text_color;
+    color: $text_color_normal;
 
     a {
-      color: $main_text_color;
+      color: $text_color_normal;
       text-decoration: none;
     }
 
@@ -48,6 +48,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { PostListItemData } from '~/models/post/post-list-item.model'
+import { toDate } from '~/utils/utils'
 
 @Component
 export default class PostInfoItem extends Vue {
@@ -57,15 +58,7 @@ export default class PostInfoItem extends Vue {
   }) postItem!: PostListItemData
 
   get toDate () {
-    const diff = this.$dayjs().diff(this.$dayjs(+this.postItem.createdAtTime), 'days')
-
-    if (diff < 7) {
-      return this.$dayjs(+this.postItem.createdAtTime).fromNow().toLowerCase()
-    } else if (diff > 7 && diff < 365) {
-      return this.$dayjs(+this.postItem.createdAtTime).format('D MMM')
-    } else {
-      return this.$dayjs(+this.postItem.createdAtTime).format('D MMM YY')
-    }
+    return toDate(this.postItem.createdAtTime)
   }
 }
 </script>

@@ -1,7 +1,6 @@
 import { FlatSubsocialApi } from '@subsocial/api/flat-subsocial'
-import { ProfileStruct } from '@subsocial/api/flat-subsocial/flatteners'
+import { ProfileStruct, ProfileData } from '@subsocial/types/dto'
 import { AnyAccountId } from '@subsocial/types'
-import { ProfileData } from '@subsocial/api/flat-subsocial/dto'
 import SubsocialApiService from '~/services/subsocial-api.service'
 
 const subsocialApiService = new SubsocialApiService()

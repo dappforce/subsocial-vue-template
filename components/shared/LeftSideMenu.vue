@@ -1,5 +1,5 @@
 <template>
-  <div class="ma-12 pa-12">
+  <div class="ma-12 pa-12 left-drawer">
     <v-card>
       <v-navigation-drawer
         v-model="drawer"
@@ -8,70 +8,70 @@
         width="220"
         @transitionend="onDrawerChange"
       >
-        <v-list class="px-5">
+        <v-list class="px-5 custom-hover">
           <v-list-item link :href="links.reactApp">
             <v-list-item-icon>
               <img class="logo" src="../../assets/image/react-logo.svg" alt="React logo">
             </v-list-item-icon>
-            <v-list-item-title>{{ $t('drawer.reactApp') }}</v-list-item-title>
+            <v-list-item-title>{{ $t('buttons.reactApp') }}</v-list-item-title>
           </v-list-item>
 
           <v-list-item link :href="links.angularApp">
             <v-list-item-icon>
               <img class="logo" src="../../assets/image/angular-logo.svg" alt="Angular logo">
             </v-list-item-icon>
-            <v-list-item-title>{{ $t('drawer.angularApp') }}</v-list-item-title>
+            <v-list-item-title>{{ $t('buttons.angularApp') }}</v-list-item-title>
           </v-list-item>
 
-          <v-divider />
+          <v-divider/>
 
           <v-list-item link :href="links.subsocial">
             <v-list-item-icon>
               <img class="logo" src="../../assets/image/subsocial-icon.svg" alt="Subsocial logo">
             </v-list-item-icon>
-            <v-list-item-title>{{ $t('drawer.subsocialApp') }}</v-list-item-title>
+            <v-list-item-title>{{ $t('buttons.subsocialApp') }}</v-list-item-title>
           </v-list-item>
           <v-list-item link :href="links.landingPage">
             <v-list-item-icon>
               <v-icon>mdi-web</v-icon>
             </v-list-item-icon>
-            <v-list-item-title>{{ $t('drawer.landingPage') }}</v-list-item-title>
+            <v-list-item-title>{{ $t('buttons.landingPage') }}</v-list-item-title>
           </v-list-item>
           <v-list-item link :href="links.legalDocuments">
             <v-list-item-icon>
               <v-icon>mdi-file-document-outline</v-icon>
             </v-list-item-icon>
-            <v-list-item-title>{{ $t('drawer.legalDocuments') }}</v-list-item-title>
+            <v-list-item-title>{{ $t('buttons.legalDocuments') }}</v-list-item-title>
           </v-list-item>
           <v-list-item link :href="links.github">
             <v-list-item-icon>
               <v-icon>mdi-github</v-icon>
             </v-list-item-icon>
-            <v-list-item-title>{{ $t('drawer.github') }}</v-list-item-title>
+            <v-list-item-title>{{ $t('buttons.github') }}</v-list-item-title>
           </v-list-item>
           <v-list-item link :href="links.whatIsSubsocial">
             <v-list-item-icon>
               <v-icon>mdi-help-circle-outline</v-icon>
             </v-list-item-icon>
-            <v-list-item-title>{{ $t('drawer.whatIsSubsocial') }}</v-list-item-title>
+            <v-list-item-title>{{ $t('buttons.whatIsSubsocial') }}</v-list-item-title>
           </v-list-item>
         </v-list>
 
-        <v-list class="bottom">
+        <v-list class="bottom custom-hover">
           <v-list-item class="bottom-title">
-            <v-list-item-icon />
+            <v-list-item-icon/>
             <v-list-item-title class="social-title">
-              {{ $t('drawer.ourSocialLinks') }}
+              {{ $t('serverApp.social') }}
             </v-list-item-title>
           </v-list-item>
 
           <v-list-item :inactive="true">
-            <v-list-item-icon link>
+            <v-list-item-icon class="twitter-icon-container" >
               <a :href="links.twitter" class="twitter-link">
                 <img src="../../assets/image/twitter.svg" alt="twitter icon">
               </a>
             </v-list-item-icon>
-            <v-list-item-title>
+            <v-list-item-title class="hidden-social">
               <a :href="links.discord" class="social-link">
                 <img src="../../assets/image/discord.svg" alt="discord icon">
               </a>
@@ -89,97 +89,116 @@
   </div>
 </template>
 
-<style scoped lang="scss">
-.v-navigation-drawer {
-  padding-top: 56px;
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
-  z-index: 1;
+<style lang="scss">
+.left-drawer {
+  .v-navigation-drawer {
+    padding-top: 56px;
+    box-shadow: $box_shadow_left_drawer;
+    z-index: 1;
 
-  .logo {
-    height: 24px;
-  }
+    &__content {
+      display: flex;
+      justify-content: space-between;
+      flex-direction: column;
+    }
 
-  & .v-divider {
-    margin: 0 16px;
-  }
+    & .logo {
+      height: 24px;
+    }
 
-  .v-list--nav .v-list-item:not(:last-child):not(:only-child) {
-    margin-bottom: 0!important;
-  }
+    & .v-divider {
+      margin: 0 $space_normal;
+    }
 
-  .v-list-item {
-    &__title {
-      margin-left: $space_normal;
-      font-size: $font_small;
-      color: $color_dark_gray;
-      font-weight: 500;
-      line-height: 125%;
-      z-index: 10;
+    & .v-list--nav .v-list-item:not(:last-child):not(:only-child) {
+      margin-bottom: 0 !important;
+    }
 
-      &.social-title {
-        font-weight: normal;
-        color: $color_font_secondary;
+    & .v-list-item {
+      &__title {
+        margin-left: $space_normal;
+        font-size: $font_small;
+        color: $text_color_dark_gray;
+        font-weight: 500;
+        line-height: 125%;
+        z-index: 10;
+
+        &.social-title {
+          font-weight: normal;
+          color: $text_color_dark_gray;
+        }
+
+        .social-link {
+          & img {
+            border: 1px solid transparent;
+          }
+
+          &:hover img {
+            border-radius: 50%;
+            border-color: $button_outline_gray;
+          }
+        }
       }
 
-      .social-link {
-        margin-right: $space_normal;
+      &__icon {
+        z-index: 10;
+        color: $icon_color_dark_gray;
+      }
+
+      .twitter-link {
+        position: relative;
+
         & img {
           border: 1px solid transparent;
         }
-        
+
         &:hover img {
           border-radius: 50%;
-          border-color: $color_hover_social_linK;
+          border-color: $button_outline_gray;
         }
       }
     }
-    
-    &__icon {
-      z-index: 10;
-    }
 
-    .twitter-link {
-      margin-right: $space_normal;
-      position: relative;
-
-      & img {
-        border: 1px solid transparent;
-      }
-
-      &:hover img {
-        border-radius: 50%;
-        border-color: $color_hover_social_linK;
+    &--is-mouseover {
+      .twitter-link {
+        &::after {
+          display: none !important;
+        }
       }
     }
-  }
 
-  &--is-mouseover {
-    .twitter-link {
-      &::after {
-        display: none !important;
+    & .bottom {
+      .bottom-title {
+        min-height: 15px !important;
+
+        .v-list-item__icon {
+          margin: 0 !important;
+        }
       }
-    }
-  }
 
-  .bottom {
-    position: absolute;
-    bottom: 0;
-    left: -3px;
+      & .v-list-item {
+        padding: 0 12px;
+      }
 
-    .bottom-title {
-      min-height: 15px !important;
+      & .twitter-icon-container {
+        min-width: auto;
+      }
 
-      .v-list-item__icon {
-        margin: 0!important;
+      & .hidden-social {
+        display: flex;
+        justify-content: space-between;
+        margin-left: 1.35rem;
       }
     }
   }
+
 }
 </style>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { MenuLinks } from '~/constants/menu-links'
 import { isMobile } from '~/utils/utils'
+import { config } from '~/config/config'
 
 @Component
 export default class LeftSideMenu extends Vue {
@@ -188,7 +207,7 @@ export default class LeftSideMenu extends Vue {
   isMobileView: boolean = false
   isSetMobile: boolean = false
 
-  created () {
+  created() {
     this.$nuxt.$on('openDrawer', (isOpen: boolean) => {
       this.drawer = isOpen
     })
@@ -199,7 +218,7 @@ export default class LeftSideMenu extends Vue {
     }
   }
 
-  getIsMobile () {
+  getIsMobile() {
     this.isMobileView = isMobile()
     if (!isMobile()) {
       this.drawer = true
@@ -207,16 +226,16 @@ export default class LeftSideMenu extends Vue {
       this.drawer = false
     }
 
-    if (window.innerWidth < 991 && !this.isSetMobile) {
+    if (window.innerWidth < config.mobileScreenWidth && !this.isSetMobile) {
       this.isSetMobile = true
-    } else if (window.innerWidth > 991 && this.isSetMobile) {
+    } else if (window.innerWidth > config.mobileScreenWidth && this.isSetMobile) {
       this.isSetMobile = false
     }
 
     return isMobile()
   }
 
-  onDrawerChange () {
+  onDrawerChange() {
     this.$nuxt.$emit('changeHeaderIcon', this.drawer)
   }
 }

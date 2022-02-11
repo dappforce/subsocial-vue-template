@@ -33,7 +33,7 @@
       font-size: $font_normal;
       line-height: 22px;
       letter-spacing: 0.25px;
-      color: $color_font_normal;
+      color: $text_color_normal;
       width: 200px;
       text-overflow: ellipsis;
       overflow: hidden;
@@ -49,7 +49,7 @@
     padding-left: 4px;
 
     .gray {
-      color: $color_font_secondary;
+      color: $text_color_dark_gray;
       font-weight: normal;
     }
   }
@@ -58,8 +58,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { ProfileData } from '@subsocial/api/flat-subsocial/dto'
-import { ProfileStruct } from '@subsocial/api/flat-subsocial/flatteners'
+import { ProfileData, ProfileStruct } from '@subsocial/types/dto'
 import { config } from '~/config/config'
 
 @Component

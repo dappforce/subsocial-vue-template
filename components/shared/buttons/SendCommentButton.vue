@@ -5,31 +5,29 @@
 </template>
 
 <style scoped lang="scss">
-.theme--light.v-btn {
+.v-btn {
   &.send-button {
-    background-color: $color_primary !important;
+    background-color: $button_bg_primary !important;
     border-radius: $border_small;
-    width: 78px;
     height: $buttons_height;
-    color: $color_white;
+    color: $text_color_white;
     text-align: center;
     font-weight: 500;
     margin-top: $space_tiny;
     margin-bottom: $space_tiny;
     text-transform: capitalize;
-    color: $color_white;
     font-size: $font_normal;
 
     &:disabled {
-      background-color: #F597CA !important;
-      color: $color_white !important;
+      background-color: $button_bg_disabled !important;
+      color: $text_color_disabled !important;
     }
   }
 
   &--disabled {
     &.v-btn--has-bg:disabled {
-      background-color: #F597CA !important;
-      color: #fff !important;
+      background-color: $button_bg_disabled !important;
+      color: $text_color_disabled !important;
     }
   }
 }

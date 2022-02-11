@@ -6,8 +6,7 @@
     >
       <v-card v-if="usersIds" class="v-modal-container">
         <v-card-title>
-          {{ usersIds.length }} {{ usersIds.length | pluralize('en', [$tc('general.follower'), $tc('general.followers')]) }}
-
+          {{usersIds.length | numeral('0,0a')}} {{$tc('plural.follower', usersIds.length)}}
           <v-icon class="close-icon" @click="onClick">
             mdi-close
           </v-icon>
@@ -44,7 +43,7 @@
     }
 
     &::-webkit-scrollbar-thumb {
-      background-color: $color_gray;
+      background-color: $scroll_outline_gray;
       width: 6px;
     }
 

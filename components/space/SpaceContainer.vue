@@ -29,7 +29,6 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
 import { SpaceListItemData } from '~/models/space/space-list-item.model'
 import { config } from '~/config/config'
-import { PostListItemData } from '~/models/post/post-list-item.model'
 
 const stepNumber = config.stepForLoading
 
