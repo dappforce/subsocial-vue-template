@@ -11,7 +11,7 @@
             <v-icon color="#EFB041">
               mdi-alert-circle
             </v-icon>
-            {{ $t('generalMessages.hiddenMessage', {type: $t('general.post')}) }}
+            {{ $t('generalMessages.hiddenComment') }}
           </div>
           <div class="unhidden-btn">
             <span class="make-visible">
@@ -84,7 +84,7 @@
       />
 
       <span v-if="commentIds.length" class="show-reply" @click="showReplies()">
-        {{ isShowReplies ? $t('buttons.hide') : $t('buttons.view') }} {{ $tc('plural.reply', commentIds.length, { n: commentIds.length }) }}
+        {{ isShowReplies ? $t('buttons.hide') : $t('buttons.view') }} {{$tc('plural.'+i18nextKey(commentIds.length, 'reply'))}}
 
         <v-icon color="#F759AB" size="16">{{ isShowReplies ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
       </span>
@@ -253,7 +253,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { PostListItemData } from '~/models/post/post-list-item.model'
 import { ReplyIdStruct } from '~/types/reply-id.type'
-import { getIsPostOwner, isMobile, toDate } from '~/utils/utils'
+import { getIsPostOwner, isMobile, toDate, toI18next } from '~/utils/utils'
 
 @Component
 export default class CommentMessage extends Vue {
@@ -380,6 +380,10 @@ export default class CommentMessage extends Vue {
 
   getIsMobileView (): boolean {
     return isMobile()
+  }
+
+  i18nextKey (count: number, key: string): string {
+    return toI18next(count, key, this.$i18n.locale)
   }
 }
 </script>

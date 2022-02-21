@@ -1,15 +1,14 @@
 import {
-  AnyId,
-  EntityId,
-  PostData, 
+  PostData,
   SharedPostStruct,
   SpaceData
 } from '@subsocial/types/dto'
 import slug from 'slugify'
 import BN from 'bn.js'
-
 import { SubmittableResult } from '@polkadot/api'
-import dayjs from 'dayjs'
+import i18next from 'i18next'
+import { SubDate } from '@subsocial/utils'
+import { getNewIdsFromEvent } from '@subsocial/api'
 import { TransformDataArray } from '~/types/transform-dto'
 import { Content } from '~/types/content'
 import { config } from '~/config/config'
@@ -43,43 +42,12 @@ export const getPostLink = (
   return title ? `/${isHandle ? '@' : ''}${spaceHandle}/${slug(title)}-${id}` : ''
 }
 
-export function idToBn (id: AnyId): BN {
-  return BN.isBN(id) ? id : new BN(id)
-}
-
-export function bnsToIds (bnIds: BN[]): EntityId[] {
-  return bnIds.map(bnToId)
-}
-
-export function bnToId (bnId: BN): EntityId {
-  return bnId.toString()
-}
-
 export function convertToBNArray (array: string[]) {
   return array.map(el => new BN(el))
 }
 
 export function routerParamsLength (value: object) {
   return Object.keys(value).length
-}
-
-export function getNewIdsFromEvent (txResult: SubmittableResult): BN[] {
-  const newIds: BN[] = []
-  txResult.events.find((event) => {
-    const { event: { data, method } } = event
-    if (method.includes('Created')) {
-      const [, ...ids] = data.toArray()
-      newIds.push(...ids as unknown as BN[])
-      return true
-    }
-    return false
-  })
-
-  return newIds
-}
-
-export function getPostIdFromLink (link: string | null) {
-  return link ? link.trim().split('-').pop() : ''
 }
 
 export function getIsPostOwner (ownerId: string, currentUseId: string | undefined): boolean {
@@ -111,13 +79,13 @@ export function isMobile () {
 }
 
 export function toDate (date: number | string) {
-  const diff = dayjs().diff(dayjs(date), 'days')
+  return SubDate.formatDate(date)
+}
 
-  if (diff < config.weekDays) {
-    return dayjs(date).fromNow().toLowerCase()
-  } else if (diff > config.weekDays && diff < config.yearDays) {
-    return dayjs(date).format('D MMM')
+export function toI18next (count: number, key: string, lang: string): string {
+  if (i18next.services.pluralResolver) {
+    return key + i18next.services.pluralResolver.getSuffix(lang, count)
   } else {
-    return dayjs(date).format('D MMM YY')
+    return key + '_other'
   }
 }

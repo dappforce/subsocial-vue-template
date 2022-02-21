@@ -30,7 +30,7 @@ import { ProfileItemModel } from '~/models/profile/profile-item.model'
 import { SpaceListItemData } from '~/models/space/space-list-item.model'
 import { config } from '~/config/config'
 
-const stepNumber = config.stepForLoading
+const stepNumber = config.infinityScrollOffset
 
 @Component
 export default class SpaceContainer extends Vue {

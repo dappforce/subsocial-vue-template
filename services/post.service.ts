@@ -1,11 +1,12 @@
 import { AnyId, PostWithAllDetails, PostStruct, ProfileStruct, SpaceStruct } from '@subsocial/types/dto'
 import { FlatSubsocialApi } from '@subsocial/api/flat-subsocial'
 import { AnySpaceId } from '@subsocial/types'
+import { bnsToIds } from '@subsocial/utils'
 import SubsocialApiService from '~/services/subsocial-api.service'
 import { TransformPostWithAllDetails } from '~/types/transform-dto'
 import { Content } from '~/types/content'
-import { bnsToIds, convertToBNArray } from '~/utils/utils'
 import { config } from '~/config/config'
+import { convertToBNArray } from '~/utils/utils'
 
 const subsocialApiService = new SubsocialApiService()
 const suggestedSpaceIds = config.recommendedSpaceIds
@@ -84,9 +85,10 @@ export default class PostService {
           spaceContent.id = space.struct.contentId!
         }
 
-        const profileContent = owner
+        const profileContent = owner && owner.content
           ? owner.content as Content
           : { name: post.struct.ownerId } as Content
+
         profileContent.id = owner ? owner.struct.contentId! : post.struct.ownerId
         contents.push(postContent, spaceContent, profileContent)
       }

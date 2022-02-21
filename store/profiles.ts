@@ -8,10 +8,12 @@ import StorageService from '~/services/storage.service'
 import AccountService from '~/services/account.service'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
 import { config } from '~/config/config'
+import SubsocialApiService from '~/services/subsocial-api.service'
 
 const profileService = new ProfileService()
 const storage = new StorageService()
 const accountService = new AccountService()
+const subsocialApiService = new SubsocialApiService()
 
 const UPDATE_PROFILES = 'UPDATE_PROFILES'
 const SET_LOADING = 'SET_LOADING'
@@ -20,7 +22,11 @@ const SET_STATUS = 'SET_STATUS'
 const SET_POLKADOT_ACCOUNTS = 'SET_POLKADOT_ACCOUNTS'
 const SET_BALANCE = 'SET_BALANCE'
 const SET_SIGNER = 'SET_SIGNER'
+const SET_REGISTRY = 'SET_REGISTRY'
 const UPDATE_CURRENT_USER = 'UPDATE_CURRENT_USER'
+
+const DEFAULT_TOKEN = 'SUB'
+const DEFAULT_DECIMALS = 11
 
 let unsub: (() => void) | undefined
 
@@ -32,6 +38,8 @@ export interface Profile {
   polkadotAccounts: AccountData[],
   myBalance: String,
   signer: any | null,
+  chainDecimal: number,
+  chainToken: string
 }
 
 export interface UpdateUserModel {
@@ -47,7 +55,9 @@ export const state = (): Profile => ({
   status: ACCOUNT_STATUS.INIT,
   polkadotAccounts: [],
   myBalance: '0.0000',
-  signer: null
+  signer: null,
+  chainDecimal: DEFAULT_DECIMALS,
+  chainToken: DEFAULT_TOKEN
 })
 
 export const mutations = {
@@ -79,6 +89,11 @@ export const mutations = {
   [SET_SIGNER] (state: Profile, signer: any) {
     state.signer = signer
   },
+  
+  [SET_REGISTRY] (state: Profile, payload: {token: string, decimal: number}) {
+    state.chainDecimal = payload.decimal
+    state.chainToken = payload.token
+  },
 
   [UPDATE_CURRENT_USER] (state: Profile, payload: UpdateUserModel) {
     state.list.find(i => i.id === payload.id)!.followingAccountsCount += payload.type ? payload.data : -payload.data
@@ -86,7 +101,7 @@ export const mutations = {
 }
 
 export const actions = {
-  async initAccount ({ commit, dispatch }: {commit: Commit, dispatch: any}) {
+  async initAccount ({ state, commit, dispatch }: {state: Profile, commit: Commit, dispatch: any}) {
     const { web3Enable, web3Accounts } = await import('@polkadot/extension-dapp')
     const injectedExtensions = await web3Enable('Subsocial')
     const polkadotJs = injectedExtensions.find(
@@ -104,7 +119,7 @@ export const actions = {
     const accounts = await web3Accounts()
 
     if (accounts?.length > 0) {
-      const polkadotAccounts = await accountService.getAccountsData(accounts as PolkadotAccountWithMeta[])
+      const polkadotAccounts = await accountService.getAccountsData(accounts as PolkadotAccountWithMeta[], { token: state.chainToken, decimals: state.chainDecimal })
       commit(SET_POLKADOT_ACCOUNTS, polkadotAccounts)
       commit(SET_STATUS, ACCOUNT_STATUS.UNAUTHORIZED)
       dispatch('checkIfAlreadySignIn', polkadotAccounts)
@@ -183,19 +198,16 @@ export const actions = {
     return data
   },
 
-  async getAccountBalance ({ commit }: {commit: Commit}, payload: string) {
-    return await accountService.setBalance(payload)
+  async getAccountBalance ({ state }: {state: Profile}, payload: string) {
+    const registry = { token: state.chainToken, decimals: state.chainDecimal }
+    return await accountService.setBalance(payload, registry)
   },
 
-  signOut ({ commit }: {commit: Commit}) {
-    commit(SET_CURRENT_USER, undefined)
-    commit(SET_SIGNER, undefined)
-  },
-
-  async subscribeOnBalance ({ commit }: {commit: Commit}, address: string) {
+  async subscribeOnBalance ({ state, commit }: {state: Profile, commit: Commit}, address: string) {
+    const registry = { token: state.chainToken, decimals: state.chainDecimal }
     const api = await (await profileService.getApi()).subsocial.substrate.api
     unsub = await api.derive.balances.all(address, (data: Balance | undefined) => {
-      accountService.getFormattedBalance(data).then((balance) => {
+      accountService.getFormattedBalance(data, registry).then((balance) => {
         commit(SET_BALANCE, balance)
       })
     })
@@ -207,6 +219,21 @@ export const actions = {
 
   async transferMoney ({ state }: {state: Profile}, payload: {from: string, to: string, amount: number }) {
     return await accountService.transferMoney(payload.from, payload.to, payload.amount, state.signer)
+  },
+  
+  async getRegistry ({ commit }: {commit: Commit}) {
+    const registry = await subsocialApiService.getRegistry()
+    const payload = {
+      decimal: registry.chainDecimals[0],
+      token: registry.chainTokens[0]
+    }
+
+    commit(SET_REGISTRY, payload)
+  },
+
+  signOut ({ commit }: {commit: Commit}) {
+    commit(SET_CURRENT_USER, undefined)
+    commit(SET_SIGNER, undefined)
   }
 }
 

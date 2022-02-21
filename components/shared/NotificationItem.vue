@@ -6,7 +6,7 @@
         <span class="name">
           <Title :id="notification.profile.id" :link="'/accounts/'+ notification.profile.id" :name="notification.profile.name" size="medium" />
         </span>
-        <span>{{ notification.activity.agg_count ? $t('notifications.aggregate', {count: notification.activity.agg_count, message: $tc('plural.aggregate', notification.activity.agg_count, {n: notification.activity.agg_count})}) : '' }}{{ getMessage }}</span>
+        <span>{{ notification.activity.agg_count ? $t('notifications.aggregate', {count: notification.activity.agg_count, message: $tc('plural.'+i18nextKey(notification.activity.agg_count, 'aggregate'))}) : '' }}{{ getMessage }}</span>
         <span class="name">
           <Title :id="notification.followingAccount ? notification.followingAccount.id : ''" :link="getUrl" :name="getName" size="medium" />
         </span>
@@ -36,6 +36,10 @@
         line-height: $main_line_height;
         letter-spacing: 0.25px;
         color: $text_color_normal;
+        
+        &:hover a{
+          color: $text_color_primary;
+        }
       }
     }
 
@@ -45,6 +49,10 @@
       letter-spacing: 0.25px;
       color: $text_color_dark_gray;
       text-decoration: none;
+      
+      &:hover {
+        color: $text_color_primary;
+      }
     }
   }
 
@@ -58,7 +66,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { NotificationItemData } from '~/store/notifications'
-import { getPostLink, toDate } from '~/utils/utils'
+import { getPostLink, toDate, toI18next } from '~/utils/utils'
 
 @Component
 export default class NotificationItem extends Vue {
@@ -76,7 +84,7 @@ export default class NotificationItem extends Vue {
 
   get getName () {
     return this.notification.post
-      ? (this.notification.post?.title || this.notification.post?.summary || 'Shared post')
+      ? (this.notification.post?.title || this.notification.post?.summary || 'link')
       : this.notification.space
         ? this.notification.space.name
         : this.notification.followingAccount
@@ -87,11 +95,15 @@ export default class NotificationItem extends Vue {
   get getUrl () {
     return this.notification.post
       ? getPostLink((this.notification.post?.spaceId || this.notification.post.id),
-        this.notification.post?.title || this.notification.post?.summary?.slice(0, 50) || 'Shared post',
+        this.notification.post?.title || this.notification.post?.summary?.slice(0, 50) || 'link',
         this.notification.post?.id, false)
       : this.notification.space
         ? '/' + this.notification.space.id
         : this.notification.followingAccount ? '/accounts/' + this.notification.activity.following_id : ''
+  }
+
+  i18nextKey (count: number, key: string): string {
+    return toI18next(count, key, this.$i18n.locale)
   }
 }
 </script>

@@ -1,7 +1,7 @@
 import { Activity } from '@subsocial/types'
 import { Commit } from 'vuex'
 import { PostContent, SpaceContent, PostStruct, ProfileStruct, SpaceStruct } from '@subsocial/types/dto'
-import { nonEmptyStr } from '@subsocial/utils'
+import { extractEntityIdsFromActivities } from '@subsocial/api/offchain'
 import NotificationService from '~/services/notification.service'
 import { config } from '~/config/config'
 import { KeyValuePair } from '~/models/key-value-pair.model'
@@ -64,15 +64,15 @@ export const mutations = {
 
 export const actions = {
   async getNotificationService ({ commit, getters, dispatch, rootState }: { commit: Commit, getters: any, dispatch: any, rootState: any}, payload: {id: string, offset: number}) {
-    const notifications = await notificationService.getNotifications(payload.id, payload.offset, config.stepForLoading)
+    const notifications = await notificationService.getNotifications(payload.id, payload.offset, config.infinityScrollOffset)
     commit(SET_NOTIFICATIONS, notifications)
 
-    const ids = getters.selectIds(notifications)
-    await dispatch('posts/getPostsByIds', { ids: ids.postIds.filter((i: string) => !rootState.posts.list.some((p: PostStruct) => p.id === i)), type: 'all' }, { root: true })
-    await dispatch('space/getSpacesByIds', ids.spaceIds.filter((i: string) => !rootState.space.spaces.some((p: SpaceStruct) => p.id === i)), { root: true })
-    await dispatch('profiles/getProfiles', ids.ownerIds.filter((i: string) => !rootState.profiles.list.some((p: ProfileStruct) => p.id === i)), { root: true })
+    const { postIds, spaceIds, profileIds } = extractEntityIdsFromActivities(notifications)
+    await dispatch('posts/getPostsByIds', { ids: postIds.filter((i: string) => !rootState.posts.list.some((p: PostStruct) => p.id === i)), type: 'all' }, { root: true })
+    await dispatch('space/getSpacesByIds', spaceIds.filter((i: string) => !rootState.space.spaces.some((p: SpaceStruct) => p.id === i)), { root: true })
+    await dispatch('profiles/getProfiles', profileIds.filter((i: string) => !rootState.profiles.list.some((p: ProfileStruct) => p.id === i)), { root: true })
 
-    const newNotifications = getters.selectNotificationsWithDetails(ids)
+    const newNotifications = getters.selectNotificationsWithDetails(postIds)
     commit(SET_NOTIFICATIONS_WITH_DATA, newNotifications)
     return newNotifications
   },
@@ -84,30 +84,14 @@ export const actions = {
 }
 
 export const getters = {
-  selectIds: () => (data: Activity[]) => {
-    const ownerIds: string[] = []
-    const spaceIds: string[] = []
-    const postIds: string[] = []
-
-    // eslint-disable-next-line camelcase
-    data.forEach(({ account, following_id, space_id, post_id, comment_id }) => {
-      nonEmptyStr(account) && ownerIds.push(account)
-      nonEmptyStr(following_id) && ownerIds.push(following_id)
-      nonEmptyStr(space_id) && spaceIds.push(space_id)
-      nonEmptyStr(post_id) && postIds.push(post_id)
-      nonEmptyStr(comment_id) && postIds.push(comment_id)
-    })
-
-    return { ownerIds: [...new Set(ownerIds)], spaceIds: [...new Set(spaceIds)], postIds: [...new Set(postIds)] }
-  },
-  selectNotificationsWithDetails: (state: Notifications, getters: any, rootState: any) => (ids: {postIds: string[]}) => {
-    const postArray = selectPostStructByIds(ids.postIds, rootState.posts.list)
+  selectNotificationsWithDetails: (state: Notifications, getters: any, rootState: any) => (ids: string[]) => {
+    const postArray = selectPostStructByIds(ids, rootState.posts.list)
     const notifications = state.list
     const contentEntities = rootState.content.contents
     const profileEntity = rootState.profiles.list
     const spaceEntity = [...rootState.space.spaces, rootState.space.currentSpace]
     const notificationsArray: KeyValuePair<NotificationItemData> = {}
-    notifications.map((n: Activity) => {
+    notifications.forEach((n: Activity) => {
       const item: NotificationItemData = {} as NotificationItemData
       item.activity = n
       item.profile = <ProfileItemModel>getProfile(n.account, profileEntity, contentEntities)

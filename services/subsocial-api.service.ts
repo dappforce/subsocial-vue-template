@@ -32,4 +32,10 @@ export default class SubsocialApiService {
     const ids = await readyApi.query[pallet][method](id)
     return (ids.toJSON() as Array<any>).map(id => id.toString())
   }
+  
+  async getRegistry () {
+    const readyApi = await (await this.initSubsocialApi()).subsocial.substrate.api
+    const registry = readyApi.registry
+    return registry
+  }
 }

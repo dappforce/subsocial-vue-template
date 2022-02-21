@@ -1,5 +1,3 @@
-import colors from 'vuetify/es5/util/colors'
-
 export default {
   target: 'server',
   ssr: true,
@@ -22,8 +20,8 @@ export default {
   },
 
   css: [
-    '~/assets/main.scss',
-    '~/assets/github-markdown.css',
+    '~/styles/main.scss',
+    '~/styles/github-markdown.css',
     '@mdi/font/css/materialdesignicons.min.css',
     'vuetify/src/components/VGrid/VGrid.sass',
     'easymde/dist/easymde.min.css'
@@ -31,6 +29,7 @@ export default {
 
   plugins: [
     '~/plugin/linkService.ts',
+    '~/plugin/updateLocale.ts',
     '@/plugin/numeral.ts',
     '@/plugin/linkFilters.ts',
     '@/plugin/addressShortness.ts',
@@ -64,7 +63,7 @@ export default {
 
   i18n: {
     defaultLocale: 'en',
-    langDir: 'locales/',
+    langDir: 'i18n/',
     differentDomains: false,
     locales: [
       { code: 'en', file: 'en.json', name: 'English' },
@@ -80,7 +79,7 @@ export default {
   },
 
   vuetify: {
-    customVariables: ['~/assets/variables.scss'],
+    customVariables: ['~/styles/variables.scss'],
     ltr: true,
     icons: {
       iconfont: 'mdi'

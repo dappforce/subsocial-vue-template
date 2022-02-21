@@ -2,9 +2,7 @@
   <section class="edit-space-container">
     <v-card>
       <h2 class="edit-space-title">
-        {{ isEdit ? $t('general.edit') : $t('general.new') }} {{
-          isProfile ? $t('general.profile') : $t('general.space')
-        }}
+        {{ getTitle() }}
       </h2>
 
       <ImageLoader :avatar="avatar" :type="'round'" @avatar="updateImageCID"/>
@@ -15,7 +13,7 @@
               <v-text-field
                 v-model="name"
                 outlined
-                :label="'* ' + $t('forms.placeholder.profileName', {type: isProfile ? $t('general.profile') : $t('general.space') })"
+                :label="'* ' + $t( isProfile ? 'forms.placeholder.profileName' : 'forms.placeholder.spaceName')"
                 required
                 hide-details="auto"
                 :messages="errors[0]"
@@ -81,6 +79,7 @@
   }
 
   .edit-space-title {
+    text-transform: capitalize;
     font-size: $font_large;
     margin: 0 0 15px;
   }
@@ -372,6 +371,14 @@ export default class SpaceEdit extends TransactionButton {
       return this.isEdit ? METHODS.updateProfile : METHODS.createProfile
     } else {
       return this.isEdit ? METHODS.updateSpace : METHODS.createSpace
+    }
+  }
+  
+  getTitle () {
+    if (this.isProfile) {
+      return this.isEdit ? this.$t('forms.titles.editProfile') : this.$t('forms.titles.newProfile')
+    } else {
+      return this.isEdit ? this.$t('forms.titles.editSpace') : this.$t('forms.titles.newSpace')
     }
   }
 }

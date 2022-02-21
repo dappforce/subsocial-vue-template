@@ -36,7 +36,7 @@ import { ProfileItemModel } from '~/models/profile/profile-item.model'
 import { config } from '~/config/config'
 import { PostListItemData } from '~/models/post/post-list-item.model'
 
-const stepNumber = config.stepForLoading
+const stepNumber = config.infinityScrollOffset
 
 @Component({})
 export default class PostContainer extends Vue {

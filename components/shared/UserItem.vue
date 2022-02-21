@@ -1,12 +1,13 @@
 <template>
   <div v-if="userInfo" class="user-item-wp">
     <div>
-      <Avatar :id="userInfo.id" :src="isAvatar(userInfo)" :size="40" :name="isName(userInfo)" />
+      <Avatar :id="userInfo.id" :src="isAvatar(userInfo)" :size="size" :name="isName(userInfo)" />
 
       <div class="user-info-wp">
+        <div v-if="isShowRecipient" class="recipient">{{ $t('modals.tips.recipient') }}:</div>
         <span class="user-name"><NuxtLink :to="localePath('/accounts/' + userInfo.id)">{{ isName(userInfo) }}</NuxtLink></span>
 
-        <Address :address="userInfo.id" :length="addressLength" :show-icon="false" />
+        <Address :address="userInfo.id" :length="fullAddress ? 100 : addressLength" :show-icon="false" :showCopyBtn="showCopyBtn" />
       </div>
     </div>
 
@@ -27,6 +28,9 @@
 
   .user-info-wp {
     margin-left: 13px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 
     .user-name a {
       font-weight: 500;
@@ -40,6 +44,11 @@
       white-space: nowrap;
       display: block;
       text-decoration: none;
+    }
+    
+    .recipient {
+      font-size: $font_small;
+      color: $text_color_dark_gray;
     }
   }
 
@@ -75,6 +84,26 @@ export default class UserItem extends Vue {
   @Prop({
     type: String
   }) id!: string
+
+  @Prop({
+    type: Boolean,
+    default: false
+  }) fullAddress!: boolean
+
+  @Prop({
+    type: Number,
+    default: 40
+  }) size!: number
+  
+  @Prop({
+    type: Boolean,
+    default: false
+  }) isShowRecipient!: boolean
+  
+  @Prop({
+    type: Boolean,
+    default: true
+  }) showCopyBtn!: boolean
 
   balance: string = ''
   isFollow: boolean = false

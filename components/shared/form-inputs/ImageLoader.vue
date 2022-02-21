@@ -312,7 +312,7 @@ export default class ImageLoader extends Vue {
       return
     }
 
-    if (event.size > config.imageSizeBytes) {
+    if (event.size > config.maxFileSize) {
       this.$nuxt.$emit('isShowSnackbar', { show: true, text: this.$t('imageShouldBeLessThanTwoMB') })
       return
     }

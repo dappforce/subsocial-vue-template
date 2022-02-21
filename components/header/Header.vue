@@ -51,6 +51,7 @@
       </div>
 
       <ModalAdblock :is-modal="isOpenModal"/>
+      <ModalTokenAlert />
     </div>
   </header>
 </template>
@@ -100,6 +101,7 @@ header {
               font-size: $font_small;
               align-self: flex-start;
               line-height: 17px;
+              font-weight: 500;
 
               .tokens-wp {
                 line-height: 17px;
@@ -203,8 +205,10 @@ import { Component, Vue } from 'vue-property-decorator'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
 import { config } from '~/config/config'
 import { isMobile } from '~/utils/utils'
-
-@Component
+import ModalTokenAlert from '~/components/modal/ModalTokenAlert.vue'
+@Component({
+  components: { ModalTokenAlert }
+})
 export default class Header extends Vue {
   user: ProfileItemModel | null = null
   isOpenDrawer: boolean = false

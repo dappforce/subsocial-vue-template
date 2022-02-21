@@ -4,7 +4,7 @@
       <ValidationObserver ref="form" v-slot="{ handleSubmit, handleReset }">
         <form @submit.prevent="handleSubmit(submit)" @reset.prevent="handleReset(clear)">
           <h2 class="edit-post-title">
-            {{ isEdit ? $t('general.edit') : $t('general.new') }} {{ $t('general.post') }}
+            {{ isEdit ? $t('forms.titles.editPost') : $t('forms.titles.newPost') }}
           </h2>
 
           <v-tabs
@@ -124,6 +124,7 @@
   padding-bottom: $space_normal;
 
   .edit-post-title {
+    text-transform: capitalize;
     font-size: $font_large;
   }
 

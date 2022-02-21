@@ -1,5 +1,5 @@
 <template>
-  <v-btn depressed :disabled="!isAuth" class="tips-btn" @click="isOpen = !isOpen">
+  <v-btn depressed :disabled="isEnableTips" class="tips-btn" @click="isOpen = !isOpen">
     {{ $t('buttons.sendTips') }}
     <ModalSendTips v-if="isAuth" :is-modal="isOpen" :user-info="userInfo" />
   </v-btn>
@@ -38,6 +38,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { ProfileData } from '@subsocial/types/dto'
+import { config } from '~/config/config'
 
 @Component
 export default class SendTipsButton extends Vue {
@@ -57,6 +58,10 @@ export default class SendTipsButton extends Vue {
 
   async getAccount () {
     return await this.$store.getters['profiles/selectProfileData'](this.userId)
+  }
+  
+  get isEnableTips (): boolean {
+    return this.isAuth ? !config.enableTips : !this.isAuth
   }
 }
 </script>

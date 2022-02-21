@@ -3,7 +3,7 @@
     <span class="strong">{{ dividedTokens[0] }}</span>
     <span>.</span>
     <span>{{ dividedTokens[1] }}</span>
-    <span>SUB</span>
+    <span>{{ $store.state.profiles.chainToken }}</span>
   </div>
 </template>
 <style lang="scss">

@@ -9,7 +9,7 @@
           <v-icon>
             mdi-alert-circle
           </v-icon>
-          {{ $t('generalMessages.hiddenMessage', {type: $t('general.space')}) }}
+          {{ $t('generalMessages.hiddenSpace') }}
         </div>
         <div class="unhidden-btn">
           <span class="make-visible">

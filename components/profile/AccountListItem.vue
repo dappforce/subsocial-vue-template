@@ -23,7 +23,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: $space_tiny 5px;
+  padding: $space_tiny 0;
 
   &>div {
     display: flex;

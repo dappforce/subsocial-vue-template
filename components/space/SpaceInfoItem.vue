@@ -6,8 +6,8 @@
         <Title size="medium" :link="spaceItem.struct.handle ? '/@'+spaceItem.struct.handle : '/'+spaceItem.struct.id" :name="spaceItem.content.name" />
       </div>
       <div class="space-stats-wp">
-        <span v-if="hidePostCount" class="post-count">{{spaceItem.struct.postsCount | numeral('0,0a')}} {{ $tc('plural.post', spaceItem.struct.postsCount, { n: spaceItem.struct.postsCount }) }}</span>
-        <span class="followers-count" @click="openModal">{{spaceItem.struct.followersCount | numeral('0,0a')}} {{$tc('plural.follower', spaceItem.struct.followersCount)}}</span>
+        <span v-if="hidePostCount" class="post-count">{{spaceItem.struct.postsCount | numeral('0,0a')}} {{ $tc('plural.'+i18nextKey(spaceItem.struct.postsCount, 'post')) }}</span>
+        <span class="followers-count" @click="openModal">{{spaceItem.struct.followersCount | numeral('0,0a')}} {{$tc('plural.'+i18nextKey(spaceItem.struct.followersCount, 'follower'))}}</span>
       </div>
     </div>
     <ModalFollower :is-modal="isOpenModal" :space-id="spaceItem.struct.id" />
@@ -60,7 +60,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { SpaceListItemData } from '~/models/space/space-list-item.model'
-import { routerParamsLength } from '~/utils/utils'
+import { routerParamsLength, toI18next } from '~/utils/utils'
 
 @Component
 export default class SpaceInfoItem extends Vue {
@@ -93,6 +93,10 @@ export default class SpaceInfoItem extends Vue {
 
   openModal (): void {
     this.isOpenModal = !this.isOpenModal
+  }
+
+  i18nextKey (count: number, key: string): string {
+    return toI18next(count, key, this.$i18n.locale)
   }
 }
 </script>

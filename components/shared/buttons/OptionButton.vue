@@ -30,7 +30,7 @@
           <v-icon>mdi-pencil-outline</v-icon>
         </v-list-item-icon>
         <v-list-item-title>
-          {{ $t('general.edit') }} {{ toggleType === 'post' ? $t('general.post') : $t('general.space') }}
+          {{ toggleType === 'post' ? $t('buttons.editPost') : $t('buttons.editSpace') }}
         </v-list-item-title>
       </v-list-item>
       <v-list-item v-if="(post || space) && canEdit">

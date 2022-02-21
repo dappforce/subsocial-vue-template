@@ -5,7 +5,7 @@
       class="mx-4 divider"
     />
     <div class="comments-counter">
-      {{count | numeral('0,0a')}} {{$tc('plural.comment', count)}}
+      {{count | numeral('0,0a')}} {{$tc('plural.'+i18nextKey(count, 'comment'))}}
     </div>
 
     <div class="send-message-wp">
@@ -150,6 +150,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { PostListItemData } from '~/models/post/post-list-item.model'
 import { ReplyIdStruct } from '~/types/reply-id.type'
+import { toI18next } from '~/utils/utils'
 
 @Component
 export default class Comment extends Vue {
@@ -229,13 +230,14 @@ export default class Comment extends Vue {
   }
 
   addCommentToList (content: PostListItemData): void {
-    // this.commentsList.push(content)
     this.commentsList = [content, ...this.commentsList]
-    console.log(this.commentsList)
-    // this.$forceUpdate()
     this.showButton()
     this.comment = ''
     this.$store.dispatch('posts/getPostById', this.id)
+  }
+
+  i18nextKey (count: number, key: string): string {
+    return toI18next(count, key, this.$i18n.locale)
   }
 }
 </script>

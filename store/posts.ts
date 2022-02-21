@@ -25,7 +25,7 @@ const UPDATE_POST_HIDDEN_STATE = 'UPDATE_POST_HIDDEN_STATE'
 
 const postService = new PostService()
 const subsocialApiService = new SubsocialApiService()
-const stepNumber = config.stepForLoading
+const stepNumber = config.infinityScrollOffset
 
 export interface UpdateReactionModel {
   type: string,

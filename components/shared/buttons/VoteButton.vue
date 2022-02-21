@@ -52,8 +52,8 @@ import { SubmittableResult } from '@polkadot/api'
 import { ReactionKind } from '@subsocial/types/substrate/classes'
 import TransactionButton from '~/components/abstract/TransactionButton.vue'
 import { ReactionStruct } from '~/types/reaction-struct.type'
-import { getNewIdsFromEvent } from '~/utils/utils'
 import { METHODS, PALLETS } from '~/constants/query'
+import { getNewIdsFromEvent } from '@subsocial/api'
 
 export enum ReactionEnum {
   Upvote = 'Upvote',

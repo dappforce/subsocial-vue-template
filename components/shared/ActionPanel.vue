@@ -43,9 +43,9 @@
 
   .action-panel-wp {
     display: flex;
+    justify-content: space-evenly;
 
     &>* {
-      flex: 1;
       display: flex;
       justify-content: center;
       min-height: 40px;

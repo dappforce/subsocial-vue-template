@@ -85,6 +85,7 @@
           </v-list-item>
         </v-list>
       </v-navigation-drawer>
+      <div v-if="isMobileView && drawer" class="backdrop"></div>
     </v-card>
   </div>
 </template>
@@ -94,7 +95,7 @@
   .v-navigation-drawer {
     padding-top: 56px;
     box-shadow: $box_shadow_left_drawer;
-    z-index: 1;
+    z-index: 9;
 
     &__content {
       display: flex;
@@ -143,6 +144,7 @@
       &__icon {
         z-index: 10;
         color: $icon_color_dark_gray;
+        justify-content: center;
       }
 
       .twitter-link {
@@ -191,7 +193,15 @@
       }
     }
   }
-
+  .backdrop {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    right: 0;
+    height: 100vh;
+    background-color: #0009;
+    z-index: 2;
+  }
 }
 </style>
 <script lang="ts">
