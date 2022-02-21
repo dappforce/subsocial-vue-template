@@ -76,6 +76,7 @@ export default abstract class TransactionButton extends Vue {
     }
 
     const { status } = result
+
     if (status.isFinalized || status.isInBlock) {
       this.setIsSending(false)
       this.unsubscribe()
@@ -107,6 +108,10 @@ export default abstract class TransactionButton extends Vue {
       const errMsg = `Tx failed: ${err.toString()}`
       console.warn(`❌ ${errMsg}`)
       this.$nuxt.$emit('isShowSnackbar', { show: true, text: errMsg })
+      
+      if (errMsg.includes('account balance too low')) {
+        this.$nuxt.$emit('isShowTokenAlert', true)
+      }
     }
 
     this.doOnFailed(null)

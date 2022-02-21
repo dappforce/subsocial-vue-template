@@ -42,8 +42,7 @@ export interface AddressInt {
 
 export default class Address extends Vue implements AddressInt {
   @Prop({
-    type: String,
-    default: 'ger'
+    type: String
   }) address!: string
 
   @Prop({

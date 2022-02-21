@@ -1,7 +1,7 @@
 import { FlatSubsocialApi } from '@subsocial/api/flat-subsocial'
 import SubsocialApiService from '~/services/subsocial-api.service'
 import { ReplyIdStruct } from '~/types/reply-id.type'
-import { bnsToIds, idToBn } from '~/utils/utils'
+import { bnsToIds, idToBn } from '@subsocial/utils'
 
 const subsocialApiService = new SubsocialApiService()
 

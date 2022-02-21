@@ -4,7 +4,6 @@
       v-model="drawer"
       class="drawer-container"
       right
-      temporary
     >
       <div class="user-info">
         <div class="close" @click="closeDrawer">
@@ -20,26 +19,26 @@
             </div>
             <div class="profile-stats-wp">
               <span @click="openModal">
-                <b>{{user.followersCount | numeral('0,0a')}}</b> {{$tc('plural.follower', user.followersCount)}}
+                <b>{{user.followingCount | numeral('0,0a')}}</b> {{$tc('plural.'+i18nextKey(user.followingCount, 'following'))}}
               </span>
               <span @click="openModal">
-                <b>{{user.followingCount | numeral('0,0a')}}</b> {{$tc('plural.following', user.followingCount)}}
+                <b>{{user.followersCount | numeral('0,0a')}}</b> {{ $tc('plural.'+i18nextKey(user.followersCount, 'follower')) }}
               </span>
             </div>
           </div>
         </div>
         <div class="account-info-wp">
-          <v-icon size="24" class="account-icon">
-            mdi-wallet-outline
-          </v-icon>
+          <div size="24" class="account-icon">
+            <img class="logo" src="../../assets/image/wallet.jpg" alt="Wallet">
+          </div>
           <Address :address="user.address || user.id" :size="'large'" :length="addressLength" :show-icon="true" />
           <QrCodeButton :address="user.address || user.id" />
         </div>
 
         <div class="account-amount">
-          <v-icon class="account-icon">
-            mdi-currency-usd
-          </v-icon>
+          <div class="account-icon">
+            <img class="logo" src="../../assets/image/balance.jpg" alt="Currency">
+          </div>
           <Tokens :balance="balance" />
         </div>
       </div>
@@ -105,7 +104,7 @@
           </v-list-item-icon>
           <v-list-item-content class="language-container" @click="toggleSelect = !toggleSelect">
             <v-list-item-title>
-              {{ $t('buttons.language') }}: {{ getLanguageName() }}
+              {{ $t('buttons.Language') }}: {{ getLanguageName() }}
 
               <v-select
                 v-model="selectedHeaders"
@@ -123,7 +122,7 @@
 
       <v-divider />
 
-      <div class="drawer-user-container">
+      <div class="drawer-user-container px-5">
         <div class="user-list">
           <div
             v-for="(item, index) in accounts"
@@ -156,12 +155,18 @@
 <style lang="scss">
 .drawer-container {
   width: 420px !important;
-  padding: $space_normal $space_normal $space_normal 11px;
   z-index: 10;
 
   .account-icon {
     width: 40px;
     margin-right: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    img {
+      width: 24px;
+    }
   }
 
   .close {
@@ -177,8 +182,7 @@
     align-items: flex-start;
     justify-content: center;
     min-height: 0;
-    padding-bottom: $space_normal;
-    padding-left: 5px;
+    padding: $space_normal;
 
     .profile-info-wp {
       display: flex;
@@ -250,6 +254,10 @@
         margin-left: 10px;
         color: $text_color_normal;
       }
+      
+      svg {
+        fill: #888;
+      }
     }
 
     .account-amount {
@@ -267,11 +275,10 @@
   }
 
   & .account-btn {
-    padding-left: 5px;
 
     .v-list-item {
       color: $text_color_dark_gray;
-      padding: 0;
+      padding: 0 $space_normal;
 
       .v-icon {
         color: $icon_color_dark_gray;
@@ -329,7 +336,7 @@
   }
   
   .drawer-user-container {
-    height: calc(100% - 360px);
+    height: calc(100% - 390px);
     position: relative;
 
     .shadow {
@@ -350,7 +357,7 @@
       position: relative;
       margin-bottom: $space_large;
       padding-bottom: 30px;
-
+      
       &::-webkit-scrollbar {
         width: 6px;
       }
@@ -364,22 +371,20 @@
         width: 6px;
       }
 
-      .user-item {
-        padding: 3px 0;
-
-        .user-account {
-          transition: all .2s ease;
-          &:hover {
-            background-color: $hover_menu_item;
-            cursor: pointer;
-          }
+      & .user-item {
+        padding: 0 $space_normal !important;
+        transition: all .2s ease;
+        
+        &:hover {
+          background-color: $hover_menu_item;
+          cursor: pointer;
         }
       }
     }
   }
   
   .sign-out {
-    padding-left: 5px;
+    padding: 0 $space_normal $space_normal;
     
     &__btn {
       border: 1px solid $button_outline_primary;
@@ -408,6 +413,7 @@ import StorageService from '../../services/storage.service'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
 import { AccountData } from '~/types/account.types'
 import { config } from '~/config/config'
+import { toI18next } from '~/utils/utils'
 const storageService = new StorageService()
 
 @Component
@@ -476,14 +482,18 @@ export default class AccountDrawer extends Vue {
     this.toggleSelect = false
     if (event.code) {
       storageService.setSelectedLanguage(event.code)
+      this.$updateDateLocal(event.code)
     }
-    this.$router.push(this.switchLocalePath(event.code))
   }
 
   getLanguageName (): string {
     const locales = this.$i18n.locales as [{ code: string, name: string }]
     const currentLang = locales.find((i: { code: string, name: string }) => i.code === this.$i18n.locale)
     return currentLang ? currentLang.name : ''
+  }
+
+  i18nextKey (count: number, key: string): string {
+    return toI18next(count, key, this.$i18n.locale)
   }
 }
 </script>

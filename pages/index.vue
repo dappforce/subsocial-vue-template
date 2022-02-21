@@ -70,7 +70,7 @@ import { Component, Vue } from 'vue-property-decorator'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
 import { config } from '~/config/config'
 
-const stepNumber = config.stepForLoading
+const stepNumber = config.infinityScrollOffset
 
 @Component
 export default class IndexPage extends Vue {

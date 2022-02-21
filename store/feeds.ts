@@ -40,7 +40,7 @@ export const mutations = {
 
 export const actions = {
   async getFeedIds ({ commit }: {commit: Commit}, payload: {id: string, offset: number}) {
-    const feed = await feedService.getNewsFeed(payload.id, payload.offset, config.stepForLoading)
+    const feed = await feedService.getNewsFeed(payload.id, payload.offset, config.infinityScrollOffset)
     const feedIds = feed.map(i => i.post_id)
     commit(SET_FEED_IDS, feedIds)
     return feedIds

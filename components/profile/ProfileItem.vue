@@ -13,10 +13,10 @@
             </div>
             <div class="profile-stats-wp">
               <span @click="openModal">
-                <b>{{profileData.followersCount | numeral('0,0a')}}</b> {{$tc('plural.follower', profileData.followersCount)}}
+                <b>{{profileData.followersCount | numeral('0,0a')}}</b> {{$tc('plural.'+i18nextKey(profileData.followersCount, 'follower'))}}
               </span>
               <span @click="openModal">
-                <b>{{profileData.followingCount | numeral('0,0a')}}</b> {{$tc('plural.following', profileData.followingCount)}}
+                <b>{{profileData.followingCount | numeral('0,0a')}}</b> {{$tc('plural.'+i18nextKey(profileData.followingCount, 'following'))}}
               </span>
             </div>
           </div>
@@ -72,7 +72,7 @@
 
   .profile-item {
     padding: $space_normal $space_normal 0;
-    z-index: 9;
+    z-index: 2;
 
     .profile-item-header {
       display: flex;
@@ -192,6 +192,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
 import { config } from '~/config/config'
+import { toI18next } from '~/utils/utils'
 
 @Component
 export default class ProfileItem extends Vue {
@@ -259,6 +260,10 @@ export default class ProfileItem extends Vue {
     this.$store.dispatch('profiles/getAccountBalance', this.profileData ? this.profileData.id : this.$route.params.account).then((res) => {
       this.balance = res
     })
+  }
+
+  i18nextKey (count: number, key: string): string {
+    return toI18next(count, key, this.$i18n.locale)
   }
 }
 </script>

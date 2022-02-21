@@ -2,7 +2,7 @@
   <div data-app>
     <v-dialog
       v-model="openModal"
-      max-width="500px"
+      max-width="530px"
       @click:outside="onCancel"
     >
       <v-card class="v-modal-container">
@@ -15,7 +15,7 @@
 
         <v-card flat>
           <div class="send-tips-container">
-            <UserItem v-if="userInfo" :user-info="userInfo" />
+            <UserItem v-if="userInfo" :user-info="userInfo" :fullAddress="true" :size="60" :isShowRecipient="true" :showCopyBtn="false"/>
             <ValidationObserver ref="form" v-slot="{ handleSubmit, handleReset }">
               <form @submit.prevent="handleSubmit(submit)" @reset.prevent="handleReset(onCancel)">
                 <ValidationProvider v-slot="{ errors }" :rules="'required|numeric|min_value:1'">
@@ -24,7 +24,7 @@
                       v-model="amount"
                       outlined
                       required
-                      suffix="SUB"
+                      :suffix="$store.state.profiles.chainToken"
                       height="36"
                       hide-details="auto"
                       :messages="errors[0]"
@@ -35,7 +35,7 @@
               </form>
             </ValidationObserver>
             <div class="my-balance">
-              {{ $t('modals.tips.availableBalance') }}: <strong>{{ myBalance }}</strong>
+              {{ $t('modals.tips.availableBalance') }}: <span>{{ myBalance }} {{ $store.state.profiles.chainToken }}</span>
             </div>
             <div class="button-container">
               <v-btn class="button-third-color" @click="onCancel">
@@ -58,6 +58,7 @@
 
   .v-card {
     height: auto;
+    max-height: none;
   }
 
   .v-card__title.st-title {
@@ -68,6 +69,7 @@
 
   .send-tips-container {
     padding: 0 $space_normal $space_normal;
+    width: 100%;
 
     .user-item-wp {
       border: none;
@@ -80,6 +82,14 @@
       }
     }
 
+    .v-text-field--outlined > .v-input__control > .v-input__slot {
+      min-height: 36px !important;
+    }
+
+    .v-text-field--outlined .v-label {
+      top: 9px;
+    }
+
     .v-text-field__details {
       padding: 0;
     }
@@ -88,6 +98,16 @@
       font-size: $font_extra_small;
       color: $text_color_red;
     }
+    
+    & .address-text {
+      color: $text_color_dark_gray;
+      word-break: break-all;
+    }
+    
+    & .v-text-field__suffix {
+      color: $text_color_normal;
+      font-size: $font_normal;
+    }
 
     .my-balance {
       font-size: $font_small;
@@ -95,7 +115,7 @@
       line-height: 22px;
       margin-top: 3px;
 
-      strong {
+      span {
         color: $text_color_normal;
       }
     }
@@ -190,7 +210,7 @@ export default class ModalSendTips extends Vue {
   submit () {
     this.$refs.form.validate().then((result) => {
       if (result) {
-        this.$store.dispatch('profiles/transferMoney', { from: this.fromAccount, to: this.userInfo.id, amount: +this.amount * config.subRate })
+        this.$store.dispatch('profiles/transferMoney', { from: this.fromAccount, to: this.userInfo.id, amount: +this.amount * Math.pow(10, this.$store.state.profiles.chainDecimal) })
           .then(() => {
             this.onClick()
           })

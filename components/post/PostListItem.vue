@@ -26,7 +26,7 @@
           <v-icon>
             mdi-alert-circle
           </v-icon>
-          {{ $t('generalMessages.hiddenMessage', {type: $t('general.post')}) }}
+          {{ $t('generalMessages.hiddenPost') }}
         </div>
         <div class="unhidden-btn">
           <span class="make-visible">

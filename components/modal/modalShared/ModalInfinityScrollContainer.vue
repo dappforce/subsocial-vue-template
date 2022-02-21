@@ -28,7 +28,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import { ProfileStruct } from '@subsocial/types/dto'
 import { config } from '~/config/config'
 
-const stepNumber = config.stepForLoading
+const stepNumber = config.infinityScrollOffset
 
 @Component
 export default class ModalInfinityScrollContainer extends Vue {

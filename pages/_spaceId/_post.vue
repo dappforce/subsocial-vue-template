@@ -163,9 +163,9 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { ProfileStruct, SpaceStruct } from '@subsocial/types/dto'
 import { PostListItemData } from '~/models/post/post-list-item.model'
-import { getIsPostOwner, getPostIdFromLink, isMobile } from '~/utils/utils'
+import { getIsPostOwner, isMobile } from '~/utils/utils'
 
-@Component({})
+@Component
 export default class PostPage extends Vue {
   space: SpaceStruct | null = null
   post: PostListItemData | null = null
@@ -177,7 +177,7 @@ export default class PostPage extends Vue {
 
   created (): void {
     if (this.$store.state.loading.isLoading) {
-      this.post = this.$store.getters['posts/getPostInfo'](getPostIdFromLink(this.$route.params.post))
+      this.post = this.$store.getters['posts/getPostInfo'](this.$getPostIdFromLink(this.$route.params.post))
       this.setCurrentUser()
       this.getSharedPost()
       this.getRootPost()
@@ -190,8 +190,8 @@ export default class PostPage extends Vue {
   mounted () {
     const unsubscribe = this.$store.subscribe((mutation, state) => {
       if (mutation.type === 'posts/SET_SUGGESTED_POST_IDS' && this.post === null) {
-        this.$store.dispatch('posts/getPostById', getPostIdFromLink(this.$route.params.post)).then(() => {
-          this.post = this.$store.getters['posts/getPostInfo'](getPostIdFromLink(this.$route.params.post))
+        this.$store.dispatch('posts/getPostById', this.$getPostIdFromLink(this.$route.params.post)).then(() => {
+          this.post = this.$store.getters['posts/getPostInfo'](this.$getPostIdFromLink(this.$route.params.post))
 
           this.setCurrentUser()
           this.getSharedPost()

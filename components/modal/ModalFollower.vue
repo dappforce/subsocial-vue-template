@@ -6,7 +6,7 @@
     >
       <v-card v-if="usersIds" class="v-modal-container">
         <v-card-title>
-          {{usersIds.length | numeral('0,0a')}} {{$tc('plural.follower', usersIds.length)}}
+          {{usersIds.length | numeral('0,0a')}} {{ $tc('plural.'+i18nextKey(usersIds.length, 'follower')) }}
           <v-icon class="close-icon" @click="onClick">
             mdi-close
           </v-icon>
@@ -31,7 +31,8 @@
 
   .v-card {
     overflow: hidden;
-    height: 550px;
+    min-height: 200px;
+    max-height: 550px;
     overflow-y: auto;
 
     &::-webkit-scrollbar {
@@ -48,7 +49,7 @@
     }
 
     .user-item-wp {
-      border-bottom: 1px solid rgba(33, 33, 33, 0.08);
+      border-bottom: 1px solid $border_outline_gray;
     }
   }
 }
@@ -57,6 +58,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { toI18next } from '~/utils/utils'
 
 @Component
 export default class ModalFollower extends Vue {
@@ -89,6 +91,10 @@ export default class ModalFollower extends Vue {
 
   onClick (): void {
     this.openModal = !this.openModal
+  }
+
+  i18nextKey (count: number, key: string): string {
+    return toI18next(count, key, this.$i18n.locale)
   }
 }
 </script>

@@ -37,7 +37,7 @@ import { ProfileItemModel } from '~/models/profile/profile-item.model'
 import { NotificationItemData } from '~/store/notifications'
 import { config } from '~/config/config'
 
-const stepNumber = config.stepForLoading
+const stepNumber = config.infinityScrollOffset
 
 @Component
 export default class NotificationsPage extends Vue {
