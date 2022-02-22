@@ -31,6 +31,10 @@ export default abstract class TransactionButton extends Vue {
   abstract validate(): boolean;
 
   async initExtrinsic (props: ExtrinsicProps) {
+    if (this.$store.state.profiles.myBalance < 1) {
+      this.$nuxt.$emit('isShowTokenAlert', true);
+      return
+    }
     this.signer = this.$store.state.profiles.signer
     this.accountId = this.$store.state.profiles.currentUser ? this.$store.state.profiles.currentUser.id : undefined
     this.extrinsic = await transactionService.getExtrinsic(props)

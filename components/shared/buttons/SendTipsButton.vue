@@ -24,7 +24,7 @@
     flex: initial;
   }
 
-  &:disabled {
+  &.theme--light.v-btn.v-btn--disabled.v-btn--has-bg {
     border: none;
     background-color: $button_bg_disabled !important;
 

@@ -32,10 +32,13 @@
     }
   }
 
-  &:disabled {
+  &.theme--light.v-btn.v-btn--disabled.v-btn--has-bg {
     border: none;
-    color: $text_color_disabled !important;
-    opacity: 0.5;
+    background-color: $button_bg_disabled !important;
+
+    .v-btn__content {
+      color: $text_color_disabled;
+    }
   }
 }
 </style>

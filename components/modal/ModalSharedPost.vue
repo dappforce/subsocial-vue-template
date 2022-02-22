@@ -89,7 +89,7 @@
       }
 
       &__append-inner {
-        margin-top: 8px;
+        margin-top: 16px;
       }
     }
 

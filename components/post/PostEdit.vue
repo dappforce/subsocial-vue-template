@@ -141,6 +141,7 @@
 
     .v-tabs-items {
       background: $tab_bg_white;
+      padding-bottom: 0 !important;
     }
   }
 

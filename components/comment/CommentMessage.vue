@@ -208,7 +208,6 @@
 
         .options-button {
           &.mdi-dots-vertical::before {
-            transform: rotate(90deg);
             color: $icon_color_dark_gray !important;
           }
         }

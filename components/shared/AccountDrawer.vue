@@ -74,28 +74,6 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item link>
-          <v-list-item-icon>
-            <v-icon class="account-icon">
-              mdi-cog-outline
-            </v-icon>
-          </v-list-item-icon>
-
-          <v-tooltip top>
-            <template #activator="{ on, attrs }">
-              <v-list-item-content>
-                <v-list-item-title
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  {{ $t('buttons.settings') }}
-                </v-list-item-title>
-              </v-list-item-content>
-            </template>
-            <span>Coming soon</span>
-          </v-tooltip>
-        </v-list-item>
-
         <v-list-item v-click-outside="changeLocal" link>
           <v-list-item-icon>
             <v-icon class="account-icon">
@@ -117,6 +95,28 @@
               />
             </v-list-item-title>
           </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item link>
+          <v-list-item-icon>
+            <v-icon class="account-icon">
+              mdi-cog-outline
+            </v-icon>
+          </v-list-item-icon>
+
+          <v-tooltip top>
+            <template #activator="{ on, attrs }">
+              <v-list-item-content>
+                <v-list-item-title
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  {{ $t('buttons.settings') }}
+                </v-list-item-title>
+              </v-list-item-content>
+            </template>
+            <span>Coming soon</span>
+          </v-tooltip>
         </v-list-item>
       </v-list>
 
@@ -156,7 +156,8 @@
 .drawer-container {
   width: 420px !important;
   z-index: 10;
-
+  box-shadow: $box_shadow_left_drawer;
+  
   .account-icon {
     width: 40px;
     margin-right: 13px;
