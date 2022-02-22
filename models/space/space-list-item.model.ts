@@ -1,5 +1,4 @@
-import { SpaceContent } from '@subsocial/api/flat-subsocial/dto'
-import { SpaceStruct } from '@subsocial/api/flat-subsocial/flatteners'
+import { SpaceContent, SpaceStruct } from '@subsocial/types/dto'
 import { EntityListData } from '../../types/entity-data.type'
 
 export type HasHandle = {

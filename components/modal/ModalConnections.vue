@@ -1,5 +1,5 @@
 <template>
-  <div data-app>
+  <div class="modal-connections" data-app>
     <v-dialog
       v-model="openModal"
       max-width="500px"
@@ -17,7 +17,6 @@
             v-model="activeTab"
             grow
             centered
-            slider-color="yellow"
           >
             <v-tabs-slider class="slider-color" />
             <v-tab
@@ -49,57 +48,59 @@
 </template>
 
 <style lang="scss">
-.v-modal-container {
-  .v-card__title {
-    display: flex;
-    justify-content: space-between;
-  }
+.modal-connections {
+  .v-modal-container {
+    .v-card__title {
+      display: flex;
+      justify-content: space-between;
+    }
 
-  .v-sheet.v-card {
-    box-shadow: none;
-  }
+    .v-sheet.v-card {
+      box-shadow: none;
+    }
 
-  .votes-count {
-    font-weight: 400;
-    padding-left: 10px;
-  }
+    .votes-count {
+      font-weight: 400;
+      padding-left: 10px;
+    }
 
-  .slider-color {
-    color: $color_primary;
-  }
+    .slider-color {
+      color: $slider_color;
+    }
 
-  .v-tab--active {
-    color: $color_primary;
-  }
+    .v-tab--active {
+      color: $text_color_primary;
+    }
 
-  .v-tabs {
-    box-shadow: $box_shadow_for_tabs;
-    position: relative;
-    z-index: 1;
-  }
+    .v-tabs {
+      box-shadow: $box_shadow_for_tabs;
+      position: relative;
+      z-index: 1;
+    }
 
-  .v-tabs-items {
-    .v-card {
-      overflow: hidden;
-      max-height: 500px;
-      overflow-y: auto;
+    .v-tabs-items {
+      .v-card {
+        overflow: hidden;
+        max-height: 500px;
+        overflow-y: auto;
 
-      &::-webkit-scrollbar {
-        width: 6px;
-      }
+        &::-webkit-scrollbar {
+          width: 6px;
+        }
 
-      &::-webkit-scrollbar-track {
-        box-shadow: none;
-      }
+        &::-webkit-scrollbar-track {
+          box-shadow: none;
+        }
 
-      &::-webkit-scrollbar-thumb {
-        background-color: $color_gray;
-        width: 6px;
+        &::-webkit-scrollbar-thumb {
+          background-color: $scroll_outline_gray;
+          width: 6px;
+        }
       }
     }
   }
-}
 
+}
 </style>
 
 <script lang="ts">

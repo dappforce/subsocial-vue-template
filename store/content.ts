@@ -1,4 +1,4 @@
-import { SpaceStruct } from '@subsocial/api/flat-subsocial/flatteners'
+import { SpaceStruct } from '@subsocial/types/dto'
 import { SpaceEntity } from '~/models/entities/space-entity.model'
 import { Content } from '~/types/content'
 
@@ -41,11 +41,7 @@ export const mutations = {
 }
 
 export const actions = {
-
 }
 
 export const getters = {
-  getContent: (state: any, rootState: any) => {
-    return state.content
-  }
 }

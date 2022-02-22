@@ -7,7 +7,7 @@
     >
       <v-card class="v-modal-container">
         <v-card-title>
-          {{ reactions.length }} {{ reactions.length | pluralize('en', [$tc('modals.likes.reaction'), $tc('modals.likes.reactions')]) }}
+          {{reactions.length | numeral('0,0a')}} {{$tc('plural.'+i18nextKey(reactions.length, 'reaction'))}}
 
           <v-icon class="close-icon" @click="onClick">
             mdi-close
@@ -66,7 +66,7 @@
   }
 
   .v-tab--active {
-    color: $color_primary;
+    color: $text_color_primary;
   }
 
   .v-tabs {
@@ -76,13 +76,15 @@
   }
 
   .slider-color {
-    color: $color_primary;
+    color: $slider_color;
   }
 
   .v-tabs-items {
+    padding-bottom: 0;
     .v-card {
       overflow: hidden;
-      height: 550px;
+      min-height: 200px;
+      max-height: 500px;
       overflow-y: auto;
 
       &::-webkit-scrollbar {
@@ -94,7 +96,7 @@
       }
 
       &::-webkit-scrollbar-thumb {
-        background-color: $color_gray;
+        background-color: $scroll_outline_gray;
         width: 6px;
       }
     }
@@ -105,6 +107,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { toI18next } from '~/utils/utils'
 
 @Component
 export default class ModalLikes extends Vue {
@@ -159,6 +162,10 @@ export default class ModalLikes extends Vue {
 
   clickOutside (): void {
     this.$nuxt.$emit('isModalClose-' + this.postId)
+  }
+
+  i18nextKey (count: number, key: string): string {
+    return toI18next(count, key, this.$i18n.locale)
   }
 }
 </script>

@@ -5,11 +5,12 @@
       elevation="2"
       class="post-item"
     >
-      <div v-if="post.hidden && isPostOwner" class="hidden-post">
+      <div v-if="post.hidden && isPostOwner" class="hidden-container">
         <div class="alert-text">
-          <v-icon color="#EFB041">
+          <v-icon>
             mdi-alert-circle
-          </v-icon>This post is unlisted and only you can see it
+          </v-icon>
+          {{ $t('generalMessages.hiddenPost') }}
         </div>
         <div class="unhidden-btn">
           <span class="make-visible">
@@ -66,7 +67,7 @@
 
     .shared-post {
       margin-top: 0;
-      border: 1px solid $color_light_border;
+      border: 1px solid $border_outline_gray;
       border-radius: $border_small;
 
       & .post-item {
@@ -74,40 +75,7 @@
       }
     }
   }
-
-  .hidden-post {
-    margin: (-$space_normal) (-$space_normal) $space_normal;
-    height: 40px;
-    background: #FEFBE8;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 $space_normal;
-    color: $color_font_normal;
-    font-size: $font_small;
-    border-bottom: 1px solid $color_warning_border;
-
-    .v-icon {
-      margin-right: 10px;
-    }
-
-    .make-visible {
-      border: 1px solid #D9D9D9;
-      box-sizing: border-box;
-      border-radius: $border_small;
-      color: $color_font_normal;
-      font-weight: 500;
-      line-height: 125%;
-      padding: 3px 5px;
-      transition: all .2s ease;
-
-      &:hover {
-        cursor: pointer;
-        color: $color_primary;
-      }
-    }
-  }
-
+  
   .post-main-wp {
     display: flex;
     padding-bottom: 0;
@@ -132,12 +100,12 @@
 
   .hidden-post-text {
     text-align: center;
-    background: $color_white;
-    border: 1px solid $color_light_border;
+    background: $container_bg_white;
+    border: 1px solid $border_outline_gray;
     box-sizing: border-box;
     border-radius: $border_small;
     padding: $space_large;
-    color: $color_dark_gray;
+    color: $text_color_dark_gray;
     font-size: $font_normal;
   }
 }

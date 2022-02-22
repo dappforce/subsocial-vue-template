@@ -1,8 +1,4 @@
-import {
-  PostStruct,
-  ProfileStruct,
-  SpaceStruct
-} from '@subsocial/api/flat-subsocial/flatteners'
+import { PostStruct, ProfileStruct, SpaceStruct } from '@subsocial/types/dto'
 import { Content } from './content'
 
 export type TransformSpaceData = {

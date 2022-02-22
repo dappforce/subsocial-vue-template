@@ -1,6 +1,7 @@
 export const STORAGE_KEYS = {
   accountId: 'accountId',
-  spaceId: 'spaceId'
+  spaceId: 'spaceId',
+  lang: 'lang'
 }
 
 export default class StorageService {
@@ -22,5 +23,13 @@ export default class StorageService {
 
   getCurrentSpaceId (): string {
     return localStorage.getItem(STORAGE_KEYS.spaceId) || ''
+  }
+  
+  setSelectedLanguage (lang: string) {
+    localStorage.setItem(STORAGE_KEYS.lang, lang)
+  }
+
+  getSelectedLanguage () {
+    return localStorage.getItem(STORAGE_KEYS.lang)
   }
 }

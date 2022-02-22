@@ -1,16 +1,17 @@
 import {
-  AnyId,
-  EntityId,
   PostData,
+  SharedPostStruct,
   SpaceData
-} from '@subsocial/api/flat-subsocial/dto'
+} from '@subsocial/types/dto'
 import slug from 'slugify'
 import BN from 'bn.js'
-
 import { SubmittableResult } from '@polkadot/api'
-import { SharedPostStruct } from '@subsocial/api/flat-subsocial/flatteners'
+import i18next from 'i18next'
+import { SubDate } from '@subsocial/utils'
+import { getNewIdsFromEvent } from '@subsocial/api'
 import { TransformDataArray } from '~/types/transform-dto'
 import { Content } from '~/types/content'
+import { config } from '~/config/config'
 
 export function getNewIdFromEvent (txResult: SubmittableResult): BN | undefined {
   const [newId] = getNewIdsFromEvent(txResult)
@@ -32,24 +33,6 @@ export const transformEntityDataArray = (
   return { structs, contents }
 }
 
-export const sliceEntityArray = (
-  entityArray: Array<any>,
-  contentEntities: any,
-  start: number,
-  end: number
-) => {
-  const entityData: any[] = []
-
-  entityArray.slice(start, end).map((struct) => {
-    if (struct.contentId) {
-      const content = contentEntities[struct.contentId]
-      content ? entityData.push({ struct, content }) : null
-    }
-  })
-
-  return entityData
-}
-
 export const getPostLink = (
   spaceHandle: string,
   title: string,
@@ -59,51 +42,12 @@ export const getPostLink = (
   return title ? `/${isHandle ? '@' : ''}${spaceHandle}/${slug(title)}-${id}` : ''
 }
 
-export function idToBn (id: AnyId): BN {
-  return BN.isBN(id) ? id : new BN(id)
-}
-
-export function bnsToIds (bnIds: BN[]): EntityId[] {
-  return bnIds.map(bnToId)
-}
-
-export function bnToId (bnId: BN): EntityId {
-  return bnId.toString()
-}
-
-export function convertBN (value: BN) {
-  return value.toString()
-}
-
 export function convertToBNArray (array: string[]) {
   return array.map(el => new BN(el))
 }
 
-export function convertToBN (value: string) {
-  return new BN(value)
-}
-
 export function routerParamsLength (value: object) {
   return Object.keys(value).length
-}
-
-export function getNewIdsFromEvent (txResult: SubmittableResult): BN[] {
-  const newIds: BN[] = []
-  txResult.events.find((event) => {
-    const { event: { data, method } } = event
-    if (method.includes('Created')) {
-      const [, ...ids] = data.toArray()
-      newIds.push(...ids as unknown as BN[])
-      return true
-    }
-    return false
-  })
-
-  return newIds
-}
-
-export function getPostIdFromLink (link: string | null) {
-  return link ? link.trim().split('-').pop() : ''
 }
 
 export function getIsPostOwner (ownerId: string, currentUseId: string | undefined): boolean {
@@ -116,7 +60,7 @@ export function getIsPostOwner (ownerId: string, currentUseId: string | undefine
 export function selectPostStructByIds (ids: string[], state: SharedPostStruct[]): SharedPostStruct[] {
   const structs: SharedPostStruct[] = []
   ids.forEach((id) => {
-    const struct = state.find(i => i.id === id)
+    const struct: any = state.find(i => i.id === id)
     if (struct) {
       structs.push(struct)
     }
@@ -126,10 +70,22 @@ export function selectPostStructByIds (ids: string[], state: SharedPostStruct[])
 
 export function isMobile () {
   if (process.browser) {
-    if (window.innerWidth <= 991) {
+    if (window.innerWidth <= config.mobileScreenWidth) {
       return true
     } else {
       return false
     }
   } else { return false }
+}
+
+export function toDate (date: number | string) {
+  return SubDate.formatDate(date)
+}
+
+export function toI18next (count: number, key: string, lang: string): string {
+  if (i18next.services.pluralResolver) {
+    return key + i18next.services.pluralResolver.getSuffix(lang, count)
+  } else {
+    return key + '_other'
+  }
 }

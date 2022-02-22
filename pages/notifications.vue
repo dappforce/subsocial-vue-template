@@ -1,7 +1,7 @@
 <template>
   <v-card class="notification">
     <div class="header">
-      {{ $t('notificationItem.title') }}
+      {{ $t('notifications.title') }}
     </div>
     <NotificationItem
       v-for="(item, index) in notifications"
@@ -25,7 +25,7 @@
     font-size: $font_large;
     line-height: $main_line_height;
     letter-spacing: 0.15px;
-    color: $color_font_normal;
+    color: $text_color_normal;
     padding: $space_normal;
   }
 }
@@ -37,7 +37,7 @@ import { ProfileItemModel } from '~/models/profile/profile-item.model'
 import { NotificationItemData } from '~/store/notifications'
 import { config } from '~/config/config'
 
-const stepNumber = config.stepForLoading
+const stepNumber = config.infinityScrollOffset
 
 @Component
 export default class NotificationsPage extends Vue {

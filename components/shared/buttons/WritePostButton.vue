@@ -18,7 +18,7 @@
 
 <style lang="scss">
 .write-post-btn {
-  background-color: $color_primary !important;
+  background-color: $button_bg_primary !important;
   height: $buttons_height;
   border: none;
   box-sizing: border-box;
@@ -30,17 +30,17 @@
   text-transform: capitalize;
 
   .v-btn__content {
-    color: $color_white;
+    color: $text_color_white;
     font-size: $font_normal;
     flex: initial;
   }
 
-  &:disabled {
+  &.theme--light.v-btn.v-btn--disabled.v-btn--has-bg {
     border: none;
-    background-color: $color_shadow !important;
+    background-color: $button_bg_disabled !important;
 
     .v-btn__content {
-      color: $color_disabled_gray;
+      color: $text_color_disabled;
     }
   }
 }
@@ -67,7 +67,9 @@ export default class WritePostButton extends Vue {
     if (this.spaceId) {
       storageService.setCurrentSpaceId(this.spaceId)
     }
-    this.$router.push(this.$nuxt.localePath('/post?new'))
+    if (this.$store.state.profiles.currentUser) {
+      this.$router.push(this.$nuxt.localePath('/post?new'))
+    }
   }
 }
 </script>

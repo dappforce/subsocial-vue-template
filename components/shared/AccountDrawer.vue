@@ -4,7 +4,6 @@
       v-model="drawer"
       class="drawer-container"
       right
-      temporary
     >
       <div class="user-info">
         <div class="close" @click="closeDrawer">
@@ -19,30 +18,34 @@
               <Title :id="user.id" size="large" :name="user.name" :link="'/accounts/' + user.id" />
             </div>
             <div class="profile-stats-wp">
-              <span @click="openModal"><b>{{ user.followingCount | numeral('0,0a') }}</b> {{ user.followingCount | pluralize('en', [$t('general.following'), $t('general.following')]) }}</span>
-              <span @click="openModal"><b>{{ user.followersCount | numeral('0,0a') }}</b> {{ user.followersCount | pluralize('en', [$t('general.follower'), $t('general.followers')]) }}</span>
+              <span @click="openModal">
+                <b>{{user.followingCount | numeral('0,0a')}}</b> {{$tc('plural.'+i18nextKey(user.followingCount, 'following'))}}
+              </span>
+              <span @click="openModal">
+                <b>{{user.followersCount | numeral('0,0a')}}</b> {{ $tc('plural.'+i18nextKey(user.followersCount, 'follower')) }}
+              </span>
             </div>
           </div>
         </div>
         <div class="account-info-wp">
-          <v-icon size="24" class="account-icon">
-            mdi-wallet-outline
-          </v-icon>
+          <div size="24" class="account-icon">
+            <img class="logo" src="../../assets/image/wallet.jpg" alt="Wallet">
+          </div>
           <Address :address="user.address || user.id" :size="'large'" :length="addressLength" :show-icon="true" />
           <QrCodeButton :address="user.address || user.id" />
         </div>
 
         <div class="account-amount">
-          <v-icon class="account-icon">
-            mdi-currency-usd
-          </v-icon>
+          <div class="account-icon">
+            <img class="logo" src="../../assets/image/balance.jpg" alt="Currency">
+          </div>
           <Tokens :balance="balance" />
         </div>
       </div>
 
       <v-divider />
 
-      <v-list class="account-btn" dense>
+      <v-list class="account-btn custom-hover" dense>
         <v-list-item link :to="localePath('/accounts/' + user.id)">
           <v-list-item-icon>
             <v-icon class="account-icon">
@@ -52,7 +55,7 @@
 
           <v-list-item-content>
             <v-list-item-title>
-              {{ $t('drawer.myProfile') }}
+              {{ $t('buttons.myProfile') }}
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -66,7 +69,30 @@
 
           <v-list-item-content>
             <v-list-item-title>
-              {{ $t('drawer.editMyProfile') }}
+              {{ $t('buttons.editMyProfile') }}
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item v-click-outside="changeLocal" link>
+          <v-list-item-icon>
+            <v-icon class="account-icon">
+              mdi-web
+            </v-icon>
+          </v-list-item-icon>
+          <v-list-item-content class="language-container" @click="toggleSelect = !toggleSelect">
+            <v-list-item-title>
+              {{ $t('buttons.Language') }}: {{ getLanguageName() }}
+
+              <v-select
+                v-model="selectedHeaders"
+                :items="availableLocales"
+                :menu-props="{value: toggleSelect}"
+                return-object
+                item-text="name"
+                class="select-language-input"
+                @change="changeLocal"
+              />
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -85,61 +111,40 @@
                   v-bind="attrs"
                   v-on="on"
                 >
-                  {{ $t('drawer.settings') }}
+                  {{ $t('buttons.settings') }}
                 </v-list-item-title>
               </v-list-item-content>
             </template>
             <span>Coming soon</span>
           </v-tooltip>
         </v-list-item>
-
-        <v-list-item v-click-outside="changeLocal" link>
-          <v-list-item-icon>
-            <v-icon class="account-icon">
-              mdi-web
-            </v-icon>
-          </v-list-item-icon>
-          <v-list-item-content class="language-container" @click="toggleSelect = !toggleSelect">
-            <v-list-item-title>
-              {{ $t('drawer.language') }}: {{ getLanguageName() }}
-
-              <v-select
-                v-model="selectedHeaders"
-                :items="availableLocales"
-                :menu-props="{value: toggleSelect}"
-                return-object
-                item-text="name"
-                class="select-language-input"
-                @change="changeLocal"
-              />
-            </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
       </v-list>
 
       <v-divider />
 
-      <div class="user-list">
-        <div
-          v-for="(item, index) in accounts"
-          :key="index"
-          class="user-item"
-          @click="setAccount(item)"
-        >
-          <VoteUserItem
-            :user-info="item"
-            :type="'account'"
-            class="user-account"
-          />
+      <div class="drawer-user-container px-5">
+        <div class="user-list">
+          <div
+            v-for="(item, index) in accounts"
+            :key="index"
+            class="user-item"
+            @click="setAccount(item)"
+          >
+            <ProfileAccountListItem
+              :user-info="item"
+              :type="'account'"
+              class="user-account"
+            />
+          </div>
         </div>
         <div class="shadow">
           <v-divider light />
         </div>
       </div>
-
+      
       <div class="sign-out">
         <v-btn class="sign-out__btn" @click="signOut">
-          {{ $t('drawer.signOut') }}
+          {{ $t('buttons.signOut') }}
         </v-btn>
       </div>
       <ModalConnections :is-modal="isOpenModal" :account-id="user.id" />
@@ -150,12 +155,19 @@
 <style lang="scss">
 .drawer-container {
   width: 420px !important;
-  padding: $space_normal $space_normal $space_normal 11px;
   z-index: 10;
-
+  box-shadow: $box_shadow_left_drawer;
+  
   .account-icon {
     width: 40px;
     margin-right: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    img {
+      width: 24px;
+    }
   }
 
   .close {
@@ -171,8 +183,7 @@
     align-items: flex-start;
     justify-content: center;
     min-height: 0;
-    padding-bottom: $space_normal;
-    padding-left: 5px;
+    padding: $space_normal;
 
     .profile-info-wp {
       display: flex;
@@ -190,7 +201,7 @@
           line-height: $main_line_height;
           align-items: center;
           letter-spacing: 0.15px;
-          color: $color_font_normal;
+          color: $text_color_normal;
 
           a {
             text-decoration: none;
@@ -221,12 +232,12 @@
         align-items: center;
 
         .address-text {
-          color: $color_font_normal;
+          color: $text_color_normal;
           font-size: $font_normal;
         }
 
         .v-icon {
-          color: $color_black;
+          color: $icon_color_normal;
           margin-left: 10px;
         }
       }
@@ -242,7 +253,11 @@
 
       .qr-icon {
         margin-left: 10px;
-        color: $color_black;
+        color: $text_color_normal;
+      }
+      
+      svg {
+        fill: #888;
       }
     }
 
@@ -254,21 +269,20 @@
       align-items: center;
 
       .gray {
-        color: $color_font_secondary;
+        color: $text_color_dark_gray;
         font-weight: normal;
       }
     }
   }
 
   & .account-btn {
-    padding-left: 5px;
 
     .v-list-item {
-      color: $color_icon_gray;
-      padding: 0;
+      color: $text_color_dark_gray;
+      padding: 0 $space_normal;
 
       .v-icon {
-        color: $color_icon_gray;
+        color: $icon_color_dark_gray;
         margin-right: $space_small;
       }
 
@@ -277,11 +291,12 @@
         font-weight: normal;
         letter-spacing: 0.25px;
         line-height: 1.1rem;
-        color: $color_icon_gray;
+        color: $text_color_dark_gray;
+        z-index: 10;
 
         a {
           text-decoration: none;
-          color: $color_black;
+          color: $text_color_normal;
         }
       }
     }
@@ -320,65 +335,70 @@
       }
     }
   }
-
-  .user-list {
-    height: calc(100% - 373px);
-    overflow: hidden;
-    overflow-y: auto;
+  
+  .drawer-user-container {
+    height: calc(100% - 390px);
     position: relative;
-    margin-bottom: $space_large;
 
-    &::-webkit-scrollbar {
-      width: 6px;
+    .shadow {
+      display: flex;
+      align-items: flex-end;
+      height: 50px;
+      position: absolute;
+      bottom: 15px;
+      right: 0;
+      left: 0;
+      background: $drawer_shadow;
     }
 
-    &::-webkit-scrollbar-track {
-      box-shadow: none;
-    }
+    .user-list {
+      height: calc(100% - 15px);
+      overflow: hidden;
+      overflow-y: auto;
+      position: relative;
+      margin-bottom: $space_large;
+      padding-bottom: 30px;
+      
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
 
-    &::-webkit-scrollbar-thumb {
-      background-color: $color_gray;
-      width: 6px;
-    }
+      &::-webkit-scrollbar-track {
+        box-shadow: none;
+      }
 
-    .user-item {
-      padding: 3px 0;
+      &::-webkit-scrollbar-thumb {
+        background-color: $scroll_outline_gray;
+        width: 6px;
+      }
 
-      .user-account {
+      & .user-item {
+        padding: 0 $space_normal !important;
         transition: all .2s ease;
+        
         &:hover {
-          background-color: rgba(238, 236, 236, 0.7);
+          background-color: $hover_menu_item;
           cursor: pointer;
         }
       }
     }
-
-    .shadow {
-      display: flex;
-      align-items: end;
-      height: 50px;
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      left: 0;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.4) 17.71%, rgba(255, 255, 255, 0.6) 40.1%, #FFFFFF 78.12%);
-    }
   }
-
+  
   .sign-out {
-    padding-left: 5px;
+    padding: 0 $space_normal $space_normal;
+    
     &__btn {
-      border: 1px solid $color_primary;
+      border: 1px solid $button_outline_primary;
       box-sizing: border-box;
       border-radius: $border_small;
       width: 100%;
       height: $buttons_height;
-      color: $color_primary;
+      color: $text_color_primary;
       font-size: $font_normal;
       font-weight: 500;
       letter-spacing: 1.25px;
       box-shadow: none;
-      background-color: $color_white !important;
+      background-color: $button_bg_white !important;
     }
   }
 }
@@ -394,6 +414,7 @@ import StorageService from '../../services/storage.service'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
 import { AccountData } from '~/types/account.types'
 import { config } from '~/config/config'
+import { toI18next } from '~/utils/utils'
 const storageService = new StorageService()
 
 @Component
@@ -460,13 +481,20 @@ export default class AccountDrawer extends Vue {
 
   changeLocal (event: any) {
     this.toggleSelect = false
-    this.$router.push(this.switchLocalePath(event.code))
+    if (event.code) {
+      storageService.setSelectedLanguage(event.code)
+      this.$updateDateLocal(event.code)
+    }
   }
 
   getLanguageName (): string {
     const locales = this.$i18n.locales as [{ code: string, name: string }]
     const currentLang = locales.find((i: { code: string, name: string }) => i.code === this.$i18n.locale)
     return currentLang ? currentLang.name : ''
+  }
+
+  i18nextKey (count: number, key: string): string {
+    return toI18next(count, key, this.$i18n.locale)
   }
 }
 </script>

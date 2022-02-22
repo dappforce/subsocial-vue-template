@@ -1,7 +1,7 @@
 <template>
   <div class="account-present">
     <div class="title">
-      {{ isLoginText ? $t('modals.login.title') : $t('modals.login.waitSec') }}
+      {{ isLoginText ? $t('modals.login.title') : $t('modals.login.title-wait') }}
     </div>
     <div class="message">
       {{ isLoginText ? $t('modals.login.accountScreen.message') : $t('modals.login.accountScreen.notLoginMessage') }}
@@ -41,7 +41,7 @@
     font-weight: 500;
     font-size: $font_huge;
     line-height: 125%;
-    color: $color_font_secondary;
+    color: $text_color_dark_gray;
     width: 100%;
     text-align: center;
     margin-bottom: 14px;
@@ -52,7 +52,7 @@
     text-align: center;
     font-size: $font_normal;
     line-height: 125%;
-    color: #262626;
+    color: $text_color_normal;
     margin-bottom: 10px;
   }
 
@@ -65,10 +65,10 @@
       display: flex;
       align-items: center;
       padding: 10px 0;
-      border-bottom: 1px solid $color_shadow;
+      border-bottom: 1px solid $line_outline_gray;
 
       &:hover {
-        background-color: rgba(238, 236, 236, 0.7);
+        background-color: $hover_menu_item;
         cursor: pointer;
       }
 
@@ -81,7 +81,7 @@
           font-weight: 500;
           font-size: $font_normal;
           line-height: 125%;
-          color: $color_font_normal;
+          color: $text_color_normal;
         }
 
         .balance {
@@ -104,7 +104,7 @@
     }
 
     &::-webkit-scrollbar-thumb {
-      background-color: $color_gray;
+      background-color: $scroll_outline_gray;
       width: 6px;
     }
   }
@@ -115,12 +115,12 @@
 
     a {
       text-decoration: none;
-      color: $color_font_secondary;
+      color: $text_color_dark_gray;
       font-size: $font_small;
       line-height: 125%;
 
       &:hover {
-        color: $color_primary;
+        color: $text_color_primary;
       }
     }
   }

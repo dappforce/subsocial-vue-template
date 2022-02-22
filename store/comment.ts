@@ -1,4 +1,4 @@
-import { Commit, Dispatch } from 'vuex'
+import { Commit } from 'vuex'
 import CommentService from '~/services/comment.service'
 import { ReplyIdStruct } from '~/types/reply-id.type'
 const SET_REPLY_IDS = 'SET_REPLY_IDS'
@@ -21,7 +21,7 @@ export const mutations = {
 }
 
 export const actions = {
-  async getPostReplyId ({ dispatch, commit }: {dispatch: Dispatch, commit: Commit}, payload: string) {
+  async getPostReplyId ({ commit }: {commit: Commit}, payload: string) {
     await commentService.getPostReplyId(payload).then((res) => {
       commit(SET_REPLY_IDS, { id: res.id, replyIds: res.replyIds, postId: payload })
       return res.replyIds

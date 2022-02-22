@@ -4,7 +4,7 @@
     centered
     class="tabs-container"
   >
-    <v-tabs-slider class="slider-color" />
+    <v-tabs-slider class="slider-color"/>
 
     <v-tab
       v-for="item in tabLinks"
@@ -23,7 +23,7 @@
   height: 100%;
   min-height: 56px;
   padding-top: $space_normal;
-  background-color: $color_page_bg;
+  background-color: $body_bg;
   margin-bottom: $space_normal;
 
   .v-tabs-bar {
@@ -31,18 +31,22 @@
     min-height: 56px;
     box-shadow: $box_shadow_card;
     width: $general_width;
+
+    @media (max-width: 768px) {
+      width: 100%
+    }
   }
 
   .slider-color {
-    color: $color_primary;
+    color: $slider_color;
   }
 
   .v-slide-group__content {
     justify-content: space-between;
   }
+
   .tab {
     width: 100%;
-    font-family: Roboto;
     font-style: normal;
     font-weight: 500;
     font-size: $font_normal;
@@ -50,10 +54,10 @@
     text-align: center;
     letter-spacing: 1.25px;
     text-transform: uppercase;
-    color: $main_text_color;
+    color: $text_color_normal;
 
     &.v-tab--active {
-      color: $color_primary;
+      color: $text_color_primary;
     }
   }
 }

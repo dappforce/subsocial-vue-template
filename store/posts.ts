@@ -1,6 +1,5 @@
 import { Commit, Dispatch } from 'vuex/types/index'
-import { PostContent, ProfileContent, SpaceContent } from '@subsocial/api/flat-subsocial/dto'
-import { PostStruct, SharedPostStruct, SpaceStruct } from '@subsocial/api/flat-subsocial/flatteners'
+import { PostContent, ProfileContent, SpaceContent, PostStruct, SharedPostStruct, SpaceStruct } from '@subsocial/types/dto'
 import { environment } from '~/environments/environment'
 import { PostListItemData } from '~/models/post/post-list-item.model'
 import PostService from '~/services/post.service'
@@ -8,6 +7,7 @@ import SubsocialApiService from '~/services/subsocial-api.service'
 import { KeyValuePair } from '~/models/key-value-pair.model'
 import { Content } from '~/types/content'
 import { getPostLink, selectPostStructByIds } from '~/utils/utils'
+import { config } from '~/config/config'
 
 const UPDATE_POSTS = 'UPDATE_POSTS'
 const SET_LOADING_POSTS = 'SET_LOADING_POSTS'
@@ -25,6 +25,7 @@ const UPDATE_POST_HIDDEN_STATE = 'UPDATE_POST_HIDDEN_STATE'
 
 const postService = new PostService()
 const subsocialApiService = new SubsocialApiService()
+const stepNumber = config.infinityScrollOffset
 
 export interface UpdateReactionModel {
   type: string,
@@ -136,7 +137,7 @@ export const actions = {
         resolve(postService.findPostsWithAllDetails(payload.ids))
       }
     }).then((postsData: any) => {
-      if (postsData.posts.length === 0) {
+      if (!postsData.posts.length) {
         commit(NEW_POSTS_ABSENT, true)
       }
       commit(SET_LOADING_POSTS, true)
@@ -175,7 +176,7 @@ export const actions = {
     await postService.getSuggestedPostsIds(payload, true).then((ids: string[]) => {
       commit(SET_SELECTED_SPACE_POSTS, ids)
       commit(SET_LOADING_POST_IDS, false)
-      dispatch('getPostsByIds', { ids: ids.slice(0, 20), type: 'public' })
+      dispatch('getPostsByIds', { ids: ids.slice(0, stepNumber), type: 'public' })
     })
   },
 
@@ -183,7 +184,7 @@ export const actions = {
     commit(SET_LOADING_POST_IDS, true)
     await postService.getSuggestedPostsIds(payload, true).then((ids: string[]) => {
       commit(SET_ACCOUNT_POSTS_IDS, ids)
-      dispatch('getPostsByIds', { ids: ids.slice(0, 20), type: 'public' })
+      dispatch('getPostsByIds', { ids: ids.slice(0, stepNumber), type: 'public' })
       commit(SET_LOADING_POST_IDS, false)
     })
   },
@@ -204,14 +205,16 @@ export const getters = {
     const profileEntity = rootState.profiles.list
     const spaceEntity = [...rootState.space.spaces, rootState.space.currentSpace]
     const postListItemDataArray: KeyValuePair<PostListItemData> = {}
-    postArray.map((postStruct: SharedPostStruct) => {
+    postArray.map((postStruct: any) => {
       const profile = profileEntity.find((i: PostStruct) => i?.id === postStruct.ownerId)
-      if (postStruct.contentId && postStruct.spaceId) {
+     
+      if (postStruct.contentId) {
         const spaceStruct = spaceEntity.find((i: SpaceStruct) => i?.id === postStruct.spaceId)
         const postContent = contentEntities.find((i: Content) => i?.id === postStruct.contentId) as PostContent
         const profileContent = contentEntities.find((i: Content) => i?.id === profile.contentId) as ProfileContent
         const spaceContent = contentEntities.find((i: Content) => i?.id === spaceStruct?.contentId) as SpaceContent
-        if (spaceStruct && postContent) {
+     
+        if (postContent && spaceStruct) {
           const postListItemData: PostListItemData = {
             id: postStruct.id,
             ownerId: postStruct.ownerId,
@@ -232,7 +235,7 @@ export const getters = {
             isShowMore: postContent.isShowMore,
             ownerName: profileContent?.name || '',
             postLink: getPostLink(
-                spaceStruct.handle! || spaceStruct.id,
+                spaceStruct?.handle! || spaceStruct.id,
                 postContent.title || postContent.summary.slice(0, 50) || spaceContent.name,
                 postStruct.id,
                 !!spaceStruct.handle
@@ -245,7 +248,8 @@ export const getters = {
             sharedPostId: postStruct.sharedPostId,
             hidden: postStruct.hidden,
             hiddenSpace: spaceStruct.hidden,
-            contentId: postStruct.contentId
+            contentId: postStruct.contentId,
+            rootPostId: postStruct.rootPostId
           }
           postListItemDataArray[postStruct.id] = postListItemData
         }
@@ -263,10 +267,12 @@ export const getters = {
     const postArray = selectPostStructByIds(ids.flat(1), state.list)
     const contentEntities = rootState.content.contents
     const profileEntity = rootState.profiles.list
+    const spaceEntity = [...rootState.space.spaces, rootState.space.currentSpace]
     const postListItemDataArray: KeyValuePair<PostListItemData> = {}
-    postArray.map((postStruct: PostStruct) => {
+    postArray.map((postStruct: any) => {
       const profile = profileEntity.find((i: PostStruct) => i?.id === postStruct.ownerId)
       if (postStruct.contentId && profile.contentId) {
+        const spaceStruct = spaceEntity.find((i: SpaceStruct) => i?.id === postStruct.spaceId)
         const postContent = contentEntities.find((i: Content) => i?.id === postStruct.contentId) as PostContent
         const profileContent = contentEntities.find((i: Content) => i?.id === profile.contentId) as ProfileContent
 
@@ -294,8 +300,15 @@ export const getters = {
             body: postContent.body,
             tags: postContent.tags,
             link: postContent.link,
+            rootPostId: postStruct.rootPostId,
             hidden: postStruct.hidden,
-            contentId: postStruct.contentId
+            contentId: postStruct.contentId,
+            postLink: getPostLink(
+              spaceStruct.handle! || spaceStruct.id,
+              postContent.title || postContent.summary.slice(0, 50),
+              postStruct.id,
+              !!spaceStruct.handle
+            )
           }
           postListItemDataArray[postStruct.id] = postListItemData
         }

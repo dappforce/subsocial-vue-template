@@ -43,7 +43,7 @@
     font-weight: 500;
     font-size: $font_large;
     line-height: 125%;
-    color: $color_font_normal;
+    color: $text_color_normal;
   }
 
   .qr {
@@ -58,7 +58,7 @@
     font-weight: 500;
     font-size: $font_small;
     line-height: 125%;
-    color: $color_font_normal;
+    color: $text_color_normal;
     text-align: center;
     display: block;
   }
@@ -70,19 +70,19 @@
 
     .v-btn {
       width: 140px;
-      border: 1px solid $color_primary;
+      border: 1px solid $button_bg_primary;
       box-sizing: border-box;
       border-radius: 5px;
 
       &.close-btn {
-        background: $color_white;
-        color: $color_primary;
+        background: $button_bg_white;
+        color: $text_color_primary;
         box-shadow: none;
       }
 
       &.copy-btn {
-        background: $color_primary;
-        color: $color_white;
+        background: $button_bg_primary;
+        color: $text_color_white;
 
         .v-icon {
           margin-right: $space_small;

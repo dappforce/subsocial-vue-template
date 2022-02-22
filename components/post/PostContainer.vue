@@ -31,12 +31,12 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { SharedPostStruct } from '@subsocial/api/flat-subsocial/flatteners'
+import { SharedPostStruct } from '@subsocial/types/dto'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
 import { config } from '~/config/config'
 import { PostListItemData } from '~/models/post/post-list-item.model'
 
-const stepNumber = config.stepForLoading
+const stepNumber = config.infinityScrollOffset
 
 @Component({})
 export default class PostContainer extends Vue {
@@ -123,13 +123,13 @@ export default class PostContainer extends Vue {
   load () {
     this.allPostsIds = this.ids
     this.max = this.isFeed ? +this.feedCount : this.ids.length
-
+    this.setCurrentUser()
     if (this.isAllPostsInState()) {
       this.selectPostsWithData(this.defaultStart, this.defaultEnd)
-      this.setCurrentUser()
+      // this.setCurrentUser()
     } else {
       this.getNewPosts(this.defaultStart, this.defaultEnd).then(() => {
-        this.setCurrentUser()
+        // this.setCurrentUser()
         this.selectPostsWithData(this.defaultStart, this.defaultEnd)
       })
     }

@@ -4,28 +4,33 @@
       elevation="2"
       class="post-item"
     >
-      <div v-if="post.hiddenSpace && isPostOwner" class="hidden-post">
+      <div v-if="post.hiddenSpace && isPostOwner" class="hidden-container">
         <div class="alert-text">
-          <v-icon color="#EFB041">
+          <v-icon>
             mdi-alert-circle
-          </v-icon>{{ $t('generalMessages.hiddenPostBySpace') }}
+          </v-icon>
+          {{ $t('generalMessages.hiddenPostBySpace') }}
         </div>
         <div class="unhidden-btn">
           <span class="make-visible">
-            <ToggleVisibilityButton :space="{struct: {id: post.spaceId, hidden: post.hiddenSpace}}" :toggle-type="'space'" />
+            <ToggleVisibilityButton
+              :space="{struct: {id: post.spaceId, hidden: post.hiddenSpace}}"
+              :toggle-type="'space'"
+            />
           </span>
         </div>
       </div>
 
-      <div v-if="post.hidden && isPostOwner" class="hidden-post">
+      <div v-if="post.hidden && isPostOwner" class="hidden-container">
         <div class="alert-text">
-          <v-icon color="#EFB041">
+          <v-icon>
             mdi-alert-circle
-          </v-icon>{{ $t('generalMessages.hiddenPost') }}
+          </v-icon>
+          {{ $t('generalMessages.hiddenPost') }}
         </div>
         <div class="unhidden-btn">
           <span class="make-visible">
-            <ToggleVisibilityButton :post="post" :toggle-type="'post'" />
+            <ToggleVisibilityButton :post="post" :toggle-type="'post'"/>
           </span>
         </div>
       </div>
@@ -36,11 +41,13 @@
               :post-item="post"
             />
             <div v-if="!isSharedPost" class="button-wp">
-              <OptionButton :post-id="post.id" :account-id="post.ownerId" :post="post" :can-edit="isPostOwner" :toggle-type="'post'" />
+              <OptionButton :post-id="post.id" :account-id="post.ownerId" :post="post" :can-edit="isPostOwner"
+                            :toggle-type="'post'" :no-reactions="noReactions"
+              />
             </div>
           </div>
-          <Title size="large" :link="post.postLink" :name="post.title" />
-          <Youtube v-if="post.link" :link="post.link" />
+          <Title size="large" :link="post.postLink" :name="post.title"/>
+          <Youtube v-if="post.link" :link="post.link"/>
           <Paragraph
             v-if="post.summary.length"
             :text="post.summary"
@@ -50,14 +57,14 @@
           />
         </div>
 
-        <PostImage :image-src="post.imageUrl" :link="post.postLink" />
+        <PostImage :image-src="post.imageUrl" :link="post.postLink"/>
       </div>
       <v-divider
         v-if="!isSharedPost"
         class="mx-4"
       />
       <div v-if="!isSharedPost" class="action-panel-wp">
-        <ActionPanel :id="post.id" :is-show-label="false" :handle="post.ownerId" :post="post" />
+        <ActionPanel :id="post.id" :is-show-label="false" :handle="post.ownerId" :post="post"/>
       </div>
     </v-card>
   </div>
@@ -67,39 +74,6 @@
 .post-item-wp {
   width: 100%;
   margin-top: $space_normal;
-
-  .hidden-post {
-    margin: (-$space_normal) (-$space_normal) $space_normal;
-    height: 40px;
-    background: #FEFBE8;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 $space_normal;
-    color: $color_font_normal;
-    font-size: $font_small;
-    border-bottom: 1px solid $color_warning_border;
-
-    .v-icon {
-      margin-right: 10px;
-    }
-
-    .make-visible {
-      border: 1px solid #D9D9D9;
-      box-sizing: border-box;
-      border-radius: $border_small;
-      color: $color_font_normal;
-      font-weight: 500;
-      line-height: 125%;
-      padding: 3px 5px;
-      transition: all .2s ease;
-
-      &:hover {
-        cursor: pointer;
-        color: $color_primary;
-      }
-    }
-  }
 
   .post-item {
     padding: $space_normal;
@@ -153,6 +127,11 @@ export default class PostListItem extends Vue {
     type: Boolean,
     default: false
   }) isSharedPost!: boolean
+
+  @Prop({
+    type: Boolean,
+    default: false
+  }) noReactions!: boolean
 
   @Prop({
     type: String

@@ -12,14 +12,17 @@
               <Title size="large" :name="profileData.name || profileData.id | addressShortness(addressLength)" />
             </div>
             <div class="profile-stats-wp">
-              <span @click="openModal"><b>{{ profileData.followingCount | numeral('0,0a') }}</b> {{ profileData.followingCount | pluralize('en', ['Following', 'Following']) }}</span>
-              <span @click="openModal"><b>{{ profileData.followersCount | numeral('0,0a') }}</b> {{ profileData.followersCount | pluralize('en', ['Follower', 'Followers']) }}</span>
+              <span @click="openModal">
+                <b>{{profileData.followersCount | numeral('0,0a')}}</b> {{$tc('plural.'+i18nextKey(profileData.followersCount, 'follower'))}}
+              </span>
+              <span @click="openModal">
+                <b>{{profileData.followingCount | numeral('0,0a')}}</b> {{$tc('plural.'+i18nextKey(profileData.followingCount, 'following'))}}
+              </span>
             </div>
           </div>
         </div>
         <div class="button-wp">
           <EditButton v-if="isOwner && isAccountView" :link="'/profile?id=' + profileData.id" />
-          <!--          <OptionButton />-->
         </div>
       </div>
 
@@ -27,16 +30,16 @@
         <Paragraph v-if="profileData.summary" :text="profileData.summary" :margin-bottom="'17'" />
         <LinkIcons v-if="profileData.links" :links="profileData.links" />
         <div class="account-info-wp">
-          <v-icon size="24" class="account-icon">
-            mdi-wallet-outline
-          </v-icon>
+          <div size="24" class="account-icon">
+            <img class="logo" src="../../assets/image/wallet.jpg" alt="Wallet">
+          </div>
           <Address :address="profileData.address" :size="'large'" :length="addressLength" :show-icon="true" />
           <QrCodeButton :address="profileData.address || profileData.id" />
         </div>
         <div class="account-amount">
-          <v-icon class="account-icon">
-            mdi-currency-usd
-          </v-icon>
+          <div class="account-icon">
+            <img class="logo" src="../../assets/image/balance.jpg" alt="Currency">
+          </div>
           <Tokens :balance="balance" />
         </div>
       </div>
@@ -63,18 +66,20 @@
   margin-top: $space_normal;
 
   .account-icon {
-    color: $color_font_secondary;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-right: 5px;
-  }
-
-  .gray {
-    color: $color_font_secondary;
-    font-weight: normal;
+    
+    img {
+      width: 24px;
+    }
   }
 
   .profile-item {
     padding: $space_normal $space_normal 0;
-    z-index: 9;
+    z-index: 2;
 
     .profile-item-header {
       display: flex;
@@ -100,7 +105,7 @@
         line-height: $main_line_height;
         align-items: center;
         letter-spacing: 0.15px;
-        color: $color_font_normal;
+        color: $text_color_normal;
 
         a {
           text-decoration: none;
@@ -123,7 +128,7 @@
     .link {
       font-weight: 500;
       letter-spacing: 0.25px;
-      color: $color_primary;
+      color: $text_color_primary;
       text-decoration: none;
     }
 
@@ -142,9 +147,13 @@
         }
       }
 
+      .address-text {
+        font-size: $font_normal;
+      }
+
       .qr-icon {
         margin-left: 10px;
-        color: $color_black;
+        color: $icon_color_normal;
       }
     }
 
@@ -154,17 +163,17 @@
   }
 
   .address-text {
-    color: $color_font_normal;
+    color: $text_color_normal;
   }
 
   .mdi-content-copy {
-    color: $color_black;
+    color: $icon_color_normal;
   }
 
   .action-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: $space_big;
+    margin-bottom: $space_normal;
     margin-top: $space_big;
 
     & button, & a, & .btn-tooltip-wrapper {
@@ -194,6 +203,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
 import { config } from '~/config/config'
+import { toI18next } from '~/utils/utils'
 
 @Component
 export default class ProfileItem extends Vue {
@@ -261,6 +271,10 @@ export default class ProfileItem extends Vue {
     this.$store.dispatch('profiles/getAccountBalance', this.profileData ? this.profileData.id : this.$route.params.account).then((res) => {
       this.balance = res
     })
+  }
+
+  i18nextKey (count: number, key: string): string {
+    return toI18next(count, key, this.$i18n.locale)
   }
 }
 </script>

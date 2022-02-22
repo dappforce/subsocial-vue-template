@@ -17,7 +17,7 @@
     font-size: $font_small;
     line-height: 20px;
     letter-spacing: 0.25px;
-    color: rgba(0, 0, 0, 0.38);
+    color: $text_color_normal;
   }
 
   .mat-icon-button {
@@ -42,8 +42,7 @@ export interface AddressInt {
 
 export default class Address extends Vue implements AddressInt {
   @Prop({
-    type: String,
-    default: 'ger'
+    type: String
   }) address!: string
 
   @Prop({

@@ -4,14 +4,13 @@
       <ValidationObserver ref="form" v-slot="{ handleSubmit, handleReset }">
         <form @submit.prevent="handleSubmit(submit)" @reset.prevent="handleReset(clear)">
           <h2 class="edit-post-title">
-            {{ isEdit ? $t('general.edit') : $t('general.new') }} {{ $t('general.post') }}
+            {{ isEdit ? $t('forms.titles.editPost') : $t('forms.titles.newPost') }}
           </h2>
 
           <v-tabs
             v-if="!isSharedPost"
             v-model="tab"
             background-color="transparent"
-            color="basil"
             grow
           >
             <v-tabs-slider class="slider-color" />
@@ -46,7 +45,7 @@
                     :hide-details="!isArticleTab ? 'auto' : true"
                     :messages="errors[0]"
                     outlined
-                    :label="(!isArticleTab ? '* ' : '') + $t('forms.fieldName.videoUrl')"
+                    :label="(!isArticleTab ? '* ' : '') + $t('forms.placeholder.videoUrl')"
                   />
                 </ValidationProvider>
                 <client-only>
@@ -61,7 +60,7 @@
                 v-model="postName"
                 hide-details="auto"
                 outlined
-                :label="$t('forms.fieldName.postTitle')"
+                :label="$t('forms.placeholder.postTitle')"
               />
             </div>
             <div class="form-row description-row">
@@ -125,6 +124,7 @@
   padding-bottom: $space_normal;
 
   .edit-post-title {
+    text-transform: capitalize;
     font-size: $font_large;
   }
 
@@ -132,15 +132,16 @@
     padding: $space_huge $space_big $space_big;
 
     .v-tabs {
-      border-bottom: 1px solid #E0E0E0;
+      border-bottom: 1px solid $line_outline_gray;
 
       .slider-color {
-        color: $color_primary;
+        color: $slider_color;
       }
     }
 
     .v-tabs-items {
-      background: $color_white;
+      background: $tab_bg_white;
+      padding-bottom: 0 !important;
     }
   }
 
@@ -154,7 +155,7 @@
 
     .CodeMirror-placeholder {
       font-size: 16px;
-      color: rgba(0, 0, 0, 0.6);
+      color: $text_color_dark_gray;
       opacity: 1;
     }
 
@@ -163,16 +164,16 @@
     }
 
     .editor-toolbar, .CodeMirror {
-      border-color: $color_border;
+      border-color: $border_outline_gray;
     }
 
     .v-text-field--outlined fieldset {
-      border-color: $color_border;
+      border-color: $input_outline_gray;
     }
 
     .v-text-field--outlined.v-input--is-focused fieldset, .v-text-field--outlined.v-input--has-state fieldset {
       border-width: 1px;
-      border-color: $color_font_normal;
+      border-color: $text_color_normal;
     }
 
     .v-text-field__details {
@@ -183,7 +184,7 @@
 
       .v-messages__message {
         font-size: $font_extra_small;
-        color: $color_red;
+        color: $text_color_red;
       }
     }
   }
@@ -194,7 +195,7 @@
 
   .v-chip {
     &__content {
-      color: $main_text_color;
+      color: $text_color_normal;
     }
   }
 
@@ -214,24 +215,24 @@
     margin-top: 5px;
 
     .button-main-color {
-      background-color: $color_primary;
+      background-color: $button_bg_primary;
     }
 
     .button-third-color {
-      background-color: $color_white
+      background-color: $button_bg_white
     }
 
     button {
       min-width: 110px !important;
       font-size: $font_normal;
-      border: 1px solid #E0E0E0!important;
+      border: 1px solid $button_outline_gray !important;
       border-radius: $border_small;
       box-shadow: none;
       text-transform: capitalize;
 
       &:last-child {
         border: none;
-        color: $color_white;
+        color: $text_color_white;
       }
     }
 
@@ -239,12 +240,6 @@
       & {
         justify-content: space-between;
       }
-    }
-  }
-
-  .tag-input {
-    .v-label--active {
-      left: 6px !important;
     }
   }
 }
@@ -265,6 +260,7 @@ import TransactionService from '~/services/transaction.service'
 import { getNewIdFromEvent } from '~/utils/utils'
 import { SpaceListItemData } from '~/models/space/space-list-item.model'
 import StorageService from '~/services/storage.service'
+import SpacesDropdown from '~/components/space/SpacesDropdown.vue'
 
 extend('required', required)
 extend('min', min)
@@ -277,7 +273,7 @@ const storageService = new StorageService()
 const transactionService = new TransactionService()
 
 @Component({
-  components: { ValidationProvider, ValidationObserver }
+  components: { SpacesDropdown, ValidationProvider, ValidationObserver }
 })
 export default class PostEdit extends TransactionButton {
   $refs!: {
@@ -364,6 +360,7 @@ export default class PostEdit extends TransactionButton {
       this.description = ''
       this.videoUrl = ''
       this.selectTags = []
+      this.image = ''
     }
   }
 
@@ -413,7 +410,9 @@ export default class PostEdit extends TransactionButton {
   async goToPostPage (id: string) {
     const space: SpaceListItemData = await this.$store.getters['space/getSpaceWithContent'](this.spaceId)
     const slug = createPostSlug(id, { title: this.postName, body: this.description })
-
+    if (!this.isEdit) {
+      storageService.setCurrentSpaceId(space.struct.id)
+    }
     await this.$store.dispatch('posts/getSuggestedPostIds')
     await this.$store.dispatch('posts/getPostById', id).then(() => {
       this.$router.push(this.$nuxt.localePath('/' + (space.struct?.handle || space.struct.id) + '/' + slug))

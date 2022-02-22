@@ -1,19 +1,20 @@
 <template>
   <v-btn
+    depressed
     class="vote-button"
     @click="onClick"
   >
     <template v-if="type.toLowerCase() === 'upvote'">
-      <v-icon medium class="vote-icon" :color="isActive ? '#3BB356' : ''">
+      <v-icon class="vote-icon" :class="[isActive ? 'like' : '']">
         {{ isActive ? 'mdi-thumb-up' : 'mdi-thumb-up-outline' }}
       </v-icon>
     </template>
     <template v-if="type.toLowerCase() === 'downvote'">
-      <v-icon medium class="vote-icon" :color="isActive ? '#EA3323' : ''">
+      <v-icon class="vote-icon" :class="[isActive ? 'dislike' : '']">
         {{ isActive ? 'mdi-thumb-down' : 'mdi-thumb-down-outline' }}
       </v-icon>
     </template>
-    <span v-if="isShowLabel" class="vote-label" :class="[isActive && type.toLowerCase() === 'downvote' ? 'dislike' : isActive ? 'like' : '']">{{ type }} <span v-if="voteCount > 0" :class="[type.toLowerCase() === 'downvote' ? 'dislike' : 'like']">({{ voteCount }})</span></span>
+    <span v-if="isShowLabel" class="vote-label" :class="[isActive && type.toLowerCase() === 'downvote' ? 'dislike' : isActive ? 'like' : '']">{{ type }} <span v-if="voteCount > 0" :class="[isActive && type.toLowerCase() === 'downvote' ? 'dislike' : isActive ? 'like' : '']">({{ voteCount }})</span></span>
     <span v-if="!isShowLabel && voteCount > 0" class="vote-label" :class="[isActive && type.toLowerCase() === 'downvote' ? 'dislike' : isActive && type.toLowerCase() === 'upvote' ? 'like' : '']">{{ voteCount }}</span>
   </v-btn>
 </template>
@@ -22,11 +23,14 @@
 .vote-button {
   display: flex;
   align-items: center;
+  background-color: transparent !important;
+  color: $icon_color_dark_gray !important;
+  box-shadow: none;
 
   .vote-label {
     margin-left: 9px;
     font-weight: 500;
-    font-size: $font_small;
+    font-size: $font_normal;
     line-height: $main_line_height;
     letter-spacing: 0.1px;
     text-transform: capitalize;
@@ -34,11 +38,11 @@
 }
 
 .like {
-  color: #3BB356;
+  color: $icon_color_like !important;
 }
 
 .dislike {
-  color: #EA3323;
+  color: $icon_color_dislike !important;
 }
 </style>
 
@@ -46,16 +50,16 @@
 import { Component, Prop, Watch } from 'vue-property-decorator'
 import { SubmittableResult } from '@polkadot/api'
 import { ReactionKind } from '@subsocial/types/substrate/classes'
-import { ReactionType } from '@subsocial/api/flat-subsocial/dto'
 import TransactionButton from '~/components/abstract/TransactionButton.vue'
 import { ReactionStruct } from '~/types/reaction-struct.type'
-import { getNewIdsFromEvent } from '~/utils/utils'
 import { METHODS, PALLETS } from '~/constants/query'
+import { getNewIdsFromEvent } from '@subsocial/api'
 
 export enum ReactionEnum {
   Upvote = 'Upvote',
   Downvote = 'Downvote'
 }
+declare type ReactionKindType = 'Upvote' | 'Downvote';
 
 @Component
 export default class VoteButton extends TransactionButton {
@@ -96,7 +100,7 @@ export default class VoteButton extends TransactionButton {
   isActive: boolean = this.active
   voteCount: number = this.count
   oldKind: string | undefined
-  newKind: string | undefined
+  newKind: ReactionKindType | undefined
   id: string | null = null
   eventType: string | null = null
 
@@ -208,9 +212,9 @@ export default class VoteButton extends TransactionButton {
 
   buildTxParams (): any[] {
     if (!this.id) {
-      return [this.postId, new ReactionKind(this.newKind)]
+      return [this.postId, ReactionKind(this.newKind as ReactionKindType)]
     } else if (this.oldKind !== this.newKind) {
-      return [this.postId, this.id, new ReactionKind(this.newKind)]
+      return [this.postId, this.id, ReactionKind(this.newKind as ReactionKindType)]
     } else {
       this.eventType = 'delete'
       return [this.postId, this.id]

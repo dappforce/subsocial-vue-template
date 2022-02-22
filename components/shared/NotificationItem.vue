@@ -6,12 +6,12 @@
         <span class="name">
           <Title :id="notification.profile.id" :link="'/accounts/'+ notification.profile.id" :name="notification.profile.name" size="medium" />
         </span>
-        <span>{{ notification.activity.agg_count ? $t('notificationItem.message', {count: notification.activity.agg_count, message: aggregateMessage}) : '' }}{{ getMessage }}</span>
+        <span>{{ notification.activity.agg_count ? $t('notifications.aggregate', {count: notification.activity.agg_count, message: $tc('plural.'+i18nextKey(notification.activity.agg_count, 'aggregate'))}) : '' }}{{ getMessage }}</span>
         <span class="name">
           <Title :id="notification.followingAccount ? notification.followingAccount.id : ''" :link="getUrl" :name="getName" size="medium" />
         </span>
       </div>
-      <span class="date">{{ toDate }}</span>
+      <span class="date"><NuxtLink :to="getUrl">{{ toDate }}</NuxtLink></span>
     </div>
     <PostImage v-if="notification.post && notification.post.image && notification.post.image.length" :image-src="notification.post.image" :link="'/'" />
   </div>
@@ -35,15 +35,24 @@
         font-size: $font_normal;
         line-height: $main_line_height;
         letter-spacing: 0.25px;
-        color: $color_font_normal;
+        color: $text_color_normal;
+        
+        &:hover a{
+          color: $text_color_primary;
+        }
       }
     }
 
-    .date {
+    .date a {
       font-size: $font_small;
       line-height: 20px;
       letter-spacing: 0.25px;
-      color: $main_text_color;
+      color: $text_color_dark_gray;
+      text-decoration: none;
+      
+      &:hover {
+        color: $text_color_primary;
+      }
     }
   }
 
@@ -56,10 +65,9 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { pluralize } from '@subsocial/utils'
-import { OwnerNotificationEntity } from '~/models/enum/owner-notification-entity.enum'
 import { NotificationItemData } from '~/store/notifications'
-import { getPostLink } from '~/utils/utils'
+import { getPostLink, toDate, toI18next } from '~/utils/utils'
+
 @Component
 export default class NotificationItem extends Vue {
   @Prop({
@@ -67,10 +75,7 @@ export default class NotificationItem extends Vue {
   }) notification!: NotificationItemData
 
   get toDate () {
-    const days = 7
-    return Math.round(this.$dayjs().diff(this.$dayjs(this.notification.activity.date), 'day', true)) < days
-      ? this.$dayjs(this.notification.activity.date).fromNow()
-      : this.$dayjs(this.notification.activity.date).format('MMM D, YYYY HH:mm A')
+    return toDate(this.notification.activity.date)
   }
 
   get getMessage () {
@@ -79,7 +84,7 @@ export default class NotificationItem extends Vue {
 
   get getName () {
     return this.notification.post
-      ? (this.notification.post?.title || this.notification.post?.summary || 'Shared post')
+      ? (this.notification.post?.title || this.notification.post?.summary || 'link')
       : this.notification.space
         ? this.notification.space.name
         : this.notification.followingAccount
@@ -90,15 +95,15 @@ export default class NotificationItem extends Vue {
   get getUrl () {
     return this.notification.post
       ? getPostLink((this.notification.post?.spaceId || this.notification.post.id),
-        this.notification.post?.title || this.notification.post?.summary?.slice(0, 50) || 'Shared post',
+        this.notification.post?.title || this.notification.post?.summary?.slice(0, 50) || 'link',
         this.notification.post?.id, false)
       : this.notification.space
         ? '/' + this.notification.space.id
         : this.notification.followingAccount ? '/accounts/' + this.notification.activity.following_id : ''
   }
 
-  get aggregateMessage () {
-    return this.$options?.filters?.pluralize(this.notification.activity.agg_count, 'en', [this.$tc('general.person'), this.$tc('general.people')]) + ' '
+  i18nextKey (count: number, key: string): string {
+    return toI18next(count, key, this.$i18n.locale)
   }
 }
 </script>

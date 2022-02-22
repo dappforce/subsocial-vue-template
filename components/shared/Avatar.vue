@@ -9,6 +9,12 @@
   </v-avatar>
 </template>
 
+<style lang="scss">
+.v-avatar {
+  border: 1px solid $photo_outline_gray;
+}
+</style>
+
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { environment } from '~/environments/environment'

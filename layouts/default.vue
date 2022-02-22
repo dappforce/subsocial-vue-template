@@ -16,8 +16,9 @@
 }
 
 #__layout, .theme--light.v-tabs-items {
-  background: $color_page_bg;
+  background: $body_bg;
   width: 100%;
+  padding-bottom: $space_huge;
 }
 .container {
   width: $general_width;
@@ -39,14 +40,27 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import StorageService from '~/services/storage.service'
+import i18next from 'i18next'
+
+const storageService = new StorageService()
 
 @Component
 export default class Default extends Vue {
   showHideSpinner: boolean = false
 
   created (): void {
+    i18next.init()
+
     this.showHideSpinner = !this.showHideSpinner
+    if (typeof window !== 'undefined') {
+      const lang = storageService.getSelectedLanguage()
+      if (lang) {
+        this.$updateDateLocal(lang)
+      }
+    }
     this.$store.dispatch('posts/getSuggestedPostIds').then(() => {
+      this.$store.dispatch('profiles/getRegistry')
       this.$store.dispatch('profiles/initAccount').then(() => {
         this.$store.dispatch('loading/setLoading', true)
         this.showHideSpinner = !this.showHideSpinner

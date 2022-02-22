@@ -34,6 +34,10 @@
 .main-page-container {
   padding-top: 72px;
 
+  @media (max-width: 991px){
+    padding-top: 56px;
+  }
+
   .items-list {
     display: flex;
     flex-direction: column;
@@ -43,7 +47,7 @@
   .empty-feed {
     text-align: center;
     padding: 40px;
-    background-color: $color_white;
+    background-color: $container_bg_white;
     margin-top: $space_normal;
     width: 100%;
   }
@@ -58,19 +62,26 @@
   width: 100%;
   display: flex;
   justify-content: center;
+  
+  @media (max-width: 768px) {
+    top: 40px;
+  }
 }
 </style>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
+import { config } from '~/config/config'
+
+const stepNumber = config.infinityScrollOffset
 
 @Component
 export default class IndexPage extends Vue {
   tabsLink: string [] = this.guestTabs
   tabs: string [] = this.userTabs
   currentTab: string | null = null
-  currentUser: ProfileItemModel | undefined | null = null
+  currentUser: ProfileItemModel | null = null
   postsIds: string[] = []
   feedIds: string[] = []
   feedCount: number = 0
@@ -81,7 +92,6 @@ export default class IndexPage extends Vue {
 
   created () {
     this.currentUser = this.$store.state.profiles.currentUser
-    // this.currentTab = this.currentUser ? this.tabs[1] : this.tabs[1]
     this.$nuxt.$on('mainPage', (data: string) => {
       this.currentTab = data
     })
@@ -92,7 +102,7 @@ export default class IndexPage extends Vue {
 
     const unsubscribe = this.$store.subscribe((mutation) => {
       if (mutation.type === 'posts/SET_LOADING_POST_IDS' && !mutation.payload) {
-        this.$store.dispatch('posts/getPostsByIds', { ids: this.$store.state.posts.postsIds.slice(0, 20), type: 'public' })
+        this.$store.dispatch('posts/getPostsByIds', { ids: this.$store.state.posts.postsIds.slice(0, stepNumber), type: 'public' })
         this.postsIds = this.$store.state.posts.postsIds
         unsubscribe()
       }

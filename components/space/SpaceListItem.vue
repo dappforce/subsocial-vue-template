@@ -4,9 +4,9 @@
       elevation="2"
       class="space-item"
     >
-      <div v-if="space.struct.hidden && isMyOwnSpace" class="hidden-space">
+      <div v-if="space.struct.hidden && isMyOwnSpace" class="hidden-container">
         <div class="alert-text">
-          <v-icon color="#EFB041">
+          <v-icon>
             mdi-alert-circle
           </v-icon>
           {{ $t('generalMessages.hiddenSpace') }}
@@ -65,40 +65,7 @@
 
   .space-item {
     padding: $space_normal;
-
-    .hidden-space {
-      margin: (-$space_normal) (-$space_normal) $space_normal;
-      height: 40px;
-      background: #FEFBE8;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 $space_normal;
-      color: $color_font_normal;
-      font-size: $font_small;
-      border-bottom: 1px solid $color_warning_border;
-
-      .v-icon {
-        margin-right: 10px;
-      }
-
-      .make-visible {
-        border: 1px solid #D9D9D9;
-        box-sizing: border-box;
-        border-radius: $border_small;
-        color: $color_font_normal;
-        font-weight: 500;
-        line-height: 125%;
-        padding: 3px 5px;
-        transition: all .2s ease;
-
-        &:hover {
-          cursor: pointer;
-          color: $color_primary;
-        }
-      }
-    }
-
+    
     .space-item-header {
       display: flex;
       justify-content: space-between;
@@ -119,7 +86,7 @@
       font-size: $font_normal;
       line-height: $main_line_height;
       letter-spacing: 0.25px;
-      color: $color_font_normal;
+      color: $text_color_normal;
     }
 
     .tags-container {
@@ -234,10 +201,6 @@ export default class SpaceListItem extends Vue {
     } else {
       this.user = null
     }
-  }
-
-  isMobileScreen (): boolean {
-    return isMobile()
   }
 }
 </script>

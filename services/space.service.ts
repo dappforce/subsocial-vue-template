@@ -1,4 +1,4 @@
-import { AnyId } from '@subsocial/api/flat-subsocial/dto'
+import { AnyId } from '@subsocial/types/dto'
 import { FlatSubsocialApi } from '@subsocial/api/flat-subsocial'
 import BN from 'bn.js'
 import { SpaceId } from '@subsocial/types/substrate/interfaces'

@@ -27,7 +27,7 @@
 <style lang="scss">
   p {
     line-height: $main_line_height;
-    color: $color_font_normal;
+    color: $text_color_normal;
     text-align: left;
     font-size: $font_normal;
   }

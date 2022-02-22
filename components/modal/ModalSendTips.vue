@@ -2,7 +2,8 @@
   <div data-app>
     <v-dialog
       v-model="openModal"
-      max-width="500px"
+      max-width="530px"
+      @click:outside="onCancel"
     >
       <v-card class="v-modal-container">
         <v-card-title class="st-title">
@@ -14,16 +15,16 @@
 
         <v-card flat>
           <div class="send-tips-container">
-            <UserItem v-if="userInfo" :user-info="userInfo" />
+            <UserItem v-if="userInfo" :user-info="userInfo" :fullAddress="true" :size="60" :isShowRecipient="true" :showCopyBtn="false"/>
             <ValidationObserver ref="form" v-slot="{ handleSubmit, handleReset }">
               <form @submit.prevent="handleSubmit(submit)" @reset.prevent="handleReset(onCancel)">
-                <ValidationProvider v-slot="{ errors }" :rules="'required|numeric'">
+                <ValidationProvider v-slot="{ errors }" :rules="'required|numeric|min_value:1'">
                   <div class="form-row">
                     <v-text-field
                       v-model="amount"
                       outlined
                       required
-                      suffix="SUB"
+                      :suffix="$store.state.profiles.chainToken"
                       height="36"
                       hide-details="auto"
                       :messages="errors[0]"
@@ -34,13 +35,13 @@
               </form>
             </ValidationObserver>
             <div class="my-balance">
-              {{ $t('modals.tips.availableBalance') }}: <strong>{{ myBalance }}</strong>
+              {{ $t('modals.tips.availableBalance') }}: <span>{{ myBalance }} {{ $store.state.profiles.chainToken }}</span>
             </div>
             <div class="button-container">
               <v-btn class="button-third-color" @click="onCancel">
                 {{ $t('buttons.cancel') }}
               </v-btn>
-              <v-btn class="button-main-color" @click="submit">
+              <v-btn :disabled="validate" class="button-main-color" @click="submit">
                 {{ $t('buttons.sendTips') }}
               </v-btn>
             </div>
@@ -57,6 +58,7 @@
 
   .v-card {
     height: auto;
+    max-height: none;
   }
 
   .v-card__title.st-title {
@@ -67,6 +69,7 @@
 
   .send-tips-container {
     padding: 0 $space_normal $space_normal;
+    width: 100%;
 
     .user-item-wp {
       border: none;
@@ -77,10 +80,14 @@
       &__slot {
         min-height: 36px;
       }
+    }
 
-      & .v-label {
-        top: 9px;
-      }
+    .v-text-field--outlined > .v-input__control > .v-input__slot {
+      min-height: 36px !important;
+    }
+
+    .v-text-field--outlined .v-label {
+      top: 9px;
     }
 
     .v-text-field__details {
@@ -89,17 +96,27 @@
 
     .v-messages__message {
       font-size: $font_extra_small;
-      color: $color_red;
+      color: $text_color_red;
+    }
+    
+    & .address-text {
+      color: $text_color_dark_gray;
+      word-break: break-all;
+    }
+    
+    & .v-text-field__suffix {
+      color: $text_color_normal;
+      font-size: $font_normal;
     }
 
     .my-balance {
       font-size: $font_small;
-      color: $color_font_secondary;
+      color: $text_color_dark_gray;
       line-height: 22px;
       margin-top: 3px;
 
-      strong {
-        color: $color_black;
+      span {
+        color: $text_color_normal;
       }
     }
 
@@ -111,24 +128,24 @@
       gap: $space_normal;
 
       .button-main-color {
-        background-color: $color_primary;
+        background-color: $button_bg_primary;
       }
 
       .button-third-color {
-        background-color: $color_white
+        background-color: $button_bg_white
       }
 
       button {
         min-width: 110px !important;
         font-size: $font_normal;
-        border: 1px solid #E0E0E0 !important;
+        border: 1px solid $button_outline_gray !important;
         border-radius: $border_small;
         box-shadow: none;
         text-transform: initial;
 
         &:last-child {
           border: none;
-          color: $color_white;
+          color: $text_color_white;
         }
       }
     }
@@ -140,8 +157,8 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { extend, ValidationObserver, ValidationProvider } from 'vee-validate'
-import { numeric, required } from 'vee-validate/dist/rules'
-import { ProfileData } from '@subsocial/api/flat-subsocial/dto'
+import { numeric, required, min_value } from 'vee-validate/dist/rules'
+import { ProfileData } from '@subsocial/types/dto'
 import { config } from '~/config/config'
 
 extend('numeric', {
@@ -151,6 +168,10 @@ extend('numeric', {
 extend('required', {
   ...required,
   message: 'This field is required'
+})
+extend('min_value', {
+  ...min_value,
+  message: 'The field must be greater than 0'
 })
 
 @Component({
@@ -189,7 +210,7 @@ export default class ModalSendTips extends Vue {
   submit () {
     this.$refs.form.validate().then((result) => {
       if (result) {
-        this.$store.dispatch('profiles/transferMoney', { from: this.fromAccount, to: this.userInfo.id, amount: +this.amount * config.subRate })
+        this.$store.dispatch('profiles/transferMoney', { from: this.fromAccount, to: this.userInfo.id, amount: +this.amount * Math.pow(10, this.$store.state.profiles.chainDecimal) })
           .then(() => {
             this.onClick()
           })
@@ -204,6 +225,10 @@ export default class ModalSendTips extends Vue {
   onCancel (): void {
     this.amount = ''
     this.onClick()
+  }
+  
+  get validate (): boolean {
+    return +this.amount > +this.myBalance
   }
 }
 </script>

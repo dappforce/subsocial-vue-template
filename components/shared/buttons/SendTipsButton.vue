@@ -1,5 +1,5 @@
 <template>
-  <v-btn depressed :disabled="!isAuth" class="tips-btn" @click="isOpen = !isOpen">
+  <v-btn depressed :disabled="isEnableTips" class="tips-btn" @click="isOpen = !isOpen">
     {{ $t('buttons.sendTips') }}
     <ModalSendTips v-if="isAuth" :is-modal="isOpen" :user-info="userInfo" />
   </v-btn>
@@ -7,9 +7,9 @@
 
 <style lang="scss">
 .tips-btn {
-  background-color: $color_white !important;
+  background-color: $button_bg_white !important;
   height: $buttons_height;
-  border: 1px solid $color_border;
+  border: 1px solid $button_outline_gray;
   box-sizing: border-box;
   border-radius: $border_small;
   font-style: normal;
@@ -19,16 +19,26 @@
   text-transform: capitalize;
 
   .v-btn__content {
-    color: $color_font_normal;
+    color: $input_focused_outline;
     font-size: $font_normal;
     flex: initial;
+  }
+
+  &.theme--light.v-btn.v-btn--disabled.v-btn--has-bg {
+    border: none;
+    background-color: $button_bg_disabled !important;
+
+    .v-btn__content {
+      color: $text_color_disabled;
+    }
   }
 }
 </style>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { ProfileData } from '@subsocial/api/flat-subsocial/dto'
+import { ProfileData } from '@subsocial/types/dto'
+import { config } from '~/config/config'
 
 @Component
 export default class SendTipsButton extends Vue {
@@ -48,6 +58,10 @@ export default class SendTipsButton extends Vue {
 
   async getAccount () {
     return await this.$store.getters['profiles/selectProfileData'](this.userId)
+  }
+  
+  get isEnableTips (): boolean {
+    return this.isAuth ? !config.enableTips : !this.isAuth
   }
 }
 </script>

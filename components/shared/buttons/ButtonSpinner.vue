@@ -6,7 +6,7 @@
 <style scoped lang="scss">
 .v-btn.v-btn--disabled.v-btn--has-bg {
   .loader:after {
-    background: $color_disabled !important;
+    background: $button_bg_disabled !important;
   }
 }
 .loader {
@@ -16,12 +16,12 @@
   width: 2em;
   height: 2em;
   border-radius: 50%;
-  background: $color_white;
-  background: -moz-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
-  background: -webkit-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
-  background: -o-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
-  background: -ms-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
-  background: linear-gradient(to right, #ffffff 10%, rgba(255, 255, 255, 0) 42%);
+  background: $container_bg_white;
+  background: -moz-linear-gradient(left, $container_bg_white 10%, rgba(255, 255, 255, 0) 42%);
+  background: -webkit-linear-gradient(left, $container_bg_white 10%, rgba(255, 255, 255, 0) 42%);
+  background: -o-linear-gradient(left, $container_bg_white 10%, rgba(255, 255, 255, 0) 42%);
+  background: -ms-linear-gradient(left, $container_bg_white 10%, rgba(255, 255, 255, 0) 42%);
+  background: linear-gradient(to right, $container_bg_white 10%, rgba(255, 255, 255, 0) 42%);
   position: relative;
   -webkit-animation: load3 1.4s infinite linear;
   animation: load3 1.4s infinite linear;
@@ -32,7 +32,7 @@
   &:before {
     width: 50%;
     height: 50%;
-    background: $color_white;
+    background: $container_bg_white;
     border-radius: 100% 0 0 0;
     position: absolute;
     top: 0;
@@ -41,7 +41,7 @@
   }
 
   &:after {
-    background: $color_primary;
+    background: $button_bg_primary;
     width: 75%;
     height: 75%;
     border-radius: 50%;

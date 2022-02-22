@@ -31,6 +31,10 @@ export default abstract class TransactionButton extends Vue {
   abstract validate(): boolean;
 
   async initExtrinsic (props: ExtrinsicProps) {
+    if (this.$store.state.profiles.myBalance < 1) {
+      this.$nuxt.$emit('isShowTokenAlert', true);
+      return
+    }
     this.signer = this.$store.state.profiles.signer
     this.accountId = this.$store.state.profiles.currentUser ? this.$store.state.profiles.currentUser.id : undefined
     this.extrinsic = await transactionService.getExtrinsic(props)
@@ -76,6 +80,7 @@ export default abstract class TransactionButton extends Vue {
     }
 
     const { status } = result
+
     if (status.isFinalized || status.isInBlock) {
       this.setIsSending(false)
       this.unsubscribe()
@@ -107,6 +112,10 @@ export default abstract class TransactionButton extends Vue {
       const errMsg = `Tx failed: ${err.toString()}`
       console.warn(`❌ ${errMsg}`)
       this.$nuxt.$emit('isShowSnackbar', { show: true, text: errMsg })
+      
+      if (errMsg.includes('account balance too low')) {
+        this.$nuxt.$emit('isShowTokenAlert', true)
+      }
     }
 
     this.doOnFailed(null)

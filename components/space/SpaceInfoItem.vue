@@ -6,8 +6,8 @@
         <Title size="medium" :link="spaceItem.struct.handle ? '/@'+spaceItem.struct.handle : '/'+spaceItem.struct.id" :name="spaceItem.content.name" />
       </div>
       <div class="space-stats-wp">
-        <span v-if="hidePostCount" class="post-count"><span class="count">{{ spaceItem.struct.postsCount | numeral('0,0a') }} </span>{{ spaceItem.struct.postsCount | pluralize('en', [$t('general.post'), $t('general.posts')]) }}</span>
-        <span class="followers-count" @click="openModal"><span class="count">{{ spaceItem.struct.followersCount | numeral('0,0a') }}</span> {{ spaceItem.struct.followersCount | pluralize('en', [$t('general.follower'), $t('general.followers')]) }}</span>
+        <span v-if="hidePostCount" class="post-count">{{spaceItem.struct.postsCount | numeral('0,0a')}} {{ $tc('plural.'+i18nextKey(spaceItem.struct.postsCount, 'post')) }}</span>
+        <span class="followers-count" @click="openModal">{{spaceItem.struct.followersCount | numeral('0,0a')}} {{$tc('plural.'+i18nextKey(spaceItem.struct.followersCount, 'follower'))}}</span>
       </div>
     </div>
     <ModalFollower :is-modal="isOpenModal" :space-id="spaceItem.struct.id" />
@@ -28,7 +28,7 @@
       font-size: $font_huge;
       line-height: $main_line_height;
       letter-spacing: 0.15px;
-      color: $color_font_normal;
+      color: $text_color_normal;
 
       a {
         text-decoration: none;
@@ -39,13 +39,13 @@
       font-size: $font_small;
       line-height: 20px;
       letter-spacing: 0.25px;
-      color: $main_text_color;
+      color: $text_color_normal;
 
       span{
         margin-right: $space_small;
 
-        &.count {
-          margin-right: 0;
+        & b {
+          font-weight: normal;
         }
 
         &.followers-count {
@@ -60,7 +60,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { SpaceListItemData } from '~/models/space/space-list-item.model'
-import { routerParamsLength } from '~/utils/utils'
+import { routerParamsLength, toI18next } from '~/utils/utils'
 
 @Component
 export default class SpaceInfoItem extends Vue {
@@ -93,6 +93,10 @@ export default class SpaceInfoItem extends Vue {
 
   openModal (): void {
     this.isOpenModal = !this.isOpenModal
+  }
+
+  i18nextKey (count: number, key: string): string {
+    return toI18next(count, key, this.$i18n.locale)
   }
 }
 </script>

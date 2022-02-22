@@ -6,16 +6,19 @@
           <div v-if="isMobileView" class="hamburger" @click="openLeftDrawer">
             <v-icon>{{ isOpenLeftMenu ? 'mdi-close' : 'mdi-menu' }}</v-icon>
           </div>
+          <div v-if="!isMobileView" class="project-logo">
+            <img src="../../assets/image/vue-logo.svg" width="30"/>
+          </div>
           <div class="project-name" @click="returnHome">
             <NuxtLink :to="localePath('/')">
-              {{ $t('general.title') }}
+              {{ getAppName() }}
             </NuxtLink>
           </div>
         </div>
         <div class="user-block">
-          <CreateSpaceButton v-if="user && !hasSpace" :is-header-btn="true" />
-          <CreatePostButton v-if="user && hasSpace" />
-          <SignInButton v-if="!user" />
+          <CreateSpaceButton v-if="user && !hasSpace && !isMobileView" :is-header-btn="true"/>
+          <CreatePostButton v-if="user && hasSpace && !isMobileView"/>
+          <SignInButton v-if="!user"/>
           <div v-if="user" class="user-info-block">
             <NuxtLink :to="localePath('/notifications')" class="notification-icon">
               <v-icon>
@@ -26,22 +29,29 @@
             <div class="user-container" @click.stop="openDrawer">
               <v-list-item>
                 <v-list-item-avatar size="36">
-                  <Avatar :id="user.id" :src="user.avatar" :size="36" />
+                  <Avatar :id="user.id" :src="user.avatar" :size="36"/>
                 </v-list-item-avatar>
                 <v-list-item-content>
                   <v-list-item-title>{{ user.name }}</v-list-item-title>
                   <v-list-item-title class="tokens">
-                    <Tokens :balance="balance" />
+                    <Tokens :balance="balance"/>
                   </v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
             </div>
-            <AccountDrawer :is-open="isOpenDrawer" :user="user" :balance="balance" />
+            <AccountDrawer :is-open="isOpenDrawer" :user="user" :balance="balance"/>
           </div>
         </div>
       </div>
 
-      <ModalAdblock :is-modal="isOpenModal" />
+      <div v-if="user && isMobileView" class="mobile-create-post">
+        <NuxtLink :to="localePath(hasSpace ? '/post?new' : '/space?new')">
+          <v-icon>mdi-plus</v-icon>
+        </NuxtLink>
+      </div>
+
+      <ModalAdblock :is-modal="isOpenModal"/>
+      <ModalTokenAlert />
     </div>
   </header>
 </template>
@@ -52,8 +62,8 @@ header {
   left: 0;
   right: 0;
   z-index: 10;
-  background: $color_white;
-  border-bottom: 1px solid $color_border;
+  background: $container_bg_white;
+  border-bottom: 1px solid $line_outline_gray;
 
   .header-container {
     display: flex;
@@ -86,17 +96,18 @@ header {
             }
 
             &__title {
-              color: $color_font_normal;
+              color: $text_color_normal;
               margin-left: $space_tiny;
               font-size: $font_small;
               align-self: flex-start;
               line-height: 17px;
+              font-weight: 500;
 
               .tokens-wp {
                 line-height: 17px;
 
                 span {
-                  color: $color_font_secondary !important;
+                  color: $text_color_dark_gray !important;
                   font-weight: normal !important;
                 }
               }
@@ -129,8 +140,12 @@ header {
         margin-left: $space_large;
 
         .v-icon {
-          color: $color_font_normal;
+          color: $icon_color_normal;
         }
+      }
+      
+      .project-logo {
+        padding: 0 $space_small;
       }
     }
 
@@ -138,18 +153,36 @@ header {
       font-style: normal;
       font-weight: 500;
       font-size: $font_large;
-      line-height:$main_line_height;
+      line-height: $main_line_height;
       letter-spacing: 0.15px;
-      color: $color_font_normal;
-      margin-left: $space_normal;
+      color: $text_color_normal;
 
       & a {
         text-decoration: none;
         color: inherit;
       }
-
-      @media (min-width: 991px) {
-        margin-left: $space_huge;
+    }
+  }
+  
+  .mobile-create-post {
+    position: fixed;
+    bottom: $space_huge;
+    right: $space_normal;
+    
+    a {
+      text-decoration: none;
+      background-color: $button_bg_primary;
+      height: 50px;
+      width: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      
+      .v-icon {
+        color: $icon_color_white;
+        width: 20px;
+        height: 20px;
       }
     }
   }
@@ -157,6 +190,8 @@ header {
 
 @media only screen and (max-width: 768px) {
   header {
+    border: none;
+
     .header-container {
       display: block;
     }
@@ -170,8 +205,10 @@ import { Component, Vue } from 'vue-property-decorator'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
 import { config } from '~/config/config'
 import { isMobile } from '~/utils/utils'
-
-@Component
+import ModalTokenAlert from '~/components/modal/ModalTokenAlert.vue'
+@Component({
+  components: { ModalTokenAlert }
+})
 export default class Header extends Vue {
   user: ProfileItemModel | null = null
   isOpenDrawer: boolean = false
@@ -254,6 +291,10 @@ export default class Header extends Vue {
 
   getIsMobileView (): void {
     this.isMobileView = isMobile()
+  }
+  
+  getAppName (): string {
+    return config.appName
   }
 }
 </script>

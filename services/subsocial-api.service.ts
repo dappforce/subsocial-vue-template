@@ -1,6 +1,6 @@
-import { newFlatSubsocialApi, SubsocialApi } from '@subsocial/api'
+import { newFlatSubsocialApi } from '@subsocial/api'
 import { FlatSubsocialApi } from '@subsocial/api/flat-subsocial'
-import { AnyId } from '@subsocial/api/flat-subsocial/dto'
+import { AnyId } from '@subsocial/types/dto';
 import { environment } from '~/environments/environment'
 
 type FetchSubstrateProps = {
@@ -31,5 +31,11 @@ export default class SubsocialApiService {
     const { pallet, method, id } = props
     const ids = await readyApi.query[pallet][method](id)
     return (ids.toJSON() as Array<any>).map(id => id.toString())
+  }
+  
+  async getRegistry () {
+    const readyApi = await (await this.initSubsocialApi()).subsocial.substrate.api
+    const registry = readyApi.registry
+    return registry
   }
 }

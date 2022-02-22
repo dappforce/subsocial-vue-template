@@ -6,7 +6,7 @@
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .splash-screen {
   background: #f2f0ee;
   width: 100vw;
@@ -26,7 +26,7 @@
   width: 80px;
   height: 80px;
   margin: 100px auto;
-  background-color: #e45447;
+  background-color: $button_bg_primary;
 
   border-radius: 100%;
   -webkit-animation: sk-scaleout 1s infinite ease-in-out;
@@ -55,3 +55,11 @@
   }
 }
 </style>
+
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+
+@Component
+export default class LoadSpinner extends Vue {
+}
+</script>
