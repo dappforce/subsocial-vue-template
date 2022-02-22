@@ -34,6 +34,10 @@
 .main-page-container {
   padding-top: 72px;
 
+  @media (max-width: 991px){
+    padding-top: 56px;
+  }
+
   .items-list {
     display: flex;
     flex-direction: column;

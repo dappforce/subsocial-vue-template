@@ -11,7 +11,7 @@
           </div>
           <div class="project-name" @click="returnHome">
             <NuxtLink :to="localePath('/')">
-              {{ $t('general.title') }}
+              {{ getAppName() }}
             </NuxtLink>
           </div>
         </div>
@@ -291,6 +291,10 @@ export default class Header extends Vue {
 
   getIsMobileView (): void {
     this.isMobileView = isMobile()
+  }
+  
+  getAppName (): string {
+    return config.appName
   }
 }
 </script>

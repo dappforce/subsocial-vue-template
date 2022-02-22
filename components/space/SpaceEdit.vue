@@ -24,7 +24,7 @@
             <mde-editor
               :show-editor="true"
               :text="description"
-              :placeholder="$t('forms.placeholder.postBody')"
+              :placeholder="$t('forms.placeholder.description')"
               :height="'200px'"
               @contentUpdate="updateDescription"
             />
@@ -92,10 +92,6 @@
     width: 100%;
     margin-bottom: $space_big;
 
-    &:last-child {
-      margin-bottom: 0;
-    }
-
     .editor-toolbar, .CodeMirror {
       border-color: $border_outline_gray;
     }
@@ -131,10 +127,6 @@
       .v-icon:before {
         content: "\F0156" !important;
       }
-    }
-
-    .v-input__slot {
-      margin-bottom: $space_big;
     }
 
     .v-text-field__details {

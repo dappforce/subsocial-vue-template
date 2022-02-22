@@ -30,16 +30,16 @@
         <Paragraph v-if="profileData.summary" :text="profileData.summary" :margin-bottom="'17'" />
         <LinkIcons v-if="profileData.links" :links="profileData.links" />
         <div class="account-info-wp">
-          <v-icon size="24" class="account-icon">
-            mdi-wallet-outline
-          </v-icon>
+          <div size="24" class="account-icon">
+            <img class="logo" src="../../assets/image/wallet.jpg" alt="Wallet">
+          </div>
           <Address :address="profileData.address" :size="'large'" :length="addressLength" :show-icon="true" />
           <QrCodeButton :address="profileData.address || profileData.id" />
         </div>
         <div class="account-amount">
-          <v-icon class="account-icon">
-            mdi-currency-usd
-          </v-icon>
+          <div class="account-icon">
+            <img class="logo" src="../../assets/image/balance.jpg" alt="Currency">
+          </div>
           <Tokens :balance="balance" />
         </div>
       </div>
@@ -66,8 +66,15 @@
   margin-top: $space_normal;
 
   .account-icon {
-    color: $icon_color_dark_gray;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-right: 5px;
+    
+    img {
+      width: 24px;
+    }
   }
 
   .profile-item {
@@ -140,6 +147,10 @@
         }
       }
 
+      .address-text {
+        font-size: $font_normal;
+      }
+
       .qr-icon {
         margin-left: 10px;
         color: $icon_color_normal;
@@ -162,7 +173,7 @@
   .action-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: $space_big;
+    margin-bottom: $space_normal;
     margin-top: $space_big;
 
     & button, & a, & .btn-tooltip-wrapper {
