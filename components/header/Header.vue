@@ -137,7 +137,7 @@ header {
         width: 30px;
         height: 30px;
         line-height: 30px;
-        margin-left: $space_large;
+        margin-left: $space_normal;
 
         .v-icon {
           color: $icon_color_normal;

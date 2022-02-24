@@ -11,10 +11,10 @@
       @change="onSelect"
     >
       <template slot="item" slot-scope="data">
-        <img :src="imageUrl(data.item)" alt="" class="space-image">  {{ data.item.name }}
+        <Avatar :id="data.item.id" :src="data.item.image" :size="36" :name="data.item.name" class="space-image"/> {{ data.item.name }}
       </template>
       <template #selection="data">
-        <img :src="imageUrl(selectedItem)" alt="" class="space-image">  {{ selectedItem.name }}
+        <Avatar :id="selectedItem.id" :src="selectedItem.image" :size="36" :name="selectedItem.name" class="space-image"/> {{ selectedItem.name }}
       </template>
     </v-combobox>
   </div>
@@ -38,8 +38,10 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import { SpaceListItemData } from '~/models/space/space-list-item.model'
 import { SpaceEntity } from '~/models/entities/space-entity.model'
 import { environment } from '~/environments/environment'
-
-@Component
+import Avatar from '~/components/shared/Avatar.vue'
+@Component({
+  components: { Avatar }
+})
 export default class SpacesDropdown extends Vue {
   @Prop({
     type: Boolean
