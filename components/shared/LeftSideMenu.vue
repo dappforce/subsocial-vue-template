@@ -104,7 +104,7 @@
     }
 
     & .logo {
-      height: 26px;
+      width: 24px;
     }
 
     & .v-divider {
