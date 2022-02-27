@@ -101,17 +101,12 @@ export const mutations = {
   [UPDATE_POST_REACTION_COUNT] (state: PostModel, payload: UpdateReactionModel) {
     state.list.map((i) => {
       if (i.id === payload.postId) {
-        if (payload.isNew) {
-          i.downvotesCount = payload.type === 'downvote' ? ++i.downvotesCount : i.downvotesCount
-          i.upvotesCount = payload.type === 'upvote' ? ++i.upvotesCount : i.upvotesCount
-        } else {
-          i.downvotesCount = payload.type === 'downvote' && payload.isActive
-            ? ++i.downvotesCount
-            : payload.type === 'downvote' && !payload.isActive ? --i.downvotesCount : i.downvotesCount
-          i.upvotesCount = payload.type === 'upvote' && payload.isActive
-            ? ++i.upvotesCount
-            : payload.type === 'upvote' && !payload.isActive ? --i.upvotesCount : i.upvotesCount
-        }
+        i.downvotesCount = payload.type === 'downvote' && payload.isActive
+          ? ++i.downvotesCount
+          : payload.type === 'downvote' && !payload.isActive ? --i.downvotesCount : i.downvotesCount
+        i.upvotesCount = payload.type === 'upvote' && payload.isActive
+          ? ++i.upvotesCount
+          : payload.type === 'upvote' && !payload.isActive ? --i.upvotesCount : i.upvotesCount
         return i
       }
     })

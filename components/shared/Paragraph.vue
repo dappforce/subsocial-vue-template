@@ -77,6 +77,10 @@ export default class FollowButton extends Vue {
 
   created (): void {
     this.spaceAbout = this.isShowMore ? this.text : this.longText
+    if (this.$route.query.isAutoExpand && this.isShowMore) {
+      this.showMoreActive = true
+      this.spaceAbout = this.longText
+    }
   }
 
   showMore (isShowMoreText: boolean): void {

@@ -60,7 +60,7 @@
     </div>
 
     <div class="space-item-container">
-      <SpaceListItem v-if="space && currentUser" :space-item-data="space" :avatar-size="40"
+      <SpaceListItem v-if="space && currentUser" :space-item-data="space" :avatar-size="40" :isSpaceView="true"
                      :current-user="currentUser"
       />
     </div>
@@ -119,7 +119,7 @@
         }
       }
     }
-    
+
     .root-comment {
       font-weight: 500;
       font-size: $font_huge;

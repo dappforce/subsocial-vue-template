@@ -50,10 +50,10 @@
 import { Component, Prop, Watch } from 'vue-property-decorator'
 import { SubmittableResult } from '@polkadot/api'
 import { ReactionKind } from '@subsocial/types/substrate/classes'
+import { getNewIdsFromEvent } from '@subsocial/api'
 import TransactionButton from '~/components/abstract/TransactionButton.vue'
 import { ReactionStruct } from '~/types/reaction-struct.type'
 import { METHODS, PALLETS } from '~/constants/query'
-import { getNewIdsFromEvent } from '@subsocial/api'
 
 export enum ReactionEnum {
   Upvote = 'Upvote',
@@ -235,7 +235,7 @@ export default class VoteButton extends TransactionButton {
 
   updatePost () {
     const payload = {
-      type: this.type,
+      type: this.type.toLowerCase(),
       isActive: this.isActive,
       postId: this.postId,
       isNew: false

@@ -120,7 +120,6 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { SpaceListItemData } from '~/models/space/space-list-item.model'
 import { ProfileItemModel } from '~/models/profile/profile-item.model'
-import { isMobile } from '~/utils/utils'
 
 @Component
 export default class SpaceListItem extends Vue {
@@ -179,7 +178,8 @@ export default class SpaceListItem extends Vue {
   }
 
   link (space: SpaceListItemData): string {
-    return space.struct.handle ? '@' + space.struct.handle : space.struct.id
+    const link = space.struct.handle ? '/@' + space.struct.handle : '/' + space.struct.id
+    return this.isSpaceView ? link : link + '?isAutoExpand=true'
   }
 
   getIsFollowing () {
