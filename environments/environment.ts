@@ -4,12 +4,12 @@
 
 export const environment = {
   production: false,
-  ipfsUrl: `https://staging.subsocial.network/ipfs`,
+  ipfsUrl: 'https://staging.subsocial.network/ipfs',
   domainUrl: 'http://localhost:4200/',
   appName: 'Subsocial Vue',
-  substrateNodeUrl: `wss://testnet.subsocial.network`,
+  substrateNodeUrl: 'wss://testnet.subsocial.network',
   offchainUrl: 'https://app.subsocial.network/offchain',
-  ipfsNodeUrl: `https://staging.subsocial.network/ipfs`,
+  ipfsNodeUrl: 'https://staging.subsocial.network/ipfs',
   currency: 'SUB',
   decimals: 11,
   recommendedSpaceIds: [
